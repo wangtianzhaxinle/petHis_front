@@ -1,6 +1,7 @@
 <template>
   <section class="app-main">
     <transition name="fade-transform" mode="out-in">
+      <!-- key主要是用于区分不同路由下的相同组件的 -->
       <router-view :key="key" />
     </transition>
   </section>

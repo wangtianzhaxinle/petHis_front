@@ -30,6 +30,7 @@ export default {
     ...mapGetters([
       'sidebar'
     ]),
+    // 获取路由信息
     routes() {
       return this.$router.options.routes
     },
@@ -37,17 +38,24 @@ export default {
       const route = this.$route
       const { meta, path } = route
       // if set path, the sidebar will highlight the path you set
+      // 返回要高亮的菜单项path
+
       if (meta.activeMenu) {
+      //  如果路由信息meta里面设置了activeMenu,会转而使activeMenu里面设置的path所对应的菜单项高亮
+      // 但是如果连点两下菜单项还是会是自身的item高亮
         return meta.activeMenu
       }
       return path
     },
+    // 显示logo
     showLogo() {
       return this.$store.state.settings.sidebarLogo
     },
+    // 获取@/style/ariables.scss的样式设置
     variables() {
       return variables
     },
+    // 控制 el-menu 的展开和折叠
     isCollapse() {
       return !this.sidebar.opened
     }

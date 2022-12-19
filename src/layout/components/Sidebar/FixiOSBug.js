@@ -1,5 +1,6 @@
 export default {
   computed: {
+    // 获取设备信息
     device() {
       return this.$store.state.app.device
     }
@@ -11,6 +12,7 @@ export default {
   },
   methods: {
     fixBugIniOS() {
+      // ios设备上会有bug，用以修复
       const $subMenu = this.$refs.subMenu
       if ($subMenu) {
         const handleMouseleave = $subMenu.handleMouseleave

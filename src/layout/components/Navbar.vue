@@ -1,27 +1,37 @@
 <template>
   <div class="navbar">
+    <!-- 按钮控制侧边栏折叠或展开 -->
     <hamburger :is-active="sidebar.opened" class="hamburger-container" @toggleClick="toggleSideBar" />
-
+    <!-- 面包屑 -->
     <breadcrumb class="breadcrumb-container" />
 
     <div class="right-menu">
       <el-dropdown class="avatar-container" trigger="click">
         <div class="avatar-wrapper">
+          <!-- 头像 -->
+          <!-- '?imageView2/1/w/80/h/80'表示限制缩略图最大宽高,即缩小图片 -->
           <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
+          <!-- 下拉菜单按钮 -->
           <i class="el-icon-caret-bottom" />
         </div>
+        <!--下拉菜单-->
         <el-dropdown-menu slot="dropdown" class="user-dropdown">
           <router-link to="/">
+            <!-- 首页 -->
             <el-dropdown-item>
               Home
             </el-dropdown-item>
+
           </router-link>
+          <!-- 项目github地址 -->
           <a target="_blank" href="https://github.com/PanJiaChen/vue-admin-template/">
             <el-dropdown-item>Github</el-dropdown-item>
           </a>
+          <!-- 项目文档 -->
           <a target="_blank" href="https://panjiachen.github.io/vue-element-admin-site/#/">
             <el-dropdown-item>Docs</el-dropdown-item>
           </a>
+          <!-- 注销登录按钮 -->
           <el-dropdown-item divided @click.native="logout">
             <span style="display:block;">Log Out</span>
           </el-dropdown-item>
@@ -42,15 +52,18 @@ export default {
     Hamburger
   },
   computed: {
+    // 获取侧边栏是否展开,以及头像地址
     ...mapGetters([
       'sidebar',
       'avatar'
     ])
   },
   methods: {
+    // 侧边栏的折叠以及展开之间切换
     toggleSideBar() {
       this.$store.dispatch('app/toggleSideBar')
     },
+    // 注销登录
     async logout() {
       await this.$store.dispatch('user/logout')
       this.$router.push(`/login?redirect=${this.$route.fullPath}`)

@@ -47,11 +47,13 @@ export const constantRoutes = [
     path: '/',
     component: Layout,
     redirect: '/dashboard',
+
     children: [{
       path: 'dashboard',
       name: 'Dashboard',
       component: () => import('@/views/dashboard/index'),
       meta: { title: 'Dashboard', icon: 'dashboard' }
+
     }]
   },
 
@@ -159,7 +161,7 @@ export const constantRoutes = [
       }
     ]
   },
-
+  // 如果路由没有找到强匹配的地址，就会选择重定向“/404
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }
 ]

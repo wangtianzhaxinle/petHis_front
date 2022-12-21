@@ -22,7 +22,7 @@ router.beforeEach(async(to, from, next) => {
   // 确定用户是否有token
   const hasToken = getToken()
 
-  if (hasToken) {// 有token
+  if (hasToken) { // 有token
     if (to.path === '/login') {
       // 如果已登录，则重定向到主页
       next({ path: '/' })
@@ -49,7 +49,7 @@ router.beforeEach(async(to, from, next) => {
       }
     }
   } else {
-    //无token
+    // 无token
 
     if (whiteList.indexOf(to.path) !== -1) {
       // 如果要去的页面在白名单内可以直接进入

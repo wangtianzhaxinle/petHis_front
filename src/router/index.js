@@ -91,7 +91,34 @@ export const constantRoutes = [
       }
     ]
   },
-
+  {
+    path: '/petManager',
+    component: Layout,
+    name: 'petManager',
+    meta: { title: '宠物管理', icon: 'form' },
+    children: [
+      {
+        path: 'petInfo',
+        name: 'petInfo',
+        component: () => import('@/views/pet/petInfo'),
+        meta: { title: '宠物信息', icon: 'form' }
+      }
+    ]
+  },
+  {
+    path: '/employeeManager',
+    component: Layout,
+    name: 'employeeManager',
+    meta: { title: '员工管理', icon: 'form' },
+    children: [
+      {
+        path: 'employeeInfo',
+        name: 'employeeInfo',
+        component: () => import('@/views/form/index'),
+        meta: { title: '员工信息', icon: 'form' }
+      }
+    ]
+  },
   {
     path: '/nested',
     component: Layout,

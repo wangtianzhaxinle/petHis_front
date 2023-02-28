@@ -1,0 +1,163 @@
+
+<template>
+  <el-form ref="ruleForm" :model="perosanlInfo" :rules="rules" label-width="100px" class="demo-ruleForm">
+    <el-form-item label="姓名" prop="name">
+      <el-input v-model="user_id" :disabled="true" />
+    </el-form-item>
+
+    <!-- <el-form-item label="头像" prop="desc">
+      <el-avatar :src="avatar" />
+    </el-form-item> -->
+
+    <el-form-item label="年龄" prop="region">
+      <el-input v-model="age" :disabled="true" />
+    </el-form-item>
+    <el-form-item label="性别" required>
+      <el-radio-group v-model="sex">
+        <el-radio label="男" />
+        <el-radio label="女" />
+      </el-radio-group>
+    </el-form-item>
+    <el-form-item label="手机号" prop="delivery">
+      <el-input v-model="phoneNumber" :disabled="true" />
+    </el-form-item>
+    <el-form-item label="地址" prop="type">
+      <el-input v-model="address" :disabled="true" />
+    </el-form-item>
+    <el-form-item label="注册时间" prop="resource">
+
+      <el-col :span="11">
+
+        <el-form-item prop="date2">
+          <el-date-picker v-model="createtime" placeholder="选择时间" style="width: 100%;" />
+        </el-form-item>
+      </el-col>
+    </el-form-item>
+    <el-form-item label="电子邮件" prop="desc">
+      <el-input v-model="email" :disabled="true" />
+    </el-form-item>
+
+    <!-- <el-form-item>
+      <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
+      <el-button @click="resetForm('ruleForm')">重置</el-button>
+    </el-form-item>  -->
+
+  </el-form>
+</template>
+<script>
+// import { getPersonalUserInfo } from '@/api/user'
+import { mapGetters } from 'vuex'
+export default {
+  name: 'PersoanlInfo',
+  data() {
+    return {
+      /* ruleForm: {
+        name: '',
+        region: '',
+        date1: '',
+        date2: '',
+        delivery: false,
+        type: [],
+        resource: '',
+        desc: ''
+      },*/
+      rules: {
+        name: [
+          { required: true, message: '请输入活动名称', trigger: 'blur' },
+          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+        ],
+        region: [
+          { required: true, message: '请选择活动区域', trigger: 'change' }
+        ],
+        date1: [
+          { type: 'date', required: true, message: '请选择日期', trigger: 'change' }
+        ],
+        date2: [
+          { type: 'date', required: true, message: '请选择时间', trigger: 'change' }
+        ],
+        type: [
+          { type: 'array', required: true, message: '请至少选择一个活动性质', trigger: 'change' }
+        ],
+        resource: [
+          { required: true, message: '请选择活动资源', trigger: 'change' }
+        ],
+        desc: [
+          { required: true, message: '请填写活动形式', trigger: 'blur' }
+        ]
+      }
+      /* perosanlInfo: {
+        user_id: '',
+        name: '',
+        avatar: '',
+        sex: '',
+        phoneNumber: '',
+        address: '',
+        createtime: '',
+        email: ''
+      }*/
+    }
+  },
+  computed: {
+    ...mapGetters([
+      'name',
+      'email',
+      'user_id',
+      'username',
+      'sex',
+      'age',
+      'address',
+      'email',
+      'createtime',
+      'phoneNumber'
+    ])
+    // this.perosanlInfo.user_id = this.$store.state.user_id
+    // this.perosanlInfo.name = this.$store.state.name
+    // this.perosanlInfo.avatar = this.$store.state.avatar
+    // this.perosanlInfo.sex = this.$store.state.sex
+    // this.perosanlInfo.phoneNumber = this.$store.state.phoneNumber
+    // this.perosanlInfo.address = this.$store.state.address
+    // this.perosanlInfo.createtime = this.$store.state.createtime
+    // this.perosanlInfo.email = this.$store.state.email
+  },
+  created() {
+    // this.getLoginInfo()
+  },
+
+  methods: {
+
+    submitForm(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          alert('submit!')
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    resetForm(formName) {
+      this.$refs[formName].resetFields()
+    }
+    /* getLoginInfo() {
+      this.dataSource.loading = true
+
+       getPersonalUserInfo(user_id).then(res => {
+        this.dataSource.loading = false
+        // if (res.succeed) {
+        if (res.total > 0) {
+          this.dataSource.pageData.total = res.total
+          this.dataSource.data = res.data
+          console.log(res.data)
+        } else {
+          this.dataSource.data = []
+          this.dataSource.pageData.total = 0
+        }
+        // }
+      })
+    }*/
+
+  }
+
+}
+
+</script>

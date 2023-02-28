@@ -46,18 +46,18 @@ export const constantRoutes = [
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
+    redirect: '/home',
 
     children: [{
-      path: 'dashboard',
-      name: 'Dashboard',
+      path: 'home',
+      name: 'Home',
       component: () => import('@/views/dashboard/index'),
       meta: { title: 'Dashboard', icon: 'dashboard' }
 
     }]
   },
 
-  {
+  /* {
     path: '/example',
     component: Layout,
     redirect: '/example/table',
@@ -91,35 +91,93 @@ export const constantRoutes = [
       }
     ]
   },
+  */
   {
     path: '/petManager',
     component: Layout,
-    name: 'petManager',
+    name: 'PetManager',
     meta: { title: '宠物管理', icon: 'form' },
     children: [
       {
-        path: 'petInfo',
-        name: 'petInfo',
+        path: 'allPetInfo',
+        name: 'allPetInfo',
         component: () => import('@/views/pet/petInfo'),
-        meta: { title: '宠物信息', icon: 'form' }
+        meta: { title: '全部宠物信息', icon: 'form' }
+      },
+      {
+        path: 'personalPetInfo',
+        name: 'personalPetInfo',
+        component: () => import('@/views/pet/petInfo'),
+        meta: { title: '个人宠物信息', icon: 'form' }
       }
     ]
   },
   {
     path: '/employeeManager',
     component: Layout,
-    name: 'employeeManager',
+    name: 'EmployeeManager',
     meta: { title: '员工管理', icon: 'form' },
     children: [
       {
         path: 'employeeInfo',
-        name: 'employeeInfo',
-        component: () => import('@/views/form/index'),
+        name: 'EmployeeInfo',
+        component: () => import('@/views/employee/employeeInfo'),
         meta: { title: '员工信息', icon: 'form' }
       }
     ]
   },
   {
+    path: '/userManager',
+    component: Layout,
+    name: 'userManager',
+    meta: { title: '用户管理', icon: 'form' },
+    children: [
+      {
+        path: 'userInfo',
+        name: 'userInfo',
+        component: () => import('@/views/user/userInfo'),
+        meta: { title: '用户信息', icon: 'form' }
+      }
+    ]
+  },
+  {
+    path: '/orderManager',
+    component: Layout,
+    name: 'orderManager',
+    meta: { title: '订单管理', icon: 'form' },
+    children: [
+      {
+        path: 'allOrderInfo',
+        name: 'allOrderInfo',
+        component: () => import('@/views/user/userInfo'),
+        meta: { title: '订单信息', icon: 'form' }
+      },
+      {
+        path: 'personalOrderInfo',
+        name: 'personalorderInfo',
+        component: () => import('@/views/user/userInfo'),
+        meta: { title: '个人订单信息', icon: 'form' }
+      }
+    ]
+  },
+  {
+    path: '/personalManager',
+    component: Layout,
+    name: 'personalManager',
+    meta: { title: '个人管理', icon: 'form' },
+    children: [
+      {
+
+        path: '/personalInfo',
+        name: 'personalInfo',
+        component: () => import('@/views/user/personalInfo'),
+        meta: { title: '个人信息', icon: 'form' }
+
+      }
+    ]
+  },
+
+  /* {
     path: '/nested',
     component: Layout,
     redirect: '/nested/menu1',
@@ -188,6 +246,7 @@ export const constantRoutes = [
       }
     ]
   },
+  */
   // 如果路由没有找到强匹配的地址，就会选择重定向“/404
   // 404 page must be placed at the end !!!
   { path: '*', redirect: '/404', hidden: true }

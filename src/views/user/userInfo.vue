@@ -1,18 +1,18 @@
 <template>
-  <table-pane
+  <div class="app-container"> <table-pane
     :data-source="dataSource"
     @changeSize="changeSize"
     @changeNum="changeNum"
-  />
+  /></div>
 
 </template>
 
 <script>
-import { getAllPetInfoList } from '@/api/pet'
+import { getUserInfoList } from '@/api/user'
 import tablePane from '@/components/tablePane.vue'
 
 export default {
-  name: 'PetInfo',
+  name: 'UserInfo',
   components: { tablePane },
   data() {
     return {
@@ -21,25 +21,34 @@ export default {
       // 表格配置
       dataSource: {
         tool: [{
-          name: '新增宠物',
+          name: '新增用户',
           key: 1,
           permission: 2010701,
           handleClick: this.handleAdd
-        }],
+        },
+        {
+          name: '全部删除',
+          key: 2,
+          permission: 2010701,
+          handleClick: this.handleAdd
+        }
+        ],
         data: [], // 表格数据
         cols: [
           {
             label: 'id',
-            prop: 'pet_id'
+            prop: 'userId'
 
           },
           {
             label: '名字',
-            prop: 'pet_name'
+            prop: 'name'
           },
+
           {
-            label: '主人',
-            prop: 'master_id'
+            label: '性别',
+            prop: 'sex'
+
           },
           {
             label: '年龄',
@@ -47,18 +56,28 @@ export default {
 
           },
           {
-            label: '品种',
-            prop: 'breed'
-
-          },
-          {
-            label: '是否健康',
-            prop: 'ishealth',
+            label: '手机号',
+            prop: 'phonenumber',
             width: 300
           },
           {
-            label: '性别',
-            prop: 'sex'
+            label: '地址',
+            prop: 'address'
+          },
+          {
+            label: '用户名',
+            prop: 'username'
+          },
+          {
+            label: '密码',
+            prop: 'password'
+          },
+          {
+            label: '身份证号',
+            prop: 'card'
+          }, {
+            label: '注册时间',
+            prop: 'createtime'
           }
 
         ], // 表格的列数据
@@ -76,13 +95,24 @@ export default {
         operation: {
           // 表格有操作列时设置
           label: '操作', // 列名
-          width: '100', // 根据实际情况给宽度
+          width: '300', // 根据实际情况给宽度
           data: [
             {
               label: '删除', // 操作名称
               type: 'danger',
               permission: '2010702', // 后期这个操作的权限，用来控制权限
-              handleRow: this.handleRow
+              handleRow: this.deleterow
+            }, {
+              label: '查看', // 操作名称
+              type: 'info',
+              permission: '2010702', // 后期这个操作的权限，用来控制权限
+              handleRow: this.showrow
+            },
+            {
+              label: '修改', // 操作名称
+              type: 'warning',
+              permission: '2010702', // 后期这个操作的权限，用来控制权限
+              handleRow: this.editrow
             }
           ]
         }
@@ -105,7 +135,7 @@ export default {
 
       this.dataSource.loading = true
       console.log('getAllPetInfoList')
-      getAllPetInfoList(data).then(res => {
+      getUserInfoList(data).then(res => {
         this.dataSource.loading = false
         // if (res.succeed) {
         if (res.total > 0) {

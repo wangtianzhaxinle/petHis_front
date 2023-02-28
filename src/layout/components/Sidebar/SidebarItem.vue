@@ -5,7 +5,7 @@
     <!-- 如果该路由是复合菜单，则执行<el-submenu><el-submenu/>，在el-submenu里面将会再次执行sidebar-item组件，遍历直到路由只有一层菜单 -->
 
     <template v-if="hasOneShowingChild(item.children,item) && (!onlyOneChild.children||onlyOneChild.noShowingChildren)&&!item.alwaysShow">
-      <!-- <app-lin><app-link/>是通过通过动态组件component  :is=‘type’ 来动态显示相应内容 -->
+      <!-- <app-link><app-link/>是通过通过动态组件component  :is=‘type’ 来动态显示相应内容 -->
       <!-- 其中isExternal 来判读type类型，决定是显示 a 链接 或是 router-link -->
       <!-- el-menu-item标签中的index属性值应该是一个唯一标识,所以用全路径表示 -->
       <app-link v-if="onlyOneChild.meta" :to="resolvePath(onlyOneChild.path)">

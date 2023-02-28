@@ -1,4 +1,4 @@
-import { login, logout, getInfo } from '@/api/user'
+import { login, logout, getInfo } from '@/api/index'
 import { getToken, setToken, removeToken } from '@/utils/auth'
 import { resetRouter } from '@/router'
 
@@ -6,7 +6,18 @@ const getDefaultState = () => {
   return {
     token: getToken(),
     name: '',
-    avatar: ''
+    avatar: '',
+
+    address: '',
+    age: '',
+    sex: '',
+    user_id: '',
+    username: '',
+    email: '',
+    createtime: '',
+    phoneNumber: '',
+    role: []
+
   }
 }
 
@@ -24,6 +35,34 @@ const mutations = {
   },
   SET_AVATAR: (state, avatar) => {
     state.avatar = avatar
+  },
+
+  SET_ADDRESS: (state, address) => {
+    state.address = address
+  },
+  SET_USER_ID: (state, user_id) => {
+    state.user_id = user_id
+  },
+  SET_USERNAME: (state, username) => {
+    state.username = username
+  },
+  SET_SEX: (state, sex) => {
+    state.sex = sex
+  },
+  SET_AGE: (state, age) => {
+    state.age = age
+  },
+  SET_EMAIL: (state, email) => {
+    state.email = email
+  },
+  SET_CREATETIME: (state, createtime) => {
+    state.createtime = createtime
+  },
+  SET_PHONENUMBER: (state, phoneNumber) => {
+    state.phoneNumber = phoneNumber
+  },
+  SET_ROLE: (state, role) => {
+    state.role = role
   }
 }
 
@@ -36,6 +75,8 @@ const actions = {
         const { data } = response
 
         commit('SET_TOKEN', data.token)
+        console.log('token为')
+        console.log(data.token)
         setToken(data.token)
         resolve()
       }).catch(error => {
@@ -55,10 +96,19 @@ const actions = {
           return reject('Verification failed, please Login again.')
         }
 
-        const { name, avatar } = data
+        const { name, avatar, address, age, sex, phonenumber, userId, username, createtime, email, role } = data
 
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
+        commit('SET_ADDRESS', address)
+        commit('SET_AGE', age)
+        commit('SET_SEX', sex)
+        commit('SET_PHONENUMBER', phonenumber)
+        commit('SET_USER_ID', userId)
+        commit('SET_USERNAME', username)
+        commit('SET_CREATETIME', createtime)
+        commit('SET_EMAIL', email)
+        commit('SET_ROLE', role)
 
         resolve(data)
       }).catch(error => {

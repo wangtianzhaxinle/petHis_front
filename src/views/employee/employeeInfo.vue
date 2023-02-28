@@ -8,11 +8,11 @@
 </template>
 
 <script>
-import { getAllPetInfoList } from '@/api/pet'
+import { getAllEmployeeInfoList } from '@/api/employee'
 import tablePane from '@/components/tablePane.vue'
 
 export default {
-  name: 'PetInfo',
+  name: 'EmployeeInfo',
   components: { tablePane },
   data() {
     return {
@@ -21,7 +21,7 @@ export default {
       // 表格配置
       dataSource: {
         tool: [{
-          name: '新增宠物',
+          name: '新增员工',
           key: 1,
           permission: 2010701,
           handleClick: this.handleAdd
@@ -30,35 +30,33 @@ export default {
         cols: [
           {
             label: 'id',
-            prop: 'pet_id'
+            prop: 'employee_id'
 
           },
           {
             label: '名字',
-            prop: 'pet_name'
+            prop: 'name'
           },
-          {
-            label: '主人',
-            prop: 'master_id'
-          },
-          {
-            label: '年龄',
-            prop: 'age'
 
-          },
-          {
-            label: '品种',
-            prop: 'breed'
-
-          },
-          {
-            label: '是否健康',
-            prop: 'ishealth',
-            width: 300
-          },
           {
             label: '性别',
             prop: 'sex'
+
+          },
+
+          {
+            label: '手机号',
+            prop: 'phone',
+            width: 300
+          },
+          {
+            label: '地址',
+            prop: 'address'
+          },
+
+          {
+            label: '入职时间',
+            prop: 'hiredate'
           }
 
         ], // 表格的列数据
@@ -105,7 +103,7 @@ export default {
 
       this.dataSource.loading = true
       console.log('getAllPetInfoList')
-      getAllPetInfoList(data).then(res => {
+      getAllEmployeeInfoList(data).then(res => {
         this.dataSource.loading = false
         // if (res.succeed) {
         if (res.total > 0) {
@@ -151,25 +149,25 @@ export default {
       this.dialogAdd = true
     }
     /*
-    // 表格操作列回调
-    handleRow(index, row, lable) {
-      if (lable === '删除') {
-        this.$confirm('确认删除该版本?', '温馨提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          delVersion({ versionId: row.id }).then(res => {
-            if (res.succeed) {
-              this.$message.success('删除成功')
-              this.getList()
-            }
+      // 表格操作列回调
+      handleRow(index, row, lable) {
+        if (lable === '删除') {
+          this.$confirm('确认删除该版本?', '温馨提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            delVersion({ versionId: row.id }).then(res => {
+              if (res.succeed) {
+                this.$message.success('删除成功')
+                this.getList()
+              }
+            })
+          }).catch(() => {
           })
-        }).catch(() => {
-        })
+        }
       }
-    }
-    **/
+      **/
 
   }
 }

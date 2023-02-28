@@ -20,3 +20,10 @@ export function getUserInfoList(data) {
 
   })
 }
+export function deleteUserById(user_id) {
+  return request({
+    url: '/user/deleteUserById/' + user_id,
+    method: 'delete'
+
+  })
+}

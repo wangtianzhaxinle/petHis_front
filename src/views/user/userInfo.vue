@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { getUserInfoList } from '@/api/user'
+import { getUserInfoList, deleteUserById } from '@/api/user'
 import tablePane from '@/components/tablePane.vue'
 
 export default {
@@ -179,7 +179,7 @@ export default {
     // 表格上方工具栏回调
     handleAdd(index, row) {
       this.dialogAdd = true
-    }
+    },
     /*
     // 表格操作列回调
     handleRow(index, row, lable) {
@@ -200,7 +200,16 @@ export default {
       }
     }
     **/
-
+    deleterow(index, row) {
+      console.log(row.id)
+      deleteUserById(row.userId).then(res => {
+        if (res.total > 0) {
+          console.log(res.data)
+          console.log('删除成功')
+          this.getList
+        }
+      })
+    }
   }
 }
 </script>

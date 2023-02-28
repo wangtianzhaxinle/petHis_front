@@ -46,6 +46,7 @@
 <script>
 // import { getPersonalUserInfo } from '@/api/user'
 import { mapGetters } from 'vuex'
+import store from '@/store'
 export default {
   name: 'PersoanlInfo',
   data() {
@@ -83,17 +84,18 @@ export default {
         desc: [
           { required: true, message: '请填写活动形式', trigger: 'blur' }
         ]
+      },
+      // 原来data中可以直接获取到vuex的数据
+      perosanlInfo: {
+        user_id: store.getters.user_id,
+        name: store.getters.name,
+        avatar: store.getters.avatar,
+        sex: store.getters.sex,
+        phoneNumber: store.getters.phoneNumber,
+        address: store.getters.address,
+        createtime: store.getters.createtime,
+        email: store.getters.email
       }
-      /* perosanlInfo: {
-        user_id: '',
-        name: '',
-        avatar: '',
-        sex: '',
-        phoneNumber: '',
-        address: '',
-        createtime: '',
-        email: ''
-      }*/
     }
   },
   computed: {

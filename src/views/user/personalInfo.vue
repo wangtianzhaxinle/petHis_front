@@ -2,20 +2,20 @@
 <template>
   <el-form ref="ruleForm" :model="perosanlInfo" :rules="rules" label-width="100px" class="demo-ruleForm">
     <el-form-item label="姓名" prop="name">
-      <el-input v-model="user_id" :disabled="true" />
+      <el-input v-model="name" :disabled="true" />
     </el-form-item>
 
-    <!-- <el-form-item label="头像" prop="desc">
-      <el-avatar :src="avatar" />
-    </el-form-item> -->
+    <el-form-item label="头像" prop="desc">
+      <el-avatar g :src="avatar" class="user-avatar" />
+    </el-form-item>
 
     <el-form-item label="年龄" prop="region">
       <el-input v-model="age" :disabled="true" />
     </el-form-item>
     <el-form-item label="性别" required>
       <el-radio-group v-model="sex">
-        <el-radio label="男" />
-        <el-radio label="女" />
+        <el-radio :label="1">男</el-radio>
+        <el-radio :label="0">女</el-radio>
       </el-radio-group>
     </el-form-item>
     <el-form-item label="手机号" prop="delivery">
@@ -27,9 +27,8 @@
     <el-form-item label="注册时间" prop="resource">
 
       <el-col :span="11">
-
         <el-form-item prop="date2">
-          <el-date-picker v-model="createtime" placeholder="选择时间" style="width: 100%;" />
+          <el-date-picker v-model="createtime" placeholder="选择时间" style="width: 100%;" :disabled="true" />
         </el-form-item>
       </el-col>
     </el-form-item>
@@ -101,6 +100,7 @@ export default {
     ...mapGetters([
       'name',
       'email',
+      'avatar',
       'user_id',
       'username',
       'sex',

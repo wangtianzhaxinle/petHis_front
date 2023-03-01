@@ -203,6 +203,7 @@ export default {
     },
     // 点击行即可选中
     getRowData(row) {
+      console.log(row)
       this.$refs.table.toggleRowSelection(row)
     }
   }

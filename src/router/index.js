@@ -52,7 +52,7 @@ export const constantRoutes = [
       path: 'home',
       name: 'Home',
       component: () => import('@/views/dashboard/index'),
-      meta: { title: 'Dashboard', icon: 'dashboard' }
+      meta: { title: '首页', icon: 'dashboard' }
 
     }]
   },
@@ -137,6 +137,13 @@ export const constantRoutes = [
         name: 'userInfo',
         component: () => import('@/views/user/userInfo'),
         meta: { title: '用户信息', icon: 'form' }
+      }, {
+
+        path: '/personalInfo',
+        name: 'personalInfo',
+        component: () => import('@/views/user/personalInfo'),
+        meta: { title: '个人信息', icon: 'form' }
+
       }
     ]
   },
@@ -160,23 +167,127 @@ export const constantRoutes = [
       }
     ]
   },
+
   {
-    path: '/personalManager',
+    path: '/projectManager',
     component: Layout,
-    name: 'personalManager',
-    meta: { title: '个人管理', icon: 'form' },
+    name: 'projectManager',
+    meta: { title: '项目管理', icon: 'form' },
     children: [
       {
 
-        path: '/personalInfo',
-        name: 'personalInfo',
+        path: '/projectInfo',
+        name: 'projectInfo',
         component: () => import('@/views/user/personalInfo'),
-        meta: { title: '个人信息', icon: 'form' }
+        meta: { title: '项目信息', icon: 'form' }
 
       }
     ]
   },
+  {
+    path: '/medicalRecordManager',
+    component: Layout,
+    name: 'medicalRecord',
+    meta: { title: '病历管理', icon: 'form' },
+    children: [
+      {
 
+        path: '/medicalRecordInfo',
+        name: 'medicalRecordInfo',
+        component: () => import('@/views/user/personalInfo'),
+        meta: { title: '宠物病历信息', icon: 'form' }
+
+      }
+    ]
+  },
+  {
+    path: '/permissionControl',
+    component: Layout,
+    name: 'permissionControl',
+    meta: { title: '权限控制', icon: 'form' },
+    children: [
+      {
+
+        path: '/roleManager',
+        name: 'roleManager',
+        component: () => import('@/views/user/personalInfo'),
+        meta: { title: '角色管理', icon: 'form' }
+
+      },
+      {
+
+        path: '/permissionManager',
+        name: 'permissionManager',
+        component: () => import('@/views/user/personalInfo'),
+        meta: { title: '权限管理', icon: 'form' }
+
+      }
+    ]
+  },
+  {
+    path: '/apponitManager',
+    component: Layout,
+    name: 'apponitManager',
+    meta: { title: '预约管理', icon: 'form' },
+    children: [
+      {
+
+        path: '/apponitInfo',
+        name: 'apponitInfo',
+        component: () => import('@/views/user/personalInfo'),
+        meta: { title: '预约信息', icon: 'form' }
+
+      }
+    ]
+  },
+  {
+    path: '/depositManager',
+    component: Layout,
+    name: 'depositManager',
+    meta: { title: '托管管理', icon: 'form' },
+    children: [
+      {
+
+        path: '/depositInfo',
+        name: 'depositInfo',
+        component: () => import('@/views/user/personalInfo'),
+        meta: { title: '托管信息', icon: 'form' }
+
+      }
+    ]
+  },
+  {
+    path: '/medicineManager',
+    component: Layout,
+    name: 'medicineManager',
+    meta: { title: '药品管理', icon: 'form' },
+    children: [
+      {
+
+        path: '/medicineInfo',
+        name: 'medicineInfo',
+        component: () => import('@/views/user/personalInfo'),
+        meta: { title: '药品信息', icon: 'form' }
+
+      }
+    ]
+  },
+  {
+    path: '/dutyManager',
+    component: Layout,
+    name: 'dutyManager',
+    meta: { title: '值班管理', icon: 'form' },
+    children: [
+      {
+
+        path: '/dutyInfo',
+        name: 'dutyInfo',
+        component: () => import('@/views/duty/dutyInfo'),
+        meta: { title: '值班信息', icon: 'form' }
+
+      }
+    ]
+  },
   /* {
     path: '/nested',
     component: Layout,

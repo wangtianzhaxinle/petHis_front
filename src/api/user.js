@@ -27,3 +27,10 @@ export function deleteUserById(user_id) {
 
   })
 }
+export function deleteUserByIds(data) {
+  return request({
+    url: '/user/deleteUserByIds',
+    method: 'post',
+    data
+  })
+}

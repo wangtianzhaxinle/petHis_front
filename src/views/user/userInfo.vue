@@ -178,6 +178,7 @@
 
 <script>
 import { getUserInfoList, deleteUserById, deleteUserByIds } from '@/api/user'
+
 import tablePane from '@/components/tablePane.vue'
 
 export default {
@@ -252,36 +253,39 @@ export default {
         cols: [
           {
             label: 'id',
-            prop: 'userId'
+            prop: 'userId',
+            width: 30
 
           },
           {
             label: '名字',
-            prop: 'name',
+            prop: 'name'
+
+          },
+
+          {
+            label: '性别',
+            prop: 'sex',
             isCodeTableFormatter: function(val) { // 过滤器
               if (val.sex === 1) {
                 return '男'
               } else {
                 return '女'
               }
-            }
-
-          },
-
-          {
-            label: '性别',
-            prop: 'sex'
+            },
+            width: 50
 
           },
           {
             label: '年龄',
-            prop: 'age'
+            prop: 'age',
+            width: 50
 
           },
           {
             label: '手机号',
             prop: 'phonenumber',
-            width: 300
+            width: 150
           },
           {
             label: '地址',
@@ -303,6 +307,12 @@ export default {
           }, {
             label: '注册时间',
             prop: 'createtime'
+            /*,
+            isCodeTableFormatter: function(time) { // 过滤器
+              var date = new Date(time).toISOString().replace(/T/g, ' ').replace(/\.[\d]{3}Z/, '')
+
+              return date
+            }*/
           },
           {
             label: '邮箱',

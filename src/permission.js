@@ -9,8 +9,8 @@ import getPageTitle from '@/utils/get-page-title'
 //  页面加载进度条nprogress
 NProgress.configure({ showSpinner: false }) // NProgress Configuration
 
-//  vue项目配置白名单
-const whiteList = ['/login'] // no redirect whitelist
+//  vue项目配置白名单,记得加"/",因为没加斜杆点击注册重定向晖404页面,我还以为点击事件无效
+const whiteList = ['/login', '/forgetPassword', '/doRegister'] // no redirect whitelist
 
 router.beforeEach(async(to, from, next) => {
   // start progress bar

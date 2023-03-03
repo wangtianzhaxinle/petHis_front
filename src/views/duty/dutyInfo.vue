@@ -1,190 +1,353 @@
 <template>
-  <div>
-    <el-table
-      :data="Sunday_AM"
-      height="250"
-      border
-      style="width: 100%"
-    >
-      <el-table-column
-        prop="employeeName"
-        label="星期天上午"
-        width="180"
-      /></el-table>
+  <table-pane
+    :data-source="dataSource"
+    @changeSize="changeSize"
+    @changeNum="changeNum"
+  />
 
-    <el-table
-      :data="Monday_AM"
-      height="250"
-      border
-      style="width: 100%"
-    >
-      <el-table-column
-        prop="employeeName"
-        label="星期天上午"
-        width="180"
-      /></el-table>
-
-    <el-table
-      :data="Tuesday_AM"
-      height="250"
-      border
-      style="width: 100%"
-    >
-      <el-table-column
-        prop="employeeName"
-        label="星期一上午"
-        width="180"
-      /></el-table>
-
-    <el-table
-      :data="Wednesday_AM"
-      height="250"
-      border
-      style="width: 100%"
-    >
-      <el-table-column
-        prop="employeeName"
-        label="星期二上午"
-      /></el-table>
-
-    <el-table
-      :data="Thursday_AM"
-      height="250"
-      border
-      style="width: 100%"
-    >
-      <el-table-column
-        prop="employeeName"
-        label="星期三上午"
-      /></el-table>
-    <el-table
-      :data="Friday_AM"
-      height="250"
-      border
-      style="width: 100%"
-    >
-      <el-table-column
-        prop="employeeName"
-        label="星期四上午"
-      /></el-table>
-
-    <el-table
-      :data="Saturday_AM"
-      height="250"
-      border
-      style="width: 100%"
-    >
-      <el-table-column
-        prop="employeeName"
-        label="星期五上午"
-      /></el-table>
-    <el-table
-      :data="Sunday_AM"
-      height="250"
-      border
-      style="width: 100%"
-    >
-      <el-table-column
-        prop="employeeName"
-        label="星期六上午"
-      /> </el-table>
-
-    <!-- <el-table
-      :data="PMData"
-      height="250"
-      border
-      style="width: 100%"
-    >
-      <el-table-column
-        prop="Sunday_PM"
-        label="星期天下午"
-        width="180"
-      />
-      <el-table-column
-        prop="Monday_PM"
-        label="星期一下午"
-        width="180"
-      />
-      <el-table-column
-        prop="Tuesday_PM"
-        label="星期二下午"
-      />
-      <el-table-column
-        prop="Wednesday_PM"
-        label="星期三下午"
-      />
-      <el-table-column
-        prop="Thursday_PM"
-        label="星期四下午"
-      />
-      <el-table-column
-        prop="Friday_PM"
-        label="星期五下午"
-      />
-      <el-table-column
-        prop="Saturday_PM"
-        label="星期六下午"
-      />
-    </el-table> -->
-  </div>
 </template>
+
 <script>
+
 import { getDutyList } from '@/api/duty'
+import tablePane from '@/components/tablePane.vue'
+
 export default {
-  name: 'DutyeeInfo',
+  name: 'DutyInfo',
+  components: { tablePane },
   data() {
     return {
-      // 每当点击这个菜单项时vue都会卡死完全无法操作,只能强制退出,原因似乎是因为table需要一个array,可是:data绑定了一个对象
+      // 搜索栏配置
 
-      Sunday_AM: [],
-      Monday_AM: [],
-      Tuesday_AM: [],
-      Wednesday_AM: [],
-      Thursday_AM: [],
-      Friday_AM: [],
-      Saturday_AM: [],
+      // 表格配置
+      dataSource: {
+        tool: [],
+        data: [], // 表格数据
+        cols: [
+          {
+            label: 'id',
+            prop: 'dutyid',
+            width: 40
 
-      Sunday_PM: [],
-      Monday_PM: [],
-      Tuesday_PM: [],
-      Wednesday_PM: [],
-      Thursday_PM: [],
-      Friday_PM: [],
-      Saturday_PM: []
+          },
+          {
+            label: '名字',
+            prop: 'user.name',
+            width: 40
+          },
 
+          {
+            label: '周一上午',
+            prop: 'mondayam',
+            width: 100,
+
+            // isIcon: true,
+            isCodeTableFormatter: function(val) {
+              if (val.mondayam === 1) {
+                return '上班'
+              } else {
+                return '休息'
+              }
+            }/*,
+            isTemplateClass: function(val) {
+              if (val.mondayam === 1) {
+                return 'color-red'
+              } else {
+                return 'color-green'
+              }
+            }*/
+
+            /* filter: function(val) {
+              if (val === 4) {
+                return '特定用户'
+              } else if (val === 3) {
+                return '新注册用户'
+              } else if (val === 2) {
+                return '标签用户'
+              } else if (val === 1) {
+                return '全部用户'
+              }
+            },
+
+            icon: function(val) {
+              if (val.mondayam === 1) {
+                console.log('1')
+                return 'el-icon-checke'
+              } else {
+                console.log(val)
+                return 'el-icon-close'
+              }
+            }*/
+          },
+
+          {
+            label: '周一下午',
+            prop: 'mondayam',
+            width: 100,
+            isCodeTableFormatter: function(val) {
+              if (val.mondayam === 1) {
+                return '上班'
+              } else {
+                return '休息'
+              }
+            }
+
+          },
+
+          {
+            label: '周二上午',
+            prop: 'tuesdayam',
+            width: 100,
+            isCodeTableFormatter: function(val) {
+              if (val.mondayam === 1) {
+                return '上班'
+              } else {
+                return '休息'
+              }
+            }
+
+          },
+
+          {
+            label: '周二下午',
+            prop: 'tuesdaypm',
+            width: 100,
+            isCodeTableFormatter: function(val) {
+              if (val.mondayam === 1) {
+                return '上班'
+              } else {
+                return '休息'
+              }
+            }
+
+          },
+          {
+            label: '周三上午',
+            prop: 'wednesdayam',
+            width: 100,
+            isCodeTableFormatter: function(val) {
+              if (val.mondayam === 1) {
+                return '上班'
+              } else {
+                return '休息'
+              }
+            }
+          },
+
+          {
+            label: '周三下午',
+            prop: 'wednesdaypm',
+            width: 100,
+            isCodeTableFormatter: function(val) {
+              if (val.mondayam === 1) {
+                return '上班'
+              } else {
+                return '休息'
+              }
+            }
+          },
+
+          {
+            label: '周四上午',
+            prop: 'thursdayam',
+            width: 100,
+            isCodeTableFormatter: function(val) {
+              if (val.mondayam === 1) {
+                return '上班'
+              } else {
+                return '休息'
+              }
+            }
+
+          },
+
+          {
+            label: '周四下午',
+            prop: 'thursdaypm',
+            width: 100,
+            isCodeTableFormatter: function(val) {
+              if (val.mondayam === 1) {
+                return '上班'
+              } else {
+                return '休息'
+              }
+            }
+          },
+
+          {
+            label: '周五上午',
+            prop: 'fridayam',
+            width: 100,
+            isCodeTableFormatter: function(val) {
+              if (val.mondayam === 1) {
+                return '上班'
+              } else {
+                return '休息'
+              }
+            }
+
+          },
+
+          {
+            label: '周五下午',
+            prop: 'fridaypm',
+            width: 100,
+            isCodeTableFormatter: function(val) {
+              if (val.mondayam === 1) {
+                return '上班'
+              } else {
+                return '休息'
+              }
+            }
+          },
+
+          {
+            label: '周六上午',
+            prop: 'saturdayam',
+            width: 100,
+            isCodeTableFormatter: function(val) {
+              if (val.mondayam === 1) {
+                return '上班'
+              } else {
+                return '休息'
+              }
+            }
+
+          },
+
+          {
+            label: '周六下午',
+            prop: 'saturdaypm',
+            width: 100,
+            isCodeTableFormatter: function(val) {
+              if (val.mondayam === 1) {
+                return '上班'
+              } else {
+                return '休息'
+              }
+            }
+          },
+
+          {
+            label: '周日上午',
+            prop: 'sundayam',
+            width: 100,
+            isCodeTableFormatter: function(val) {
+              if (val.mondayam === 1) {
+                return '上班'
+              } else {
+                return '休息'
+              }
+            }
+
+          },
+
+          {
+            label: '周日下午',
+            prop: 'sundaypm',
+            width: 100,
+            isCodeTableFormatter: function(val) {
+              if (val.mondayam === 1) {
+                return '上班'
+              } else {
+                return '休息'
+              }
+            }
+          }
+
+        ], // 表格的列数据
+
+        handleSelectionChange: this.handleSelectionChange,
+        isSelection: true, // 表格有多选时设置
+        isOperation: true, // 表格有操作列时设置
+        isIndex: true, // 列表序号
+        loading: true, // loading
+        pageData: {
+          total: 0, // 总条数
+          pageSize: 10, // 每页数量
+          pageNum: 1 // 页码
+        },
+        operation: {
+          // 表格有操作列时设置
+          label: '操作', // 列名
+          width: '100', // 根据实际情况给宽度
+          data: [
+
+            {
+              label: '修改', // 操作名称
+              type: 'warming',
+              permission: 'editRow', // 后期这个操作的权限，用来控制权限
+              handleRow: this.editRow
+            }
+          ]
+        }
+      },
+      dialogAdd: false,
+      msg: {},
+      selected: []
     }
   },
   created() {
-    this.getDutyList()
-  }, methods: {
-    getDutyList() {
-      getDutyList().then(res => {
+    this.getList()
+  },
+  methods: {
+    // 获取列表数据
+    getList() {
+      const data = {
+        pageSize: this.dataSource.pageData.pageSize,
+        pageNum: this.dataSource.pageData.pageNum
+      }
+
+      this.dataSource.loading = true
+      console.log('getAllPetInfoList')
+      getDutyList(data).then(res => {
+        this.dataSource.loading = false
         // if (res.succeed) {
         if (res.total > 0) {
-          this.Sunday_AM = res.data.sundayAMDuty
-          // console.log(res.data)
-          // console.log(res.data.sundayAMDuty)
-          this.Monday_AM = res.data.Monday_AM
-          this.Tuesday_AM = res.data.Tuesday_AM
-          this.Wednesday_Am = res.data.Wednesday_Am
-          this.Thursday_AM = res.data.Thursday_AM
-          this.Friday_AM = res.data.Friday_AM
-          this.Saturday_Am = res.data.Saturday_Am
-
-          this.Monday_PM = res.data.Monday_PM
-          this.Sunday_PM = res.data.Sunday_PM
-          this.Monday_PM = res.data.Monday_PM
-          this.Tuesday_PM = res.data.Tuesday_PM
-          this.Wednesday_Pm = res.data.Wednesday_Pm
-          this.Thursday_PM = res.data.Thursday_PM
-          this.Friday_PM = res.data.Friday_PM
-          this.Saturday_Pm = res.data.Saturday_Pm
-
-          // console.log(res.data)
+          this.dataSource.pageData.total = res.total
+          this.dataSource.data = res.data
+          console.log(res.data)
+        } else {
+          this.dataSource.data = []
+          this.dataSource.pageData.total = 0
         }
         // }
       })
+    },
+
+    // 搜索层事件
+
+    // 子组件通信
+    childMsg(msg) {
+      if (msg.dialogAdd === false) {
+        this.dialogAdd = false
+      } else if (msg.refreshList) {
+        this.getList()
+      }
+    },
+    // 改变每页数量
+    changeSize(size) {
+      this.dataSource.pageData.pageSize = size
+      this.getList()
+    },
+    // 改变页码
+    changeNum(pageNum) {
+      this.dataSource.pageData.pageNum = pageNum
+      this.getList()
+    },
+    // 多选事件
+    handleSelectionChange(val) {
+      this.selected = val
+      console.log('调用了父组件的select方法')
+      console.log(val)
+    },
+    //
+    // 表格上方工具栏回调
+    handleAdd(index, row) {
+      this.dialogAdd = true
     }
+
   }
 }
 </script>
+

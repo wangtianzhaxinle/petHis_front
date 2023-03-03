@@ -10,19 +10,19 @@ export function getUserInfoList(data) {
     }
 
   })
-} export function getPersonalUserInfo(user_id) {
+} export function getPersonalUserInfo(userId) {
   return request({
     url: '/user/getPersonalUserInfo',
     method: 'get',
     params: {
-      user_id
+      userId
     }
 
   })
 }
-export function deleteUserById(user_id) {
+export function deleteUserById(userId) {
   return request({
-    url: '/user/deleteUserById/' + user_id,
+    url: '/user/deleteUserById/' + userId,
     method: 'delete'
 
   })

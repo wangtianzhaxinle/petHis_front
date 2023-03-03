@@ -1,9 +1,13 @@
 import request from '@/utils/request'
 
-export function getDutyList() {
+export function getDutyList(data) {
   return request({
     url: '/duty/getDutyList',
-    method: 'get'
+    method: 'get',
+    params: {
+      pageNum: data.pageNum,
+      pageSize: data.pageSize
+    }
 
   })
 }

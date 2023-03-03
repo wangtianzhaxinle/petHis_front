@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { getAllPetInfoList } from '@/api/pet'
+import { getPetList } from '@/api/pet'
 import tablePane from '@/components/tablePane.vue'
 
 export default {
@@ -30,16 +30,16 @@ export default {
         cols: [
           {
             label: 'id',
-            prop: 'pet_id'
+            prop: 'petid'
 
           },
           {
             label: '名字',
-            prop: 'pet_name'
+            prop: 'name'
           },
           {
             label: '主人',
-            prop: 'master_id'
+            prop: 'user.name'
           },
           {
             label: '年龄',
@@ -54,11 +54,25 @@ export default {
           {
             label: '是否健康',
             prop: 'ishealth',
-            width: 300
+            width: 300,
+            isCodeTableFormatter: function(val) {
+              if (val.ishealth === 1) {
+                return '健康'
+              } else {
+                return '生病'
+              }
+            }
           },
           {
             label: '性别',
-            prop: 'sex'
+            prop: 'sex',
+            isCodeTableFormatter: function(val) {
+              if (val.sex === 1) {
+                return '公'
+              } else {
+                return '母'
+              }
+            }
           }
 
         ], // 表格的列数据
@@ -105,7 +119,7 @@ export default {
 
       this.dataSource.loading = true
       console.log('getAllPetInfoList')
-      getAllPetInfoList(data).then(res => {
+      getPetList(data).then(res => {
         this.dataSource.loading = false
         // if (res.succeed) {
         if (res.total > 0) {

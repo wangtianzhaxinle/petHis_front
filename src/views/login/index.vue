@@ -42,6 +42,11 @@
       </el-form-item>
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
+      <el-row style="text-align: center;margin-top: -10px;">
+        <el-link type="primary" @click="doRegister">注册账号</el-link>
+        <el-divider direction="vertical" />
+        <el-link type="primary" @click="forgetPassword">忘记密码</el-link>
+      </el-row>
 
       <div class="tips">
         <span style="margin-right:20px;">username: admin</span>
@@ -120,7 +125,14 @@ export default {
           return false
         }
       })
+    },
+    doRegister: function() {
+      this.$router.push('/doRegister')
+    },
+    forgetPassword: function() {
+      this.$router.push('/forgetPassword')
     }
+
   }
 }
 </script>

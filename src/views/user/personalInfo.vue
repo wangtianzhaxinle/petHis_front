@@ -87,7 +87,7 @@ export default {
       },
       // 原来data中可以直接获取到vuex的数据
       perosanlInfo: {
-        user_id: store.getters.user_id,
+        userId: store.getters.userId,
         name: store.getters.name,
         avatar: store.getters.avatar,
         sex: store.getters.sex,
@@ -103,7 +103,7 @@ export default {
       'name',
       'email',
       'avatar',
-      'user_id',
+      'userId',
       'username',
       'sex',
       'age',

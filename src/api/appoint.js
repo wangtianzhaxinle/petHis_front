@@ -1,8 +1,8 @@
 import request from '@/utils/request'
 
-export function getPetList(data) {
+export function getAppointList(data) {
   return request({
-    url: '/pet/getPetList',
+    url: '/appoint/getAppointList',
     method: 'get',
     params: {
       pageSize: data.pageSize,
@@ -11,14 +11,12 @@ export function getPetList(data) {
 
   })
 }
-export function getPetListByUserId(data) {
+export function getAppointPersonalInfo(userId) {
   return request({
-    url: '/pet/getPetListByUserId',
+    url: '/appoint/getAppointPersonalInfo',
     method: 'get',
     params: {
-      pageSize: data.pageSize,
-      pageNum: data.pageNum,
-      userId: data.userId
+      userId
     }
 
   })

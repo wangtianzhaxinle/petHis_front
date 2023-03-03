@@ -36,7 +36,7 @@ export default {
         cols: [
           {
             label: 'id',
-            prop: 'itemId'
+            prop: 'itemid'
 
           },
 
@@ -52,7 +52,7 @@ export default {
           },
           {
             label: '收费方式',
-            prop: 'chargingMethod',
+            prop: 'chargingmethod',
             width: 300
           }
 
@@ -71,7 +71,7 @@ export default {
         operation: {
           // 表格有操作列时设置
           label: '操作', // 列名
-          width: '150', // 根据实际情况给宽度
+          width: '200', // 根据实际情况给宽度
           data: [
             {
               label: '删除', // 操作名称
@@ -79,10 +79,10 @@ export default {
               permission: '2010702', // 后期这个操作的权限，用来控制权限
               handleRow: this.deleterow
             }, {
-              label: '查看', // 操作名称
+              label: '预约', // 操作名称
               type: 'info',
               permission: '2010702', // 后期这个操作的权限，用来控制权限
-              handleRow: this.showrow
+              handleRow: this.apponitDoctor
             },
             {
               label: '修改', // 操作名称
@@ -157,6 +157,10 @@ export default {
     // 表格上方工具栏回调
     handleAdd(index, row) {
       this.dialogAdd = true
+    },
+    apponitDoctor(index, row) {
+      console.log(row)
+      this.$router.push({ path: '/doctorInfo/' + row.itemid })
     }
     /*
 

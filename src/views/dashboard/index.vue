@@ -2,7 +2,7 @@
   <div class="dashboard-container">
     <div class="dashboard-text">name: {{ name }}</div>
     <div class="dashboard-text">email: {{ email }}</div>
-    <div class="dashboard-text">userid: {{ user_id }}</div>
+    <div class="dashboard-text">userid: {{ userId }}</div>
     <div class="dashboard-text">username: {{ username }}</div>
     <div class="dashboard-text">sex: {{ sex }}</div>
     <div class="dashboard-text">age: {{ age }}</div>
@@ -22,7 +22,7 @@ export default {
     ...mapGetters([
       'name',
       'email',
-      'user_id',
+      'userId',
       'username',
       'sex',
       'age',

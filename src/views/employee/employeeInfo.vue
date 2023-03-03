@@ -8,7 +8,8 @@
 </template>
 
 <script>
-import { getAllEmployeeInfoList } from '@/api/employee'
+
+import { getEmployeeList } from '@/api/employee.js'
 import tablePane from '@/components/tablePane.vue'
 
 export default {
@@ -22,25 +23,34 @@ export default {
       dataSource: {
         tool: [{
           name: '新增员工',
-          key: 1,
-          permission: 2010701,
-          handleClick: this.handleAdd
-        }],
+          key: 'addEmployee',
+          permission: 'addEmployee',
+          handleClick: this.addEmployee
+        },
+        {
+          name: '批量删除',
+          key: 'batchDeleteEmployee',
+          permission: 'batchDeleteEmployee',
+          handleClick: this.batchDeleteEmployee
+        }
+        ],
         data: [], // 表格数据
         cols: [
           {
             label: 'id',
-            prop: 'employee_id'
-
+            prop: 'employeeId',
+            width: 100
           },
           {
             label: '名字',
-            prop: 'name'
+            prop: 'name',
+            width: 100
           },
 
           {
             label: '性别',
-            prop: 'sex'
+            prop: 'sex',
+            width: 100
 
           },
 
@@ -57,6 +67,16 @@ export default {
           {
             label: '入职时间',
             prop: 'hiredate'
+          },
+
+          {
+            label: '薪水',
+            prop: 'salary'
+          },
+
+          {
+            label: '银行卡',
+            prop: 'bankcard'
           }
 
         ], // 表格的列数据
@@ -79,8 +99,14 @@ export default {
             {
               label: '删除', // 操作名称
               type: 'danger',
-              permission: '2010702', // 后期这个操作的权限，用来控制权限
-              handleRow: this.handleRow
+              permission: 'deleteRow', // 后期这个操作的权限，用来控制权限
+              handleRow: this.deleteRow
+            },
+            {
+              label: '修改', // 操作名称
+              type: 'warming',
+              permission: 'editRow', // 后期这个操作的权限，用来控制权限
+              handleRow: this.editRow
             }
           ]
         }
@@ -103,7 +129,7 @@ export default {
 
       this.dataSource.loading = true
       console.log('getAllPetInfoList')
-      getAllEmployeeInfoList(data).then(res => {
+      getEmployeeList(data).then(res => {
         this.dataSource.loading = false
         // if (res.succeed) {
         if (res.total > 0) {

@@ -7,11 +7,10 @@ const getDefaultState = () => {
     token: getToken(),
     name: '',
     avatar: '',
-
     address: '',
     age: '',
     sex: '',
-    user_id: '',
+    userId: '',
     username: '',
     email: '',
     createtime: '',
@@ -40,8 +39,8 @@ const mutations = {
   SET_ADDRESS: (state, address) => {
     state.address = address
   },
-  SET_USER_ID: (state, user_id) => {
-    state.user_id = user_id
+  SET_USERID: (state, userId) => {
+    state.userId = userId
   },
   SET_USERNAME: (state, username) => {
     state.username = username
@@ -96,7 +95,7 @@ const actions = {
           return reject('Verification failed, please Login again.')
         }
 
-        const { name, avatar, address, age, sex, phonenumber, userId, username, createtime, email, role } = data
+        const { name, avatar, address, age, sex, phonenumber, userid, username, createtime, email, role } = data
 
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
@@ -104,7 +103,7 @@ const actions = {
         commit('SET_AGE', age)
         commit('SET_SEX', sex)
         commit('SET_PHONENUMBER', phonenumber)
-        commit('SET_USER_ID', userId)
+        commit('SET_USERID', userid)
         commit('SET_USERNAME', username)
         commit('SET_CREATETIME', createtime)
         commit('SET_EMAIL', email)

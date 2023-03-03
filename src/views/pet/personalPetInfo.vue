@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import { getMedicineList } from '@/api/medicine'
+import { getPetListByUserId } from '@/api/pet'
 import tablePane from '@/components/tablePane.vue'
 import store from '@/store'
 export default {
@@ -21,7 +21,7 @@ export default {
       // 表格配置
       dataSource: {
         tool: [{
-          name: '新增药物',
+          name: '新增宠物',
           key: 1,
           permission: 2010701,
           handleClick: this.handleAdd
@@ -30,53 +30,49 @@ export default {
         cols: [
           {
             label: 'id',
-            prop: 'medicineid'
+            prop: 'petid'
 
-          },
-          {
-            label: '图片',
-            prop: 'image'
           },
           {
             label: '名字',
             prop: 'name'
           },
           {
-            label: '生产公司',
-            prop: 'company'
+            label: '主人',
+            prop: 'user.name'
           },
           {
-            label: '价格',
-            prop: 'price'
+            label: '年龄',
+            prop: 'age'
 
           },
           {
-            label: '库存',
-            prop: 'amount'
+            label: '品种',
+            prop: 'breed'
 
           },
           {
-            label: '描述',
-            prop: 'description',
-            width: 100
-
+            label: '是否健康',
+            prop: 'ishealth',
+            width: 300,
+            isCodeTableFormatter: function(val) {
+              if (val.ishealth === 1) {
+                return '健康'
+              } else {
+                return '生病'
+              }
+            }
           },
           {
-            label: '保质期',
-            prop: 'exp',
-            width: 100
-
-          },
-          {
-            label: '批准文号',
-            prop: 'authenticationcode',
-            width: 100
-
-          },
-          {
-            label: '是否处方药别',
-            prop: 'isprescription'
-
+            label: '性别',
+            prop: 'sex',
+            isCodeTableFormatter: function(val) {
+              if (val.sex === 1) {
+                return '公'
+              } else {
+                return '母'
+              }
+            }
           }
 
         ], // 表格的列数据
@@ -124,7 +120,7 @@ export default {
 
       this.dataSource.loading = true
       console.log('getAllPetInfoList')
-      getMedicineList(data).then(res => {
+      getPetListByUserId(data).then(res => {
         this.dataSource.loading = false
         // if (res.succeed) {
         if (res.total > 0) {

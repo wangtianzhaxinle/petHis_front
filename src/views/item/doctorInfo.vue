@@ -1,82 +1,69 @@
 <template>
-  <table-pane
+
+  <div class="app-container"> <table-pane
     :data-source="dataSource"
     @changeSize="changeSize"
     @changeNum="changeNum"
   />
-
-</template>
-
+  </div></template>
 <script>
-import { getMedicineList } from '@/api/medicine'
+
 import tablePane from '@/components/tablePane.vue'
-import store from '@/store'
+import { getEmployeeListByRoleId } from '@/api/employee'
 export default {
-  name: 'PersonalPetInfo',
+  name: 'ItemInfo',
   components: { tablePane },
+
   data() {
     return {
-      // 搜索栏配置
-      userId: store.getters.userId,
+      itemId: '',
       // 表格配置
       dataSource: {
-        tool: [{
-          name: '新增药物',
-          key: 1,
-          permission: 2010701,
-          handleClick: this.handleAdd
-        }],
+        tool: [
+        ],
         data: [], // 表格数据
         cols: [
           {
             label: 'id',
-            prop: 'medicineid'
-
-          },
-          {
-            label: '图片',
-            prop: 'image'
+            prop: 'employeeid',
+            width: 100
           },
           {
             label: '名字',
-            prop: 'name'
+            prop: 'user.name',
+            width: 100
           },
-          {
-            label: '生产公司',
-            prop: 'company'
-          },
-          {
-            label: '价格',
-            prop: 'price'
 
-          },
           {
-            label: '库存',
-            prop: 'amount'
-
-          },
-          {
-            label: '描述',
-            prop: 'description',
+            label: '性别',
+            prop: 'user.sex',
             width: 100
 
           },
-          {
-            label: '保质期',
-            prop: 'exp',
-            width: 100
 
+          {
+            label: '手机号',
+            prop: 'user.phonenumber',
+            width: 300
           },
           {
-            label: '批准文号',
-            prop: 'authenticationcode',
-            width: 100
-
+            label: '地址',
+            prop: 'user.address'
           },
-          {
-            label: '是否处方药别',
-            prop: 'isprescription'
 
+          {
+            label: '入职时间',
+            prop: 'hiredate'
+          },
+
+          {
+            label: '薪水',
+            prop: 'salary'
+          },
+
+          {
+            label: '银行卡',
+            prop: 'bankcard'
           }
 
         ], // 表格的列数据
@@ -94,16 +81,18 @@ export default {
         operation: {
           // 表格有操作列时设置
           label: '操作', // 列名
-          width: '100', // 根据实际情况给宽度
+          width: '200', // 根据实际情况给宽度
           data: [
             {
-              label: '删除', // 操作名称
-              type: 'danger',
+              label: '选择', // 操作名称
+              type: 'info',
               permission: '2010702', // 后期这个操作的权限，用来控制权限
-              handleRow: this.handleRow
+              handleRow: this.apponitDoctor
             }
+
           ]
         }
+
       },
       dialogAdd: false,
       msg: {},
@@ -111,20 +100,23 @@ export default {
     }
   },
   created() {
+    this.itemId = this.$route.params.itemId
+
     this.getList()
   },
   methods: {
+
     // 获取列表数据
     getList() {
       const data = {
         pageSize: this.dataSource.pageData.pageSize,
         pageNum: this.dataSource.pageData.pageNum,
-        userId: this.userId
+        roleId: this.itemId
       }
 
       this.dataSource.loading = true
-      console.log('getAllPetInfoList')
-      getMedicineList(data).then(res => {
+      console.log('getItemInfoList')
+      getEmployeeListByRoleId(data).then(res => {
         this.dataSource.loading = false
         // if (res.succeed) {
         if (res.total > 0) {
@@ -172,5 +164,6 @@ export default {
 
   }
 }
+
 </script>
 

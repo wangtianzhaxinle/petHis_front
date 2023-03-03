@@ -36,6 +36,16 @@ export const constantRoutes = [
     component: () => import('@/views/login/index'),
     hidden: true
   },
+  {
+    path: '/doRegister',
+    component: () => import('@/views/login/doRegister'),
+    hidden: true
+  },
+  {
+    path: '/forgetPassword',
+    component: () => import('@/views/login/forgetPassword'),
+    hidden: true
+  },
 
   {
     path: '/404',
@@ -107,7 +117,7 @@ export const constantRoutes = [
       {
         path: 'personalPetInfo',
         name: 'personalPetInfo',
-        component: () => import('@/views/pet/petInfo'),
+        component: () => import('@/views/pet/personalPetInfo'),
         meta: { title: '个人宠物信息', icon: 'form' }
       }
     ]
@@ -123,6 +133,12 @@ export const constantRoutes = [
         name: 'EmployeeInfo',
         component: () => import('@/views/employee/employeeInfo'),
         meta: { title: '员工信息', icon: 'form' }
+      },
+      {
+        path: 'employeePersoanlInfo',
+        name: 'employeePersoanlInfo',
+        component: () => import('@/views/employee/employeePersoanlInfo'),
+        meta: { title: '员工个人信息', icon: 'form' }
       }
     ]
   },
@@ -161,9 +177,49 @@ export const constantRoutes = [
         component: () => import('@/views/item/item'),
         meta: { title: '项目信息', icon: 'form' }
 
+      },
+      {
+        path: '/doctorInfo/:itemId',
+        name: 'doctorInfo',
+        component: () => import('@/views/item/doctorInfo'),
+        meta: { title: '项目信息', icon: 'form' },
+        hidden: true
       }
     ]
   },
+  {
+    path: '/appointManager',
+    component: Layout,
+    name: 'appointManager',
+    meta: { title: '预约管理', icon: 'form' },
+    children: [
+      {
+
+        path: '/appointInfo',
+        name: 'appointInfo',
+        component: () => import('@/views/apponit/appointInfo'),
+        meta: { title: '预约信息', icon: 'form' }
+
+      }
+    ]
+  },
+  {
+    path: '/depositManager',
+    component: Layout,
+    name: 'depositManager',
+    meta: { title: '托管管理', icon: 'form' },
+    children: [
+      {
+
+        path: '/depositInfo',
+        name: 'depositInfo',
+        component: () => import('@/views/deposit/depositInfo'),
+        meta: { title: '托管信息', icon: 'form' }
+
+      }
+    ]
+  },
+
   {
     path: '/medicalRecordManager',
     component: Layout,
@@ -200,38 +256,6 @@ export const constantRoutes = [
         name: 'permissionManager',
         component: () => import('@/views/permission/permissionManager'),
         meta: { title: '权限管理', icon: 'form' }
-
-      }
-    ]
-  },
-  {
-    path: '/appointManager',
-    component: Layout,
-    name: 'appointManager',
-    meta: { title: '预约管理', icon: 'form' },
-    children: [
-      {
-
-        path: '/appointInfo',
-        name: 'appointInfo',
-        component: () => import('@/views/apponit/appointInfo'),
-        meta: { title: '预约信息', icon: 'form' }
-
-      }
-    ]
-  },
-  {
-    path: '/depositManager',
-    component: Layout,
-    name: 'depositManager',
-    meta: { title: '托管管理', icon: 'form' },
-    children: [
-      {
-
-        path: '/depositInfo',
-        name: 'depositInfo',
-        component: () => import('@/views/deposit/depositInfo'),
-        meta: { title: '托管信息', icon: 'form' }
 
       }
     ]

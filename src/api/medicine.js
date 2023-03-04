@@ -16,9 +16,17 @@ export function getMedicineInfoById(medicineId) {
     url: '/medicine/getMedicineInfoById',
     method: 'get',
     params: {
-
       medicineId
     }
+
+  })
+}
+export function addMedicineInfo(data) {
+  return request({
+    url: '/medicine/addMedicineInfo',
+    method: 'post',
+
+    data
 
   })
 }

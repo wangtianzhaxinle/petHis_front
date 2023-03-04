@@ -48,10 +48,10 @@
         <el-link type="primary" @click="forgetPassword">忘记密码</el-link>
       </el-row>
 
-      <div class="tips">
+      <!-- <div class="tips">
         <span style="margin-right:20px;">username: admin</span>
         <span> password: any</span>
-      </div>
+      </div> -->
 
     </el-form>
   </div>

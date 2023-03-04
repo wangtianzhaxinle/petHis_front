@@ -34,3 +34,11 @@ export function deleteUserByIds(data) {
     data
   })
 }
+// 这里又把url写错了,后端是/user/RegisterUser,前端是/user/registerUser
+export function registerUser(data) {
+  return request({
+    url: '/user/registerUser',
+    method: 'post',
+    data
+  })
+}

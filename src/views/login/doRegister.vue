@@ -1,124 +1,275 @@
+
 <template>
-  <div class>
-    <el-form ref="ruleForm" :model="ruleForm" class :rules="rules">
-      <el-form-item prop="user1">
-        <el-input v-model="ruleForm.user1" type="text" placeholder="用户名" required="required" prefix-icon="el-icon-user-solid" />
+  <div class="login-container">
+    <el-form ref="loginForm" :model="registerForm" :rules="registerRules" class="login-form" auto-complete="on" label-position="left">
+
+      <div class="title-container">
+        <h3 class="title">注册账号</h3>
+      </div>
+
+      <el-form-item prop="name">
+        <span class="svg-container">
+          <svg-icon icon-class="user" />
+        </span>
+        <el-input
+          ref="name"
+          v-model="registerForm.name"
+          placeholder="名字"
+          name="name"
+          type="text"
+          tabindex="1"
+          auto-complete="on"
+        />
       </el-form-item>
-      <el-form-item prop="pass1">
-        <el-input v-model="ruleForm.pass1" class="phone-input" placeholder="手机号/邮箱" prefix-icon="el-icon-mobile-phone" />
+
+      <el-form-item prop="username">
+        <span class="svg-container">
+          <svg-icon icon-class="user" />
+        </span>
+        <el-input
+          ref="username"
+          v-model="registerForm.username"
+          placeholder="用户名"
+          name="username"
+          type="text"
+          tabindex="1"
+          auto-complete="on"
+        />
       </el-form-item>
-      <el-form-item v-show="yzmshow" prop="code" class="phone">
-        <el-input v-model="ruleForm.code" placeholder="验证码" :minlength="6" :maxlength="6" />
-        <el-button type="primary" class="code-btn" :disabled="!show" @click="getCode()">
-          <span v-show="show">发送验证码</span>
-          <span v-show="!show" class="count">{{ count }} s</span>
-        </el-button>
+
+      <el-form-item prop="sex">
+        <span class="svg-container">
+          <svg-icon icon-class="user" />
+        </span>
+        <el-radio-group v-model="registerForm.sex">
+          <el-radio :label="1">男</el-radio>
+          <el-radio :label="0">女</el-radio>
+
+        </el-radio-group>
       </el-form-item>
-      <el-form-item prop="pass">
-        <el-input v-model="ruleForm.pass" type="password" placeholder="请输入密码" prefix-icon="el-icon-lock" />
+
+      <el-form-item prop="address">
+        <span class="svg-container">
+          <svg-icon icon-class="user" />
+        </span>
+        <el-input
+          ref="address"
+          v-model="registerForm.address"
+          placeholder="地址"
+          name="address"
+          type="text"
+          tabindex="1"
+          auto-complete="on"
+        />
       </el-form-item>
-      <el-form-item prop="checkPass">
-        <el-input v-model="ruleForm.checkPass" type="password" placeholder="请再次输入密码" prefix-icon="el-icon-lock" />
+
+      <el-form-item prop="age">
+        <span class="svg-container">
+          <svg-icon icon-class="user" />
+        </span>
+        <el-input
+          ref="age"
+          v-model="registerForm.age"
+          placeholder="年龄"
+          name="age"
+          type="text"
+          tabindex="1"
+          auto-complete="on"
+        />
       </el-form-item>
-      <el-form-item class="btn-form">
-        <el-button type="primary" @click="submitForm('ruleForm')">注册</el-button>
-      <!-- <el-button @click="resetForm('ruleForm')">重置</el-button> -->
+
+      <el-form-item prop="email">
+        <span class="svg-container">
+          <svg-icon icon-class="user" />
+        </span>
+        <el-input
+          ref="email"
+          v-model="registerForm.email"
+          placeholder="邮箱"
+          name="email"
+          type="text"
+          tabindex="1"
+          auto-complete="on"
+        />
       </el-form-item>
+
+      <el-form-item prop="password">
+        <span class="svg-container">
+          <svg-icon icon-class="password" />
+        </span>
+        <el-input
+          :key="passwordType"
+          ref="password"
+          v-model="registerForm.password"
+          :type="passwordType"
+          placeholder="密码"
+          name="password"
+          tabindex="2"
+          auto-complete="on"
+          @keyup.enter.native="handleLogin"
+        />
+        <span class="show-pwd" @click="showPwd">
+          <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+        </span>
+      </el-form-item>
+
+      <el-form-item prop="confirmPassword">
+        <span class="svg-container">
+          <svg-icon icon-class="password" />
+        </span>
+        <el-input
+          :key="passwordType"
+          ref="confirmPassword"
+          v-model="registerForm.confirmPassword"
+          :type="passwordType"
+          placeholder="确认密码"
+          name="confirmPassword"
+          tabindex="2"
+          auto-complete="on"
+          @keyup.enter.native="handleLogin"
+        />
+        <span class="show-pwd" @click="showPwd">
+          <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+        </span>
+      </el-form-item>
+      <el-form-item prop="phonenumber">
+        <span class="svg-container">
+          <svg-icon icon-class="user" />
+        </span>
+        <el-input
+          ref="username"
+          v-model="registerForm.phonenumber"
+          placeholder="手机"
+          name="phonenumber"
+          type="text"
+          tabindex="1"
+          auto-complete="on"
+        />
+      </el-form-item>
+      <el-form-item
+        prop="VerificationCode"
+      >
+        <span class="svg-container">
+          <svg-icon icon-class="user" />
+        </span>
+        <el-input
+          ref="VerificationCode"
+          v-model="registerForm.VerificationCode"
+          placeholder="验证码"
+          name="VerificationCode"
+          type="text"
+          tabindex="1"
+          auto-complete="on"
+        />
+      </el-form-item>
+
+      <!-- 这里一直提示handleRegister不是一个方法,原来我把handleRegister写在methods括号外面了,获取不到 -->
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleRegister">Login</el-button>
+
     </el-form>
   </div>
 </template>
+
 <script>
+import { registerUser } from '@/api/user'
 export default {
+
+  name: 'Register',
   data() {
-  /*  var validateUser1 = async(rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('请输入用户名'))
-      } else {
-        if (value) {
-          const res = await request.post('/api/user/checkUsernameExist',
-          {
-            username: this.ruleForm.user1
-          })
-          console.log(res)
-          if (res.data.code === 20000) {
-            callback()
-          } else {
-            return callback(new Error('该用户名已经被注册'))
-          }
-        }
-      }
+    /*  var validateUser1 = async(rule, value, callback) => {
+    if (value === '') {
+    callback(new Error('请输入用户名'))
+    } else {
+    if (value) {
+    const res = await request.post('/api/user/checkUsernameExist',
+    {
+    username: this.ruleForm.user1
+    })
+    console.log(res)
+    if (res.data.code === 20000) {
+    callback()
+    } else {
+    return callback(new Error('该用户名已经被注册'))
+    }
+    }
+    }
     }*/
-    var validatePass1 = async(rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('手机号或者邮箱不能为空'))
-      } else {
-        const reg = /^1[3|4|5|7|8][0-9]\d{8}$/
-        // eslint-disable-next-line no-useless-escape
-        const reg2 = /^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/
-        if ((reg.test(value) || reg2.test(value))) {
-          this.yzmshow = true
-          callback()
-        } else {
-          callback(new Error('请输入正确的手机号或者邮箱'))
-        }
-      }
-    }
-    var validatePass = (rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('请输入密码'))
-      } else {
-        if (this.ruleForm.checkPass !== '') {
-          this.$refs.ruleForm.validateField('checkPass')
-        }
-        callback()
-      }
-    }
-    var validateCode = (rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('请输入验证码'))
-      } else {
-        if (this.ruleForm.code.length === 6) {
-          callback()
-        } else {
-          callback(new Error('验证码不正确'))
-        }
-      }
-    }
-    var validatePass2 = (rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('请再次输入密码'))
-      } else if (value !== this.ruleForm.pass) {
-        callback(new Error('两次输入密码不一致!'))
-      } else {
-        callback()
-      }
-    }
+    // var validatePass1 = async(rule, value, callback) => {
+    //   if (value === '') {
+    //     callback(new Error('手机号或者邮箱不能为空'))
+    //   } else {
+    //     const reg = /^1[3|4|5|7|8][0-9]\d{8}$/
+    //     // eslint-disable-next-line no-useless-escape
+    //     const reg2 = /^([a-z0-9_\.-]+)@([\da-z\.-]+)\.([a-z\.]{2,6})$/
+    //     if ((reg.test(value) || reg2.test(value))) {
+    //       this.yzmshow = true
+    //       callback()
+    //     } else {
+    //       callback(new Error('请输入正确的手机号或者邮箱'))
+    //     }
+    //   }
+    // }
+    // var validatePass = (rule, value, callback) => {
+    //   if (value === '') {
+    //     callback(new Error('请输入密码'))
+    //   } else {
+    //     if (this.ruleForm.checkPass !== '') {
+    //       this.$refs.ruleForm.validateField('checkPass')
+    //     }
+    //     callback()
+    //   }
+    // }
+    // var validateCode = (rule, value, callback) => {
+    //   if (value === '') {
+    //     callback(new Error('请输入验证码'))
+    //   } else {
+    //     if (this.ruleForm.code.length === 6) {
+    //       callback()
+    //     } else {
+    //       callback(new Error('验证码不正确'))
+    //     }
+    //   }
+    // }
+    // var validatePass2 = (rule, value, callback) => {
+    //   if (value === '') {
+    //     callback(new Error('请再次输入密码'))
+    //   } else if (value !== this.ruleForm.pass) {
+    //     callback(new Error('两次输入密码不一致!'))
+    //   } else {
+    //     callback()
+    //   }
+    // }
     return {
-      activeIndex: '2',
+      sending: false,
+      registerForm: {
+
+        name: '',
+        username: '',
+        sex: '',
+        age: '',
+        address: '',
+        email: '',
+
+        password: '',
+        confirmPassword: '',
+        phonenumber: '',
+        VerificationCode: ''
+
+      },
+
       loginForm: {
         mobile: '',
         code: '',
         zheCode: ''
       },
-      show: true,
-      count: '',
-      timer: null,
-      yzmshow: false,
-      ruleForm: {
-        user1: '',
-        pass1: '',
-        pass: '',
-        checkPass: '',
-        zhecode: '',
-        mobile: '',
-        phoneCode: '',
-        emailCode: '',
-        code: ''
-      },
-      rules: {
+      loading: false,
+      passwordType: 'password',
+      redirect: undefined,
+
+      registerRules: {
         code: [{
           required: true,
-          validator: validateCode,
+          // validator: validateCode,
           trigger: 'blur'
         },
         {
@@ -135,13 +286,13 @@ export default {
         }],
         pass1: [{
           required: true,
-          validator: validatePass1,
+          // validator: validatePass1,
           trigger: 'blur'
         }],
         // 密码
         pass: [{
           required: true,
-          validator: validatePass,
+          // validator: validatePass,
           trigger: 'blur'
         },
         {
@@ -153,7 +304,7 @@ export default {
         // 校验密码
         checkPass: [{
           required: true,
-          validator: validatePass2,
+          // validator: validatePass2,
           trigger: 'blur'
         },
         {
@@ -163,6 +314,28 @@ export default {
         }
         ]
       }
+    }
+  },
+  methods: {
+    showPwd() {
+      if (this.passwordType === 'password') {
+        this.passwordType = ''
+      } else {
+        this.passwordType = 'password'
+      }
+      this.$nextTick(() => {
+        this.$refs.password.focus()
+      })
+    }, handleRegister() {
+      this.loading = true
+      const data = this.registerForm
+      console.log(data) /
+      registerUser(data).then(() => {
+        // this.$router.push({ path: this.redirect || '/' })
+        this.loading = false
+      }).catch(() => {
+        this.loading = false
+      })
     }
   }
 
@@ -279,3 +452,4 @@ $light_gray:#eee;
   }
 }
 </style>
+

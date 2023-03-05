@@ -32,10 +32,11 @@ https://blog.csdn.net/weixin_44345975/article/details/123697991
              :show-file-list="false"
           -->
           <el-upload
+            ref="pictureUpload"
             class="avatar-uploader"
             action="#"
             list-type="picture-card"
-            limit="1"
+            :limit="1"
             :http-request="uploadImg"
           >
 
@@ -69,6 +70,13 @@ https://blog.csdn.net/weixin_44345975/article/details/123697991
                 >
                   <i class="el-icon-zoom-in" />
                 </span>
+                <span
+                  class="el-upload-list__item-delete"
+                  @click="handleRemove(file)"
+                >
+                  <i class="el-icon-delete" />
+                </span>
+
               </span>
             </div>
           </el-upload>
@@ -136,6 +144,7 @@ export default {
       dialogVisible: false,
       disabled: false,
       baseurl: 'http://localhost:8080/petHis',
+      realimageUrl: '',
       rules: {
         name: [
           { required: true, message: '请输入名字', trigger: 'blur' }
@@ -290,6 +299,7 @@ export default {
       this.$confirm('确认关闭？')
         .then(_ => {
           this.resetForm()
+          this.$refs.pictureUpload.clearFiles()
           done()
         })
         .catch(_ => {})
@@ -311,12 +321,23 @@ export default {
         if (res.total > 0) {
           alert(666)
           this.medicine.image = this.baseurl + res.data
+          console.log(this.medicine)
         }
       })
     },
     handlePictureCardPreview(file) {
       this.dialogImageUrl = this.medicine.image
       this.dialogVisible = true
+    },
+    handleRemove(file) {
+      // this.$refs.upload.clearFiles()
+      const uploadFiles = this.$refs.pictureUpload.uploadFiles
+      for (const i in uploadFiles) {
+        if (file.url === uploadFiles[i].url) {
+          uploadFiles.splice(i, 1)
+          this.medicine.image = ''
+        }
+      }
     },
     submitForm() {
       this.$refs.addMedicineForm.validate(valid => {
@@ -364,7 +385,10 @@ export default {
       })
     },
 
-    resetForm() { this.$refs.addMedicineForm.resetFields() },
+    resetForm() {
+      this.$refs.addMedicineForm.resetFields()
+      this.$refs.pictureUpload.clearFiles()
+    },
     // 搜索层事件
     // 子组件通信
     childMsg(msg) {

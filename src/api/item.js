@@ -10,3 +10,26 @@ export function getItemInfoList(data) {
     }
   })
 }
+export function addItem(data) {
+  return request({
+    url: '/item/addItem',
+    method: 'post',
+    data
+  })
+}
+export function deleteItembyId(id) {
+  return request({
+    url: '/item/deleteItembyId',
+    method: 'delete',
+    params: {
+      id
+    }
+  })
+}
+export function updateItemById(data) {
+  return request({
+    url: '/item/updateItemById',
+    method: 'post',
+    data
+  })
+}

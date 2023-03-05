@@ -21,3 +21,12 @@ export function getAppointPersonalInfo(userId) {
 
   })
 }
+
+export function addAppoint(data) {
+  return request({
+    url: '/appoint/addAppoint',
+    method: 'post',
+    data
+
+  })
+}

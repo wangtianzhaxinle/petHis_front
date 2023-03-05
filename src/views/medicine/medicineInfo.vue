@@ -4,7 +4,13 @@
       :data-source="dataSource"
       @changeSize="changeSize"
       @changeNum="changeNum"
-    />
+    >  <template v-slot:image="data">
+      <el-image
+        style="width: 100px; height: 100px"
+        :src="data.scope.row.image"
+      />
+    </template></table-pane>
+
     <el-dialog
       title="添加药物"
       :visible.sync="addDialogVisible"
@@ -12,6 +18,7 @@
       :before-close="handleClose"
     >
       <el-form ref="addMedicineForm" :model="medicine" :rules="rules" label-width="100px" class="demo-ruleForm">
+
         <el-form-item label="名字" prop="name">
           <el-input v-model="medicine.name" />
         </el-form-item>
@@ -38,6 +45,7 @@ https://blog.csdn.net/weixin_44345975/article/details/123697991
             list-type="picture-card"
             :limit="1"
             :http-request="uploadImg"
+            :file-list="filelist"
           >
 
             <!-- <div slot="file" slot-scope="{file}">
@@ -96,8 +104,8 @@ https://blog.csdn.net/weixin_44345975/article/details/123697991
         <el-form-item label="描述" prop="description">
           <el-input v-model="medicine.description" />
         </el-form-item>
-        <el-form-item label="保质期" prop="Exp">
-          <el-input v-model="medicine.Exp" />
+        <el-form-item label="保质期" prop="exp">
+          <el-input v-model="medicine.exp" />
         </el-form-item>
         <el-form-item label="批准文号" prop="authenticationcode">
           <el-input v-model="medicine.authenticationcode" />
@@ -118,6 +126,7 @@ https://blog.csdn.net/weixin_44345975/article/details/123697991
 
       </el-form>
     </el-dialog>
+
     <el-dialog :visible.sync="dialogVisible">
       <img width="100%" :src="dialogImageUrl" alt="">
     </el-dialog>
@@ -125,7 +134,7 @@ https://blog.csdn.net/weixin_44345975/article/details/123697991
 </template>
 
 <script>
-import { getMedicineList, addMedicineInfo } from '@/api/medicine'
+import { getMedicineList, addMedicineInfo, deleteMedicineById, updateMedicineInfo } from '@/api/medicine'
 import { upload } from '@/api/upload'
 
 import tablePane from '@/components/tablePane.vue'
@@ -143,9 +152,13 @@ export default {
       dialogImageUrl: '',
       dialogVisible: false,
       disabled: false,
+      isEditImage: false,
+      dialogtype: '',
       baseurl: 'http://localhost:8080/petHis',
-      realimageUrl: '',
+
+      filelist: [],
       rules: {
+
         name: [
           { required: true, message: '请输入名字', trigger: 'blur' }
           // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
@@ -167,7 +180,7 @@ export default {
         description: [
           { message: '请输入描述', trigger: 'blur' }
         ],
-        Exp: [
+        exp: [
           { required: true, message: '请输入保质期', trigger: 'blur' }
 
         ],
@@ -182,17 +195,30 @@ export default {
 
       },
       medicine: {
+        medicineid: '',
         name: '',
         company: '',
         price: '',
         amount: '',
         description: '',
-        Exp: '',
+        exp: '',
         authenticationcode: '',
         image: '',
-
         isprescription: ''
       },
+      /*
+      editMedicineInfo: {
+        medicineid: '',
+        name: '',
+        company: '',
+        price: '',
+        amount: '',
+        description: '',
+        exp: '',
+        authenticationcode: '',
+        image: '',
+        isprescription: ''
+      },*/
       // 表格配置
       dataSource: {
         tool: [{
@@ -210,7 +236,8 @@ export default {
           },
           {
             label: '图片',
-            prop: 'image'
+            prop: 'image',
+            isTemplate: true // 这里要开启才能启用插槽
           },
           {
             label: '名字',
@@ -250,7 +277,14 @@ export default {
           },
           {
             label: '是否处方药别',
-            prop: 'isprescription'
+            prop: 'isprescription',
+            isCodeTableFormatter: function(val) { // 过滤器
+              if (val.isprescription === 1) {
+                return '是'
+              } else {
+                return '否'
+              }
+            }
 
           }
 
@@ -298,12 +332,19 @@ export default {
     handleClose(done) {
       this.$confirm('确认关闭？')
         .then(_ => {
+          // console.log('hs11111')
           this.resetForm()
-          this.$refs.pictureUpload.clearFiles()
+          // console.log('hs22222')
+          // this.$refs.pictureUpload.clearFiles()
+          alert('filelist清空')
+          this.filelist = []
+          // console.log('hs33333')
           done()
+        //  console.log('hs44444')
         })
         .catch(_ => {})
     },
+
     uploadImg(file) {
       /* const instance1 = axios.create({
         baseURL: 'localhost:8080/petHis',
@@ -319,7 +360,7 @@ export default {
       })*/
       upload(form).then(res => {
         if (res.total > 0) {
-          alert(666)
+          alert(res.message)
           this.medicine.image = this.baseurl + res.data
           console.log(this.medicine)
         }
@@ -331,6 +372,8 @@ export default {
     },
     handleRemove(file) {
       // this.$refs.upload.clearFiles()
+      console.log('handleRemove')
+      console.log(this.filelist)
       const uploadFiles = this.$refs.pictureUpload.uploadFiles
       for (const i in uploadFiles) {
         if (file.url === uploadFiles[i].url) {
@@ -338,16 +381,68 @@ export default {
           this.medicine.image = ''
         }
       }
+      console.log('handleRemove')
     },
     submitForm() {
       this.$refs.addMedicineForm.validate(valid => {
         if (valid) {
           this.loading = true
+          const MedicineInfo = this.medicine
+          console.log(MedicineInfo)
+          if (this.dialogtype === 'create') {
+            addMedicineInfo(MedicineInfo).then(res => {
+            // alert(this.$route.path)
+              alert(res.message)
+              this.addDialogVisible = false
+              this.resetForm()
+              // this.$router.go(0)
+              // this.$router.push({ path: this.$route.path || '/' })
+              this.loading = false
+              this.getList()
+            }).catch(() => {
+              this.loading = false
+            })
+          } else if (this.dialogtype === 'edit') {
+            this.loading = true
+            const MedicineInfo = this.medicine
+
+            console.log(MedicineInfo)
+            updateMedicineInfo(MedicineInfo).then(res => {
+            // alert(this.$route.path)
+              alert(res.message)
+              this.addDialogVisible = false
+              this.resetForm()
+              // this.$router.go(0)
+              // this.$router.push({ path: this.$route.path || '/' })
+              this.loading = false
+              this.getList()
+            }).catch(() => {
+              this.loading = false
+            })
+          }
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    /*
+    submitEditForm() {
+      this.$refs.editMedicineForm.validate(valid => {
+        if (valid) {
+          this.loading = true
           const data = this.medicine
           console.log(data)
-          addMedicineInfo(data).then(() => {
-            this.$router.push({ path: this.redirect || '/' })
+          updateMedicineInfo(data).then(res => {
+            // alert(this.$route.path)
+            alert(res.message)
+            this.editDialogVisible = false
+            this.resetForm()
+            this.filelist = []
+            // this.$router.go(0)
+            // this.$router.push({ path: this.$route.path || '/' })
             this.loading = false
+            this.getList()
           }).catch(() => {
             this.loading = false
           })
@@ -356,9 +451,66 @@ export default {
           return false
         }
       })
-    },
+    },*/
     addMedicine() {
+      // this.addDialogVisible = true
+      this.dialogtype = 'create'
       this.addDialogVisible = true
+    },
+
+    editMedicine(index, row) {
+      // this.editDialogVisible = true
+      // this.medicine = row
+      // this.isEditImage = true
+      // this.filelist.push({ 'url': this.medicine.image })
+      this.dialogtype = 'edit'
+      console.log('editMedicine')
+      this.addDialogVisible = true
+      // console.log('row')
+      // console.log(row)
+      // console.log('row')
+      //
+      // this.medicine = row 这里如果这样写会导致表格的行与medicine绑定,一旦重置表单,或是修改时添加行数据,都会导致列表数据变化
+      // 当进入页面,先点击添加再点击编辑,会导致重置表单时将对应的行数据清空
+      // 如果进入页面时,先点击编辑再点击添加,会导致进入添加时是第一次点击修改的行对应的数据,且重置会把数据恢复到第一次点击编辑的对应的行的数据
+      // 上面的原因在于重置表单的初始值是进入页面第一次进入表单的初始值,添加使初始值都是空,所以能正常;
+      // 可编辑时会先获取对应的行的数据赋值,所以导致初值固定在这个值了
+      // this.medicine = row
+      /* //this.medicine = row会导致列表行和medicine数据绑定,medicine变化时带动列表对应的行也一起变化
+      //参考https://blog.csdn.net/u011096919/article/details/120369981
+      //只能单独一个个赋值,如下,或是这样this.medicine = JSON.parse(JSON.stringify(row))
+      this.medicine.medicineid = row.medicineid
+      this.medicine.name = row.name
+      this.medicine.company = row.company
+      this.medicine.price = row.price
+      this.medicine.amount = row.amount
+      this.medicine.description = row.description
+      this.medicine.exp = row.exp
+      this.medicine.authenticationcode = row.authenticationcode
+      this.medicine.image = row.image
+      this.medicine.isprescription = row.isprescription
+
+*/
+      // this.medicine = JSON.parse(JSON.stringify(row))
+      // 编辑时赋初值会导致表单初始值固定为这个,这样重置表单时无法重置到空,所以用this.$nextTick(()=>{})把赋初值的时间拖到medicine赋值为空之后
+      // 参考https://www.jianshu.com/p/9b636f4b2c30
+      this.$nextTick(() => {
+        // 赋值
+        this.medicine = JSON.parse(JSON.stringify(row))
+        // console.log(this.medicine)
+        this.filelist.push({ 'url': this.medicine.image })
+      })
+      console.log(this.medicine)
+      // this.filelist.push({ 'url': this.medicine.image })
+    },
+    deleteMedicine(index, row) {
+      deleteMedicineById(row.medicineid
+      ).then(res => {
+        alert(res.message)
+        if (res.total > 0) {
+          this.getList()
+        }
+      })
     },
     // 获取列表数据
     getList() {
@@ -386,9 +538,37 @@ export default {
     },
 
     resetForm() {
+      // 当加入修改药品信息的对话框后,如果先打开添加药品对话框,再打开修改对话框,可以关闭,但是对应的药品信息的行会内容变空
+      // 如果先打开修改对话框则无法退出对话框挑时候发现问题在 this.$refs.addMedicineForm.resetFields()
+      // console.log(55555)
       this.$refs.addMedicineForm.resetFields()
+      // console.log(6666)
       this.$refs.pictureUpload.clearFiles()
+
+      this.medicine.medicineid = ''
+      // alert(this.medicine.medicineid)
+      console.log('filelist')
+      console.log(this.filelist)
+      this.filelist = []// 不加这行,在修改时删掉原先图片在上传新的图片,提交成功后,再点击修改进去表单会发现有两张图片
+      // alert(this.medicineid)
+      /* this.$refs.editMedicineForm.resetFields()
+      this.filelist = []*/
     },
+    /*
+    reseteditForm() {
+      // 当加入修改药品信息的对话框后,如果先打开添加药品对话框,再打开修改对话框,可以关闭,但是对应的药品信息的行会内容变空
+      // 如果先打开修改对话框则无法退出对话框挑时候发现问题在 this.$refs.addMedicineForm.resetFields()
+      console.log('edit66666')
+      this.$refs.editMedicineForm.resetFields()
+
+      // this.$refs.addMedicineForm.resetFields()
+      console.log('edit7777')
+      this.$refs.editpictureUpload.clearFiles()
+      // this.$refs.editMedicineForm.resetFields()
+      this.filelist = []
+      this.filelist.push({ 'url': this.medicine.image })
+    },
+*/
     // 搜索层事件
     // 子组件通信
     childMsg(msg) {

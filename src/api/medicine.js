@@ -30,3 +30,19 @@ export function addMedicineInfo(data) {
 
   })
 }
+export function deleteMedicineById(id) {
+  return request({
+    url: '/medicine/deleteMedicineById/' + id,
+    method: 'delete'
+
+  })
+}
+export function updateMedicineInfo(data) {
+  return request({
+    url: '/medicine/updateMedicineInfo',
+    method: 'post',
+
+    data
+
+  })
+}

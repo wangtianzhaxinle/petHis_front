@@ -1,45 +1,26 @@
 <template>
-  <div>
-    <table-pane
-      :data-source="dataSource"
-      @changeSize="changeSize"
-      @changeNum="changeNum"
-    > <template v-slot:image="data">
-      <el-image
-        style="width: 100px; height: 100px"
-        :src="data.scope.row.image"
-      />
-    </template></table-pane>
 
-  </div>
-</template>
-
+  <div class="app-container"> <table-pane
+    :data-source="dataSource"
+    @changeSize="changeSize"
+    @changeNum="changeNum"
+  />
+  </div></template>
 <script>
 
-import { getEmployeeList } from '@/api/employee.js'
 import tablePane from '@/components/tablePane.vue'
-
+import { getEmployeeByTomorrow } from '@/api/employee'
+import { addAppoint } from '@/api/appoint'
 export default {
-  name: 'EmployeeInfo',
+  name: 'ApponitDoctor',
   components: { tablePane },
+
   data() {
     return {
-      // 搜索栏配置
-
+      itemId: '',
       // 表格配置
       dataSource: {
-        tool: [{
-          name: '新增员工',
-          key: 'addEmployee',
-          permission: 'addEmployee',
-          handleClick: this.addEmployee
-        },
-        {
-          name: '批量删除',
-          key: 'batchDeleteEmployee',
-          permission: 'batchDeleteEmployee',
-          handleClick: this.batchDeleteEmployee
-        }
+        tool: [
         ],
         data: [], // 表格数据
         cols: [
@@ -53,12 +34,6 @@ export default {
             prop: 'user.name',
             width: 100
           },
-          {
-            label: '照片',
-            prop: 'image',
-            width: 100,
-            isTemplate: true
-          },
 
           {
             label: '性别',
@@ -68,30 +43,20 @@ export default {
           },
 
           {
-            label: '手机号',
-            prop: 'user.phonenumber',
-            width: 300
-          },
-          {
-            label: '地址',
-            prop: 'user.address'
-          },
+            label: '容量',
+            prop: 'maxappoint',
+            width: 100
 
+          },
           {
             label: '入职时间',
             prop: 'hiredate'
           },
 
           {
-            label: '薪水',
-            prop: 'salary'
-          },
-
-          {
-            label: '银行卡',
-            prop: 'bankcard'
+            label: '学历',
+            prop: 'educationbackground'
           }
-
         ], // 表格的列数据
 
         handleSelectionChange: this.handleSelectionChange,
@@ -107,22 +72,18 @@ export default {
         operation: {
           // 表格有操作列时设置
           label: '操作', // 列名
-          width: '100', // 根据实际情况给宽度
+          width: '200', // 根据实际情况给宽度
           data: [
             {
-              label: '删除', // 操作名称
-              type: 'danger',
-              permission: 'deleteRow', // 后期这个操作的权限，用来控制权限
-              handleRow: this.deleteRow
-            },
-            {
-              label: '修改', // 操作名称
-              type: 'warming',
-              permission: 'editRow', // 后期这个操作的权限，用来控制权限
-              handleRow: this.editRow
+              label: '选择', // 操作名称
+              type: 'info',
+              permission: '2010702', // 后期这个操作的权限，用来控制权限
+              handleRow: this.apponitDoctor
             }
+
           ]
         }
+
       },
       dialogAdd: false,
       msg: {},
@@ -130,19 +91,21 @@ export default {
     }
   },
   created() {
+    // this.itemId = this.$route.params.itemId
     this.getList()
   },
   methods: {
+
     // 获取列表数据
     getList() {
       const data = {
         pageSize: this.dataSource.pageData.pageSize,
-        pageNum: this.dataSource.pageData.pageNum
+        pageNum: this.dataSource.pageData.pageNum,
+        roleId: 4
       }
-
       this.dataSource.loading = true
-      console.log('getAllPetInfoList')
-      getEmployeeList(data).then(res => {
+      console.log('getItemInfoList')
+      getEmployeeByTomorrow(data).then(res => {
         this.dataSource.loading = false
         // if (res.succeed) {
         if (res.total > 0) {
@@ -154,6 +117,11 @@ export default {
           this.dataSource.pageData.total = 0
         }
         // }
+      })
+    },
+    apponitDoctor(index, row) {
+      addAppoint().then(res => {
+
       })
     },
     // 搜索层事件
@@ -187,28 +155,9 @@ export default {
     handleAdd(index, row) {
       this.dialogAdd = true
     }
-    /*
-      // 表格操作列回调
-      handleRow(index, row, lable) {
-        if (lable === '删除') {
-          this.$confirm('确认删除该版本?', '温馨提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }).then(() => {
-            delVersion({ versionId: row.id }).then(res => {
-              if (res.succeed) {
-                this.$message.success('删除成功')
-                this.getList()
-              }
-            })
-          }).catch(() => {
-          })
-        }
-      }
-      **/
 
   }
 }
+
 </script>
 

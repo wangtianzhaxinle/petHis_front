@@ -37,18 +37,19 @@ export default {
           },
 
           {
-            label: '周一上午',
-            prop: 'mondayam',
+            label: '周一',
+            prop: 'monday',
             width: 100,
 
             // isIcon: true,
             isCodeTableFormatter: function(val) {
-              if (val.mondayam === 1) {
+              if (val.monday === 1) {
                 return '上班'
               } else {
                 return '休息'
               }
-            }/*,
+            } },
+          /*,
             isTemplateClass: function(val) {
               if (val.mondayam === 1) {
                 return 'color-red'
@@ -57,7 +58,7 @@ export default {
               }
             }*/
 
-            /* filter: function(val) {
+          /* filter: function(val) {
               if (val === 4) {
                 return '特定用户'
               } else if (val === 3) {
@@ -78,14 +79,13 @@ export default {
                 return 'el-icon-close'
               }
             }*/
-          },
 
           {
-            label: '周一下午',
-            prop: 'mondayam',
+            label: '周二',
+            prop: 'tuesday',
             width: 100,
             isCodeTableFormatter: function(val) {
-              if (val.mondayam === 1) {
+              if (val.tuesday === 1) {
                 return '上班'
               } else {
                 return '休息'
@@ -95,38 +95,11 @@ export default {
           },
 
           {
-            label: '周二上午',
-            prop: 'tuesdayam',
+            label: '周三',
+            prop: 'wednesday',
             width: 100,
             isCodeTableFormatter: function(val) {
-              if (val.mondayam === 1) {
-                return '上班'
-              } else {
-                return '休息'
-              }
-            }
-
-          },
-
-          {
-            label: '周二下午',
-            prop: 'tuesdaypm',
-            width: 100,
-            isCodeTableFormatter: function(val) {
-              if (val.mondayam === 1) {
-                return '上班'
-              } else {
-                return '休息'
-              }
-            }
-
-          },
-          {
-            label: '周三上午',
-            prop: 'wednesdayam',
-            width: 100,
-            isCodeTableFormatter: function(val) {
-              if (val.mondayam === 1) {
+              if (val.wednesday === 1) {
                 return '上班'
               } else {
                 return '休息'
@@ -135,11 +108,11 @@ export default {
           },
 
           {
-            label: '周三下午',
-            prop: 'wednesdaypm',
+            label: '周四',
+            prop: 'thursday',
             width: 100,
             isCodeTableFormatter: function(val) {
-              if (val.mondayam === 1) {
+              if (val.thursday === 1) {
                 return '上班'
               } else {
                 return '休息'
@@ -148,25 +121,11 @@ export default {
           },
 
           {
-            label: '周四上午',
-            prop: 'thursdayam',
+            label: '周五',
+            prop: 'friday',
             width: 100,
             isCodeTableFormatter: function(val) {
-              if (val.mondayam === 1) {
-                return '上班'
-              } else {
-                return '休息'
-              }
-            }
-
-          },
-
-          {
-            label: '周四下午',
-            prop: 'thursdaypm',
-            width: 100,
-            isCodeTableFormatter: function(val) {
-              if (val.mondayam === 1) {
+              if (val.friday === 1) {
                 return '上班'
               } else {
                 return '休息'
@@ -175,25 +134,11 @@ export default {
           },
 
           {
-            label: '周五上午',
-            prop: 'fridayam',
+            label: '周六',
+            prop: 'saturday',
             width: 100,
             isCodeTableFormatter: function(val) {
-              if (val.mondayam === 1) {
-                return '上班'
-              } else {
-                return '休息'
-              }
-            }
-
-          },
-
-          {
-            label: '周五下午',
-            prop: 'fridaypm',
-            width: 100,
-            isCodeTableFormatter: function(val) {
-              if (val.mondayam === 1) {
+              if (val.saturday === 1) {
                 return '上班'
               } else {
                 return '休息'
@@ -202,52 +147,11 @@ export default {
           },
 
           {
-            label: '周六上午',
-            prop: 'saturdayam',
+            label: '周日',
+            prop: 'sunday',
             width: 100,
             isCodeTableFormatter: function(val) {
-              if (val.mondayam === 1) {
-                return '上班'
-              } else {
-                return '休息'
-              }
-            }
-
-          },
-
-          {
-            label: '周六下午',
-            prop: 'saturdaypm',
-            width: 100,
-            isCodeTableFormatter: function(val) {
-              if (val.mondayam === 1) {
-                return '上班'
-              } else {
-                return '休息'
-              }
-            }
-          },
-
-          {
-            label: '周日上午',
-            prop: 'sundayam',
-            width: 100,
-            isCodeTableFormatter: function(val) {
-              if (val.mondayam === 1) {
-                return '上班'
-              } else {
-                return '休息'
-              }
-            }
-
-          },
-
-          {
-            label: '周日下午',
-            prop: 'sundaypm',
-            width: 100,
-            isCodeTableFormatter: function(val) {
-              if (val.mondayam === 1) {
+              if (val.sunday === 1) {
                 return '上班'
               } else {
                 return '休息'

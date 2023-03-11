@@ -9,9 +9,10 @@
 <script>
 
 import tablePane from '@/components/tablePane.vue'
-import { getEmployeeListByRoleId } from '@/api/employee'
+import { getEmployeeByTomorrow } from '@/api/employee'
+import { addAppoint } from '@/api/appoint'
 export default {
-  name: 'ItemInfo',
+  name: 'ApponitInjection',
   components: { tablePane },
 
   data() {
@@ -42,30 +43,20 @@ export default {
           },
 
           {
-            label: '手机号',
-            prop: 'user.phonenumber',
-            width: 300
-          },
-          {
-            label: '地址',
-            prop: 'user.address'
-          },
+            label: '容量',
+            prop: 'maxappoint',
+            width: 100
 
+          },
           {
             label: '入职时间',
             prop: 'hiredate'
           },
 
           {
-            label: '薪水',
-            prop: 'salary'
-          },
-
-          {
-            label: '银行卡',
-            prop: 'bankcard'
+            label: '学历',
+            prop: 'educationbackground'
           }
-
         ], // 表格的列数据
 
         handleSelectionChange: this.handleSelectionChange,
@@ -100,8 +91,7 @@ export default {
     }
   },
   created() {
-    this.itemId = this.$route.params.itemId
-
+    // this.itemId = this.$route.params.itemId
     this.getList()
   },
   methods: {
@@ -111,12 +101,11 @@ export default {
       const data = {
         pageSize: this.dataSource.pageData.pageSize,
         pageNum: this.dataSource.pageData.pageNum,
-        roleId: this.itemId
+        roleId: 4
       }
-
       this.dataSource.loading = true
       console.log('getItemInfoList')
-      getEmployeeListByRoleId(data).then(res => {
+      getEmployeeByTomorrow(data).then(res => {
         this.dataSource.loading = false
         // if (res.succeed) {
         if (res.total > 0) {
@@ -128,6 +117,11 @@ export default {
           this.dataSource.pageData.total = 0
         }
         // }
+      })
+    },
+    apponitDoctor(index, row) {
+      addAppoint().then(res => {
+
       })
     },
     // 搜索层事件

@@ -1,3 +1,5 @@
+import { isRepeatUsername } from '@/api/user'
+
 /**
  * Created by PanJiaChen on 16/11/18.
  */
@@ -21,4 +23,23 @@ export function validUsername(str) {
 
   // return valid_map.indexOf(str.trim()) >= 0
   return true
+}
+
+export async function checkUsername(username) {
+  // const data = JSON.stringify(username)
+  var flag = true
+  return new Promise((resolve, reject) => {
+    isRepeatUsername(username).then(res => {
+    // console.log('res.toal' + res.total)
+      if (res.total > 0) {
+        // console.log('return false')
+        flag = false
+      } else {
+      //  console.log('return true')
+        flag = true
+      }
+      resolve(flag)
+    })
+  })
+  // return flag
 }

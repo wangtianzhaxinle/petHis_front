@@ -172,13 +172,34 @@
 
       </el-form>
     </el-dialog>
+
+    <el-dialog
+      title="角色"
+      :visible.sync="roleDialogVisible"
+      width="30%"
+      :before-close="handleClose"
+    >
+      <el-tree
+        ref="roleTree"
+        :data="roleData"
+        highlight-current
+        default-expand-all
+        show-checkbox
+        node-key="roleid"
+        :props="defaultProps"
+        @check="handleCheckChange"
+      />
+      <div slot="footer" class="dialog-footer">
+        <!-- <el-button type="primary" @click="submit">提交</el-button> -->
+      </div>
+    </el-dialog>
   </div>
 
 </template>
 
 <script>
 import { getUserInfoList, deleteUserById, deleteUserByIds } from '@/api/user'
-
+import { getAllRoleList, getRoleByUserId } from '@/api/role'
 import tablePane from '@/components/tablePane.vue'
 
 export default {
@@ -191,6 +212,8 @@ export default {
       editDialogVisible: false,
       addDialogVisible: false,
       viewDialogVisible: false,
+
+      roleDialogVisible: false,
       userInfo: {
         /* name: '',
         age: '',
@@ -202,6 +225,12 @@ export default {
         email: ''
 */
       },
+      defaultProps: {
+        label: 'description'
+      },
+      userId: '',
+      roleData: {},
+      roleIds: [],
       rules: {
         name: [
           { required: true, message: '请输入名字', trigger: 'blur' }
@@ -334,7 +363,7 @@ export default {
         operation: {
           // 表格有操作列时设置
           label: '操作', // 列名
-          width: '150', // 根据实际情况给宽度
+          width: '250', // 根据实际情况给宽度
           data: [
             {
               label: '删除', // 操作名称
@@ -342,10 +371,10 @@ export default {
               permission: 'deleteUser', // 后期这个操作的权限，用来控制权限
               handleRow: this.deleteUser
             }, {
-              label: '查看', // 操作名称
+              label: '查看角色', // 操作名称
               type: 'info',
-              permission: 'viewUser', // 后期这个操作的权限，用来控制权限
-              handleRow: this.viewUser
+              permission: 'viewRole', // 后期这个操作的权限，用来控制权限
+              handleRow: this.viewRole
             },
             {
               label: '修改', // 操作名称
@@ -363,6 +392,7 @@ export default {
   },
   created() {
     this.getList()
+    this.getRoleList()
   },
   methods: {
     handleClose(done) {
@@ -396,6 +426,11 @@ export default {
         // }
       })
     },
+    getRoleList() {
+      getAllRoleList().then(res => {
+        this.roleData = res.data
+      })
+    },
     // 搜索层事件
 
     // 子组件通信
@@ -424,9 +459,7 @@ export default {
     },
     //
     // 表格上方工具栏回调
-    handleAdd(index, row) {
-      this.dialogAdd = true
-    },
+
     /*
     // 表格操作列回调
     handleRow(index, row, lable) {
@@ -472,11 +505,33 @@ export default {
     viewUser(index, row) {
       this.viewDialogVisible = true
       this.userInfo = row
-    }, AddUser(index, row) { // 这里粗心AddUser写成了addUser,所以一直提示handleClick不是一个方法
+    },
+    AddUser(index, row) { // 这里粗心AddUser写成了addUser,所以一直提示handleClick不是一个方法
       this.addDialogVisible = true
 
       // alert(222)
-    }, AllDelete() {
+    },
+    viewRole(index, row) {
+      this.roleDialogVisible = true
+      this.userId = ''
+      this.userId = row.userid
+      getRoleByUserId(this.userId).then(res => {
+        this.roleIds = this.getIdsFromJson(res.data)
+
+        // console.log(this.permissionids)
+        if (this.roleIds) {
+          this.$nextTick(() => {
+            this.$refs.roleTree.setCheckedKeys([])// 不放在这里在的话在进入页面的第一次调用时,el-tree还
+            // 未渲染,此时如果不放在nextTick里面会报错找不到setCheckedKeys属性,没有默认选中效果,只有在第二次开始显示才正常
+            this.roleIds.forEach(value => { // 真的大坑，我自己摸索好久！！！
+              this.$refs.roleTree.setChecked(value, true, false) // 给树节点赋值
+            })
+            this.checkStrictly = false // 重点： 赋值完成后 设置为false
+          })
+        }
+      })
+    },
+    AllDelete() {
       console.log(this.selected)
       const ids = this.selected.map((user) => user.userId)
       this.$confirm('确认删除选中的用户?', '温馨提示', {
@@ -496,6 +551,24 @@ export default {
 
       // console.log(ids)
       // alert(111)
+    },
+    handleCheckChange(data, checked) {
+      // checked.checkedKeys  选中的节点id数组z
+      // checked.halfCheckedKeys 半选中节点id数组
+      this.roleIds = checked.halfCheckedKeys.concat(checked.checkedKeys) // 选中节点和半选中节点所有的id
+    },
+    getIdsFromJson(json) {
+      // console.log(json)
+      const ids = []
+      if (json) {
+        const array = json
+        for (let i = 0; i < array.length; i++) {
+          const tep = array[i].roleid
+          ids.push(tep)
+        }
+        console.log(ids)
+        return ids
+      }
     }
 
   }

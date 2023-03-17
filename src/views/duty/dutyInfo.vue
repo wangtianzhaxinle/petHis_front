@@ -1,16 +1,90 @@
 <template>
-  <table-pane
-    :data-source="dataSource"
-    @changeSize="changeSize"
-    @changeNum="changeNum"
-  />
+  <div> <table-pane
+          :data-source="dataSource"
+          @changeSize="changeSize"
+          @changeNum="changeNum"
+        />
+    <el-dialog
+      title="修改值班"
+      :visible.sync="editDutyDialogVisible"
+      width="30%"
+    >
+      <el-form ref="editDutyForm" :model="duty" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="dutyid" hidden>
+          <el-input v-model="duty.dutyid" />
+        </el-form-item>
+
+        <el-form-item label="employeeid" hidden>
+          <el-input v-model="duty.employeeid" />
+        </el-form-item>
+
+        <el-form-item label="名字">
+          <el-input v-model="duty.user.name" :disabled="true" />
+        </el-form-item>
+
+        <el-form-item label="周一是否值班">
+          <el-radio-group v-model="duty.monday" :disabled="dutyDisable.monday">
+            <el-radio :label="1">是</el-radio>
+            <el-radio :label="0">否</el-radio>
+          </el-radio-group>
+        </el-form-item>
+
+        <el-form-item label="周二是否值班">
+          <el-radio-group v-model="duty.tuesday" :disabled="dutyDisable.tuesday">
+            <el-radio :label="1">是</el-radio>
+            <el-radio :label="0">否</el-radio>
+          </el-radio-group>
+        </el-form-item>
+
+        <el-form-item label="周三是否值班">
+          <el-radio-group v-model="duty.wednesday" :disabled="dutyDisable.wednesday">
+            <el-radio :label="1">是</el-radio>
+            <el-radio :label="0">否</el-radio>
+          </el-radio-group>
+        </el-form-item>
+
+        <el-form-item label="周四是否值班">
+          <el-radio-group v-model="duty.thursday" :disabled="dutyDisable.thursday">
+            <el-radio :label="1">是</el-radio>
+            <el-radio :label="0">否</el-radio>
+          </el-radio-group>
+        </el-form-item>
+
+        <el-form-item label="周五是否值班">
+          <el-radio-group v-model="duty.friday" :disabled="dutyDisable.friday">
+            <el-radio :label="1">是</el-radio>
+            <el-radio :label="0">否</el-radio>
+          </el-radio-group>
+        </el-form-item>
+
+        <el-form-item label="周六是否值班">
+          <el-radio-group v-model="duty.saturday" :disabled="dutyDisable.saturday">
+            <el-radio :label="1">是</el-radio>
+            <el-radio :label="0">否</el-radio>
+          </el-radio-group>
+        </el-form-item>
+
+        <el-form-item label="周日是否值班">
+          <el-radio-group v-model="duty.sunday" :disabled="dutyDisable.sunday">
+            <el-radio :label="1">是</el-radio>
+            <el-radio :label="0">否</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="submitForm">添加</el-button>
+          <!-- <el-button @click="resetForm('addMedicineForm')">重置</el-button> -->
+        </el-form-item>
+      </el-form>
+    </el-dialog>
+  </div>
 
 </template>
 
 <script>
 
-import { getDutyList } from '@/api/duty'
+import { getDutyList, updateDutyByDutyId } from '@/api/duty'
 import tablePane from '@/components/tablePane.vue'
+import moment from 'moment'
 
 export default {
   name: 'DutyInfo',
@@ -18,7 +92,27 @@ export default {
   data() {
     return {
       // 搜索栏配置
-
+      editDutyDialogVisible: false,
+      duty: {
+        name: '',
+        monday: '',
+        tuesday: '',
+        wednesday: '',
+        thursday: '',
+        friday: '',
+        saturday: '',
+        sunday: '',
+        user: {}
+      },
+      dutyDisable: {
+        monday: false,
+        tuesday: false,
+        wednesday: false,
+        thursday: false,
+        friday: false,
+        saturday: false,
+        sunday: false
+      },
       // 表格配置
       dataSource: {
         tool: [],
@@ -174,14 +268,14 @@ export default {
         operation: {
           // 表格有操作列时设置
           label: '操作', // 列名
-          width: '100', // 根据实际情况给宽度
+          // 根据实际情况给宽度
           data: [
 
             {
               label: '修改', // 操作名称
               type: 'warming',
-              permission: 'editRow', // 后期这个操作的权限，用来控制权限
-              handleRow: this.editRow
+              permission: 'editDuty', // 后期这个操作的权限，用来控制权限
+              handleRow: this.editDuty
             }
           ]
         }
@@ -201,16 +295,20 @@ export default {
         pageSize: this.dataSource.pageData.pageSize,
         pageNum: this.dataSource.pageData.pageNum
       }
-
+      var today = moment().day()
+      var tomorrow = moment().add(1, 'days').day()
+      // 设置本日和明天的值班不可更改
+      this.setDisabled(today)
+      this.setDisabled(tomorrow)
       this.dataSource.loading = true
-      console.log('getAllPetInfoList')
+      // console.log('getAllPetInfoList')
       getDutyList(data).then(res => {
         this.dataSource.loading = false
         // if (res.succeed) {
         if (res.total > 0) {
           this.dataSource.pageData.total = res.total
           this.dataSource.data = res.data
-          console.log(res.data)
+          // console.log(res.data)
         } else {
           this.dataSource.data = []
           this.dataSource.pageData.total = 0
@@ -218,7 +316,60 @@ export default {
         // }
       })
     },
+    editDuty(index, row) {
+      this.editDutyDialogVisible = true
+      this.duty = JSON.parse(JSON.stringify(row))
+      // console.log(this.duty)
+    },
+    setDisabled(val) {
+      switch (val) {
+        case 1:
+          this.dutyDisable.monday = true
+          break
+        case 2:
+          this.dutyDisable.tuesday = true
+          break
+        case 3:
+          this.dutyDisable.wednesday = true
+          break
+        case 4:
+          this.dutyDisable.thursday = true
+          break
+        case 5:
+          this.dutyDisable.friday = true
+          break
+        case 6:
+          this.dutyDisable.saturday = true
+          break
+        case 7:
+          this.dutyDisable.sunday = true
+          break
+      }
+    },
+    submitForm() {
+      /*
+      var data = {
+        dutyId: this.duty.dutyid,
+        employeeId: this.duty.employeeid,
+        monday: this.duty.monday,
+        tuesday: this.duty.tuesday,
+        wednesday: this.duty.wednesday,
+        thursday: this.duty.thursday,
+        friday: this.duty.friday,
+        saturday: this.duty.saturday,
+        sunday: this.duty.sunday
 
+      }
+      */
+      const data = this.duty
+      updateDutyByDutyId(data).then(res => {
+        alert(res.message)
+        if (res.total > 0) {
+          this.getList()
+          this.editDutyDialogVisible = false
+        }
+      })
+    },
     // 搜索层事件
 
     // 子组件通信

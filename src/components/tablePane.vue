@@ -14,13 +14,14 @@
         {{ item.name }}
       </el-button>
     </div>
+    <!-- 下面本来有个 @row-click="getRowData",可以点击行就选中,当时单击操作按钮时也会选中不太方便就去掉了 -->
     <el-table
       ref="table"
       v-loading="dataSource.loading"
       style="width: 100%;"
       :class="{ 'no-data': !dataSource.data || !dataSource.data.length }"
       :data="dataSource.data"
-      @row-click="getRowData"
+
       @selection-change="dataSource.handleSelectionChange"
     >
       <!-- 是否有多选 -->

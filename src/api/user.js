@@ -42,3 +42,11 @@ export function registerUser(data) {
     data
   })
 }
+
+export async function isRepeatUsername(username) {
+  return request({
+    url: '/user/isRepeatUsername',
+    method: 'post',
+    data: { username }
+  })
+}

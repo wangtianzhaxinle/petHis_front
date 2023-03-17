@@ -19,16 +19,50 @@
         default-expand-all
         show-checkbox
         node-key="permissionid"
-
         :props="defaultProps"
+
+        @check="handleCheckChange"
       />
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submit">提交</el-button>
+      <!-- <el-button @click="resetForm('addMedicineForm')">重置</el-button> -->
+      </div>
+
+    </el-dialog>
+
+    <el-dialog
+      :title="title"
+      :visible.sync="roleDialogVisible"
+      width="30%"
+      :before-close="handleClose"
+    >
+      <el-form ref="RoleForm" :model="role" :rule="rules" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="roleId" hidden>
+          <el-input v-model="role.roleid" />
+        </el-form-item>
+
+        <el-form-item label="角色名" prop="name">
+          <el-input v-model="role.name" />
+        </el-form-item>
+
+        <el-form-item label="描述" prop="description">
+          <el-input v-model="role.description" />
+
+        </el-form-item>
+        <el-form-item>
+
+          <el-button type="primary" @click="submitForm()">提交</el-button>
+
+        </el-form-item>
+
+      </el-form>
     </el-dialog>
   </div>
 
 </template>
 
 <script>
-import { getRoleList, deleteRoleById, getPermissionByRoleId } from '@/api/role'
+import { getRoleList, deleteRoleById, getPermissionByRoleId, updatePermissionByRoleId, addRole, updateRoleByRoleId } from '@/api/role'
 import { getPermissionTree } from '@/api/permission'
 
 import tablePane from '@/components/tablePane.vue'
@@ -46,43 +80,30 @@ export default {
         label: 'name'
       },
       permissionids: [],
-      /*
-        rules: {
-          name: [
-            { required: true, message: '请输入名字', trigger: 'blur' }
-            // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
-          ],
-          age: [
-            { required: true, message: '请输入年龄', trigger: 'blur' },
-            { type: 'number', required: true, message: '请输入正确的年龄', trigger: ['blur', 'change'] }
-          ],
-          sex: [
+      roleId: '',
+      title: '',
+      roleDialogVisible: false,
+      role: {
 
-            { type: 'array', message: '请选择性别', trigger: 'blur' }
-          ],
-          phoneNumber: [
-            { required: true, message: '请选择手机号', trigger: 'blur' }
-          ],
-          address: [
-            { required: true, message: '请输入地址', trigger: 'blur' }
-          ],
-          email: [
-            { required: true, message: '请输入邮箱地址', trigger: 'blur' },
-            { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
-          ], username: [
-            { required: true, message: '请输入用户名', trigger: 'blur' }
+      },
+      submitType: '',
 
-          ], createtime: [
-            { required: true, message: '请选择日期', trigger: 'blur' }
+      rules: {
+        name: [
+          { required: true, message: '请输入名字', trigger: 'blur' }
 
-          ]
+        ],
+        description: [
+          { required: true, message: '请输入描述', trigger: 'blur' }
 
-        },
-  */
+        ]
+
+      },
+
       // 表格配置
       dataSource: {
         tool: [{
-          name: '新增权限',
+          name: '新增角色',
           key: 'AddRole',
           permission: 'AddRole',
           handleClick: this.AddRole
@@ -165,10 +186,22 @@ export default {
       this.$confirm('确认关闭？')
         .then(_ => {
           // this.resetForm()
-
           done()
         })
         .catch(_ => {})
+    },
+    submit() {
+      // alert('提交')
+      const data = {
+        permissionids: this.permissionids,
+        roleId: this.roleId
+      }
+      updatePermissionByRoleId(data).then(res => {
+        alert(res.message)
+        if (res.total > 0) {
+          this.perDialogVisible = false
+        }
+      })
     },
     // 获取列表数据
     getList() {
@@ -198,6 +231,48 @@ export default {
         }
       })
     },
+    AddRole() {
+      this.roleDialogVisible = true
+      this.submitType = 'add'
+      this.title = '添加角色'
+      this.role = {}
+    },
+    editRole(index, row) {
+      this.roleDialogVisible = true
+      this.submitType = 'edit'
+      this.title = '修改角色'
+      this.role = JSON.parse(JSON.stringify(row))
+    },
+
+    submitForm() {
+      this.$refs.RoleForm.validate(valid => {
+        if (valid) {
+          this.loading = true
+          const data = this.role
+          if (this.submitType === 'add') {
+            addRole(data).then(res => {
+              alert(res.message)
+              if (res.total > 0) {
+                this.roleDialogVisible = false
+                this.getList()
+              }
+            })
+          } else if (this.submitType === 'edit') {
+            updateRoleByRoleId(data).then(res => {
+              alert(res.message)
+              if (res.total > 0) {
+                this.roleDialogVisible = false
+                this.getList()
+              }
+            })
+          }
+        } else {
+          console.log('submit error')
+        }
+      }
+      )
+    },
+
     // 搜索层事件
 
     // 子组件通信
@@ -232,7 +307,7 @@ export default {
 
     deleteRole(index, row) {
       // console.log(row.id)
-      this.$confirm('确认删除该用户?', '温馨提示', {
+      this.$confirm('确认删除该角色?', '温馨提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -250,7 +325,9 @@ export default {
     },
     viewPermission(index, row) {
       this.perDialogVisible = true
-      this.$refs.permissionTree.setCheckedKeys([])
+      // this.$refs.permissionTree.setCheckedKeys([])
+      this.roleId = ''
+      this.roleId = row.roleid
       getPermissionByRoleId(row.roleid).then(res => {
         console.log(res.data)
         this.permissionids = this.getIdsFromJson(res.data)
@@ -258,6 +335,8 @@ export default {
         // console.log(this.permissionids)
         if (this.permissionids) {
           this.$nextTick(() => {
+            this.$refs.permissionTree.setCheckedKeys([])// 不放在这里在的话在进入页面的第一次调用时,el-tree还
+            // 未渲染,此时如果不放在nextTick里面会报错找不到setCheckedKeys属性,没有默认选中效果,只有在第二次开始显示才正常
             this.permissionids.forEach(value => { // 真的大坑，我自己摸索好久！！！
               this.$refs.permissionTree.setChecked(value, true, false) // 给树节点赋值
             })
@@ -265,6 +344,11 @@ export default {
           })
         }
       })
+    },
+    handleCheckChange(data, checked) {
+      // checked.checkedKeys  选中的节点id数组z
+      // checked.halfCheckedKeys 半选中节点id数组
+      this.permissionids = checked.halfCheckedKeys.concat(checked.checkedKeys) // 选中节点和半选中节点所有的id
     },
     editUser(index, row) {
       this.editDialogVisible = true
@@ -274,7 +358,7 @@ export default {
       this.addDialogVisible = true
 
       // alert(222)
-    },
+    }, /*
     AllDeletePermission() {
       // console.log(this.selected)
       const ids = this.selected.map((permission) => permission.permissionid)
@@ -292,7 +376,7 @@ export default {
         }
       })
       )
-    },
+    },*/
     getIdsFromJson(json) {
       // console.log(json)
       const ids = []

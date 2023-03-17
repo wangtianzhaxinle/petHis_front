@@ -207,42 +207,42 @@ export const constantRoutes = [
     children: [
       {
 
-        path: '/appointInfo',
-        name: 'appointInfo',
-        component: () => import('@/views/apponit/appointInfo'),
+        path: '/personalAppointList',
+        name: 'personalAppointList',
+        component: () => import('@/views/apponit/personalAppointList'),
         meta: { title: '个人预约列表', icon: 'form' }
 
       }, {
 
-        path: '/appointInfo',
-        name: 'appointInfo',
-        component: () => import('@/views/apponit/appointInfo'),
+        path: '/checkAppointList',
+        name: 'checkAppointList',
+        component: () => import('@/views/apponit/checkAppointList'),
         meta: { title: '看病预约列表', icon: 'form' }
 
       },
       {
 
-        path: '/appointInfo',
-        name: 'appointInfo',
-        component: () => import('@/views/apponit/appointInfo'),
+        path: '/injectAppointList',
+        name: 'injectAppointList',
+        component: () => import('@/views/apponit/injectAppointList'),
         meta: { title: '打疫苗预约列表', icon: 'form' }
 
       },
       {
 
-        path: '/appointInfo',
-        name: 'appointInfo',
-        component: () => import('@/views/apponit/appointInfo'),
+        path: '/depositAppointList',
+        name: 'depositAppointList',
+        component: () => import('@/views/apponit/depositAppointList'),
         meta: { title: '托管预约列表', icon: 'form' }
 
       }, {
 
-        path: '/appointInfo',
-        name: 'appointInfo',
-        component: () => import('@/views/apponit/appointInfo'),
+        path: '/todayAppointList',
+        name: 'todayAppointList',
+        component: () => import('@/views/apponit/todayAppointList'),
         meta: { title: '本日预约列表', icon: 'form' }
 
-      },
+      }, /*
       {
 
         path: '/appointInfo',
@@ -250,7 +250,7 @@ export const constantRoutes = [
         component: () => import('@/views/apponit/appointInfo'),
         meta: { title: '明日预约列表', icon: 'form' }
 
-      },
+      },*/
       {
 
         path: '/appointInfo',

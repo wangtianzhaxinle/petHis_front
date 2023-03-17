@@ -11,3 +11,12 @@ export function getDutyList(data) {
 
   })
 }
+
+export function updateDutyByDutyId(data) {
+  return request({
+    url: '/duty/updateDutyByDutyId',
+    method: 'post',
+    data
+
+  })
+}

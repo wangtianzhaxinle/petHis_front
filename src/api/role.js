@@ -12,6 +12,26 @@ export function getRoleList(data) {
 
   })
 }
+
+export function getAllRoleList() {
+  return request({
+    url: '/role/getAllRoleList',
+    method: 'get'
+
+  })
+}
+
+export function getRoleByUserId(userId) {
+  return request({
+    url: '/role/getRoleByUserId',
+    method: 'get',
+    params: {
+      userId: userId
+
+    }
+
+  })
+}
 export function deleteRoleById(id) {
   return request({
     url: '/role/deleteRoleById',
@@ -30,5 +50,29 @@ export function getPermissionByRoleId(roleId) {
       roleId
     }
 
+  })
+}
+
+export function updatePermissionByRoleId(data) {
+  return request({
+    url: '/role/updatePermissionByRoleId',
+    method: 'post',
+    data
+  })
+}
+
+export function addRole(data) {
+  return request({
+    url: '/role/addRole',
+    method: 'post',
+    data
+  })
+}
+
+export function updateRoleByRoleId(data) {
+  return request({
+    url: '/role/updateRoleByRoleId',
+    method: 'post',
+    data
   })
 }

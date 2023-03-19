@@ -30,14 +30,28 @@ router.beforeEach(async(to, from, next) => {
       NProgress.done()
     } else {
       const hasGetUserInfo = store.getters.name
-      if (hasGetUserInfo) {
+      // 确定用户是否通过getInfo获得了权限角色
+      const hasPerm = store.getters.permissions && store.getters.permissions.length > 0 // 这里指的是src/store/getters.js的roles
+      if (hasPerm) {
         next()
       } else {
         try {
           // 获取用户信息
-          await store.dispatch('user/getInfo')
+          const {
+            permissions
+          } = await store.dispatch('user/getInfo')
+          console.log('perm:' + permissions)
 
-          next()
+          // 2. 根据角色生成可访问路由图
+          // 获取通过权限验证的路由
+          const accessRoutes = await store.dispatch('permission/generateRoutes', permissions) // 第二步
+          console.log(accessRoutes)
+          // 3. 更新加载路由
+          router.options.routes = store.getters.permission_routes // 第三步
+          // 动态添加可访问路由
+          router.addRoutes(accessRoutes)
+          // 这里next里面不加{ ...to, replace: true }的话会导致浏览器刷新页面变成空白
+          next({ ...to, replace: true })
         } catch (error) {
           // 移除token并回到登录页面重新登录
           await store.dispatch('user/resetToken')

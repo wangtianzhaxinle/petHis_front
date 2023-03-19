@@ -9,7 +9,7 @@
 <script>
 
 import tablePane from '@/components/tablePane.vue'
-import { getEmployeeByTomorrow } from '@/api/employee'
+// import { getEmployeeByTomorrow } from '@/api/employee'
 import { addAppoint } from '@/api/appoint'
 export default {
   name: 'ApponitDoctor',
@@ -105,6 +105,7 @@ export default {
       }
       this.dataSource.loading = true
       console.log('getItemInfoList')
+      /*
       getEmployeeByTomorrow(data).then(res => {
         this.dataSource.loading = false
         // if (res.succeed) {
@@ -118,6 +119,7 @@ export default {
         }
         // }
       })
+      */
     },
     apponitDoctor(index, row) {
       addAppoint().then(res => {

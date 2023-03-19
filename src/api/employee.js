@@ -34,9 +34,9 @@ export function getEmployeeListByRoleId(data) {
   })
 }
 
-export function getEmployeeByTomorrow(data) {
+export function getEmployeeByDate(data) {
   return request({
-    url: '/employee/getEmployeeByTomorrow',
+    url: '/employee/getEmployeeByDate',
     method: 'get',
     params: {
       pageNum: data.pageNum,

@@ -63,7 +63,7 @@ const mutations = {
   SET_ROLE: (state, role) => {
     state.role = role
   },
-  SET_PERMISSION: (state, permissions) => {
+  SET_PERMISSIONS: (state, permissions) => {
     state.permissions = permissions
   }
 }
@@ -99,7 +99,9 @@ const actions = {
         }
 
         const { name, avatar, address, age, sex, phonenumber, userid, username, createtime, email, role, permissions } = data
-
+        if (!permissions || permissions.length <= 0) {
+          reject('getInfo:permissions must be a non-null array!')
+        }
         commit('SET_NAME', name)
         commit('SET_AVATAR', avatar)
         commit('SET_ADDRESS', address)
@@ -112,7 +114,7 @@ const actions = {
         commit('SET_EMAIL', email)
         commit('SET_ROLE', role)
 
-        commit('SET_PERMISSION', permissions)
+        commit('SET_PERMISSIONS', permissions)
         resolve(data)
       }).catch(error => {
         reject(error)
@@ -127,6 +129,8 @@ const actions = {
         removeToken() // must remove  token  first
         resetRouter()
         commit('RESET_STATE')
+        commit('SET_PERMISSIONS', [])
+        commit('SET_ROLE', [])
         resolve()
       }).catch(error => {
         reject(error)

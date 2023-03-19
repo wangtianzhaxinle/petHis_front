@@ -26,7 +26,7 @@
 <script>
 
 import tablePane from '@/components/tablePane.vue'
-import { getEmployeeByTomorrow } from '@/api/employee'
+import { getEmployeeByDate } from '@/api/employee'
 import { addAppoint } from '@/api/appoint'
 import moment from 'moment'
 import 'moment/locale/zh-cn'
@@ -134,6 +134,7 @@ export default {
   //  this.getList()
     // moment.updateLocale('zh-cn')
     moment.updateLocale()
+    this.getList(this.menuTabsValue)
   },
   methods: {
     handleClick(tab, event) {
@@ -151,7 +152,7 @@ export default {
       }
       this.dataSource.loading = true
       console.log('getItemInfoList')
-      getEmployeeByTomorrow(data).then(res => {
+      getEmployeeByDate(data).then(res => {
         this.dataSource.loading = false
         // if (res.succeed) {
         if (res.total > 0) {

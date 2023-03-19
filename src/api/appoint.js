@@ -30,3 +30,17 @@ export function addAppoint(data) {
 
   })
 }
+
+export function getAppointListByEmpAndItem(data) {
+  return request({
+    url: '/appoint/getAppointListByEmpAndItem',
+    method: 'get',
+    params: {
+      pageSize: data.pageSize,
+      pageNum: data.pageNum,
+      itemId: data.itemid,
+      employeeid: data.employeeid
+    }
+
+  })
+}

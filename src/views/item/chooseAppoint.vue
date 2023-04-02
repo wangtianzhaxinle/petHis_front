@@ -18,6 +18,40 @@
           @changeSize="changeSize"
           @changeNum="changeNum"
         />
+        <el-dialog
+          title="预约"
+          :visible.sync="appointDialogVisible"
+          width="30%"
+          append-to-body
+        >
+          <el-form ref="appointForm" :model="appoint" :rules="rules" label-width="100px" class="demo-ruleForm">
+            <el-form-item label="employeeid">
+              <el-input v-model="appoint.employeeid" />
+            </el-form-item>
+            <el-form-item label="itemid">
+              <el-input v-model="appoint.itemid" />
+            </el-form-item>
+            <el-form-item label="appointdate">
+              <el-input v-model="appoint.appointdate" />
+            </el-form-item>
+            <el-form-item label="你的宠物" prop="petid">
+              <el-select v-model="appoint.petid" placeholder="请选择">
+                <el-option
+                  v-for=" i in options"
+                  :key="i.petid"
+                  :label="i.name"
+                  :value="i.petid"
+                />
+              </el-select>
+            </el-form-item>
+
+            <el-form-item>
+              <el-button type="primary" @click="submitForm">立即创建</el-button>
+              <!-- <el-button @click="resetForm('ruleForm')">重置</el-button> -->
+            </el-form-item>
+
+          </el-form>
+        </el-dialog>
       </div>
     </el-tab-pane>
 
@@ -27,17 +61,32 @@
 
 import tablePane from '@/components/tablePane.vue'
 import { getEmployeeByDate } from '@/api/employee'
+
+import { getPetListByUserId } from '@/api/pet'
 import { addAppoint } from '@/api/appoint'
 import moment from 'moment'
+import store from '@/store'
 import 'moment/locale/zh-cn'
 
 export default {
-  name: 'ApponitInjection',
+  name: 'ChooseAppoint',
   components: { tablePane },
 
   data() {
     return {
-      itemId: '',
+
+      itemid: '',
+      roleid: '',
+      userId: store.getters.userId,
+      appointDialogVisible: false,
+      options: {
+      },
+      appoint: {
+        itemid: '',
+        petid: '',
+        employeeid: '',
+        appointdate: moment().add(1, 'days').format('L')
+      },
       menuTabsValue: moment().add(1, 'days').format('L'),
       menuTabs: [
         {
@@ -57,6 +106,11 @@ export default {
         }
 
       ],
+      rules: {
+        petid: [
+          { required: true, message: '请选择宠物', trigger: 'change' }
+        ]
+      },
       // 表格配置
       dataSource: {
         tool: [
@@ -117,7 +171,7 @@ export default {
               label: '选择', // 操作名称
               type: 'info',
               permission: '2010702', // 后期这个操作的权限，用来控制权限
-              handleRow: this.apponitDoctor
+              handleRow: this.choose
             }
 
           ]
@@ -130,24 +184,45 @@ export default {
     }
   },
   created() {
-    // this.itemId = this.$route.params.itemId
-  //  this.getList()
+    this.itemid = this.$route.query.itemid
+    this.roleid = this.$route.query.roleid
+    if (typeof (this.itemid) === 'undefined' || typeof (this.roleid) === 'undefined') {
+      this.$router.go(-1)
+    } else {
+      moment.updateLocale()
+      this.getList(this.menuTabsValue)
+      this.getYourPetList()
+    }
+    //  this.getList()
     // moment.updateLocale('zh-cn')
-    moment.updateLocale()
-    this.getList(this.menuTabsValue)
   },
+
   methods: {
     handleClick(tab, event) {
       // console.log(tab, event)
-      console.log(tab.name)
+      // console.log(tab.name)
       this.getList(tab.name)
+      this.appoint.appointdate = tab.name
+    },
+    getYourPetList() {
+      // console.log('getRoleList')
+      const data = {
+        pageSize: -1,
+        pageNum: -1,
+        userId: this.userId
+
+      }
+      getPetListByUserId(data).then(res => {
+        // alert(res.mesage)
+        this.options = res.data
+      })
     },
     // 获取列表数据
     getList(appointtime) {
       const data = {
         pageSize: this.dataSource.pageData.pageSize,
         pageNum: this.dataSource.pageData.pageNum,
-        roleId: 7,
+        roleId: this.roleid,
         appointtime: appointtime
       }
       this.dataSource.loading = true
@@ -166,9 +241,18 @@ export default {
         // }
       })
     },
-    apponitDoctor(index, row) {
-      addAppoint().then(res => {
-
+    choose(index, row) {
+      this.appointDialogVisible = true
+      this.appoint.employeeid = row.employeeid
+      this.appoint.itemid = this.itemid
+    },
+    submitForm() {
+      const data = this.appoint
+      addAppoint(data).then(res => {
+        if (res.total > 0) {
+          alert(res.message)
+          this.appointDialogVisible = false
+        }
       })
     },
     // 搜索层事件

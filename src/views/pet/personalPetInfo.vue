@@ -93,6 +93,12 @@ export default {
           width: '100', // 根据实际情况给宽度
           data: [
             {
+              label: '修改', // 操作名称
+              type: 'warning',
+              permission: '2010702', // 后期这个操作的权限，用来控制权限
+              handleRow: this.handleRow
+            },
+            {
               label: '删除', // 操作名称
               type: 'danger',
               permission: '2010702', // 后期这个操作的权限，用来控制权限

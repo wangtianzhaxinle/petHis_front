@@ -3,7 +3,52 @@
            :data-source="dataSource"
            @changeSize="changeSize"
            @changeNum="changeNum"
-         />
+         >
+           <template v-slot:operator="scopedata">
+
+             <div v-if="scopedata.scope.row.itemid===2" class="btn">
+               <el-button
+                 type="info"
+                 size="mini"
+                 @click.native.prevent="diagnose(scopedata.scope.$index, scopedata.scope.row)"
+               >
+                 诊断
+               </el-button>
+
+               <el-button
+                 type="danger"
+                 size="mini"
+               >
+                 下载
+               </el-button>
+
+               <el-button
+                 type="success"
+                 size="mini"
+               >
+                 提醒
+               </el-button>
+             </div>
+
+             <div v-else class="btn">
+               <el-button
+                 type="info"
+                 size="mini"
+               >
+                 办理
+               </el-button>
+
+               <el-button
+                 type="success"
+                 size="mini"
+               >
+                 提醒
+               </el-button>
+             </div>
+
+           </template>
+
+         </table-pane>
     <el-dialog
       title="诊断"
       :visible.sync="DialogVisible"
@@ -26,9 +71,9 @@
         </el-form-item>
 
         <!-- <el-form-item>
-          <el-button type="primary" @click="submitForm">添加</el-button>
+            <el-button type="primary" @click="submitForm">添加</el-button>
 
-        </el-form-item> -->
+          </el-form-item> -->
       </el-form>
 
       <el-form :inline="true" :model="selectMedicineModel" class="demo-form-inline">
@@ -44,43 +89,43 @@
       <el-form ref="presecibeForm" :model="presecibe">
         <el-table v-if="presecibe.presecibeTable.length>0" :data="presecibe.presecibeTable" border style="width: 100%" :highlight-current-row="true">
           <el-table-column label="id" width="70" prop="medicineid" align="left">
-          <!-- <template slot-scope="scope">
-              <el-form-item :prop="medicineid" labe="id">
-                <el-input v-model="scope.row.medicineid" readonly="true" />
-              </el-form-item>
-            </template> -->
+            <!-- <template slot-scope="scope">
+                <el-form-item :prop="medicineid" labe="id">
+                  <el-input v-model="scope.row.medicineid" readonly="true" />
+                </el-form-item>
+              </template> -->
           </el-table-column>
 
           <el-table-column label="药名" width="200" prop="name" show-overflow-tooltip>
-          <!-- <template slot-scope="scope">
-              <el-form-item :prop="name">
-                <el-input v-model="scope.row.name" readonly="true" />
-              </el-form-item>
-            </template> -->
+            <!-- <template slot-scope="scope">
+                <el-form-item :prop="name">
+                  <el-input v-model="scope.row.name" readonly="true" />
+                </el-form-item>
+              </template> -->
           </el-table-column>
 
           <el-table-column label="价格" width="100" prop="price">
-          <!-- <template slot-scope="scope">
-              <el-form-item :prop="price">
-                <el-input v-model="scope.row.price" readonly="true" />
-              </el-form-item>
-            </template> -->
+            <!-- <template slot-scope="scope">
+                <el-form-item :prop="price">
+                  <el-input v-model="scope.row.price" readonly="true" />
+                </el-form-item>
+              </template> -->
           </el-table-column>
 
           <el-table-column label="库存" width="250" prop="amount">
-          <!-- <template slot-scope="scope">
-              <el-form-item :prop="amount">
-                <el-input v-model="scope.row.amount" readonly="true" />
-              </el-form-item>
-            </template> -->
+            <!-- <template slot-scope="scope">
+                <el-form-item :prop="amount">
+                  <el-input v-model="scope.row.amount" readonly="true" />
+                </el-form-item>
+              </template> -->
           </el-table-column>
 
           <el-table-column label="是否处方药" width="250" prop="isprescription">
-          <!-- <template slot-scope="scope">
-              <el-form-item :prop="isprescription">
-                <el-input v-model="scope.row.isprescription" readonly="true" style="{border: none}" />
-              </el-form-item>
-            </template> -->
+            <!-- <template slot-scope="scope">
+                <el-form-item :prop="isprescription">
+                  <el-input v-model="scope.row.isprescription" readonly="true" style="{border: none}" />
+                </el-form-item>
+              </template> -->
           </el-table-column>
 
           <el-table-column label="数量" width="250" prop="count">
@@ -93,9 +138,6 @@
 
         </el-table>
 
-        <el-form-item>
-          <el-button type="primary" @click="submitForm">添加</el-button>
-        </el-form-item>
       </el-form>
 
       <el-dialog
@@ -146,6 +188,10 @@
           </el-table-column>
         </el-table>
       </el-dialog>
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submitRecord">提交</el-button>
+
+      </div>
     </el-dialog>
   </div>
 
@@ -153,8 +199,8 @@
 
 <script>
 
-import { getAppointListByEmpAndItem, getAppointPersonalInfo, addCheck } from '@/api/appoint'
-import tablePane from '@/components/tablePane.vue'
+import { getAppointListByEmp, getAppointPersonalInfo, addCheck } from '@/api/appoint'
+import tablePane from '@/components/tablePane2.vue'
 import store from '@/store'
 import { getMedicineListByName } from '@/api/medicine'
 import { getToken } from '@/utils/auth'
@@ -192,9 +238,14 @@ export default {
             prop: 'appointid',
             width: 100
           },
+          //   {
+          //     label: 'itemid',
+          //     prop: 'itemid',
+          //     width: 100
+          //   },
           {
-            label: 'itemid',
-            prop: 'itemid',
+            label: '项目名',
+            prop: 'item.name',
             width: 100
           },
           {
@@ -210,9 +261,14 @@ export default {
 
           },
 
+          //   {
+          //     label: 'employeeId',
+          //     prop: 'employeeid',
+          //     width: 100
+          //   },
           {
-            label: 'employeeId',
-            prop: 'employeeid',
+            label: '员工名',
+            prop: 'emp.name',
             width: 100
           },
           {
@@ -318,13 +374,12 @@ export default {
       const data = {
         pageSize: this.dataSource.pageData.pageSize,
         pageNum: this.dataSource.pageData.pageNum,
-        itemid: 4,
         employeeid: this.userId
       }
 
       this.dataSource.loading = true
       console.log('getAppointList')
-      getAppointListByEmpAndItem(data).then(res => {
+      getAppointListByEmp(data).then(res => {
         this.dataSource.loading = false
         // if (res.succeed) {
         if (res.total > 0) {
@@ -341,6 +396,13 @@ export default {
     getAppointPersonalInfo() {
       getAppointPersonalInfo(this.userId).then(res => {
 
+      })
+    },
+    submitRecord() {
+      addCheck().then(res => {
+        if (res.total > 0) {
+          alert(res.message)
+        }
       })
     },
     // 搜索层事件
@@ -412,3 +474,14 @@ export default {
 }
 </script>
 
+<style lang="scss" scoped>
+
+.btn{
+ display: flex;
+ justify-content: center;
+}
+.btn div{
+ margin-left: 5px;
+}
+
+</style>

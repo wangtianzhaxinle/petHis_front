@@ -10,13 +10,22 @@
 
         <div class="btn">
           <el-button
-            v-if="scopedata.scope.row.status===0"
+
             type="info"
             size="mini"
-            @click.native.prevent="choose(scopedata.scope.$index, scopedata.scope.row)"
+            @click.native.prevent="editRoom(scopedata.scope.$index, scopedata.scope.row)"
           >
 
-            预约
+            修改
+          </el-button>
+          <el-button
+
+            type="info"
+            size="mini"
+            @click.native.prevent="deleteRoom(scopedata.scope.$index, scopedata.scope.row)"
+          >
+
+            删除
           </el-button>
         </div>
 
@@ -31,36 +40,7 @@
     >
       <el-form ref="appointForm" :model="appoint" :rules="rules" label-width="100px" class="demo-ruleForm">
         <el-form-item label="itemid">
-          <el-input v-model="appoint.itemid" />
-        </el-form-item>
-        <el-form-item label="roomid">
-          <el-input v-model="appoint.roomid" />
-        </el-form-item>
-        <el-form-item label="appointdate">
-
-          <el-select v-model="appoint.appointdate" placeholder="请选择时间">
-            <el-option
-              v-for=" i in DateOptions"
-              :key="i.date"
-              :label="i.date"
-              :value="i.date"
-            />
-          </el-select>
-        </el-form-item>
-
-        <el-form-item label="托管时间/天">
-          <el-input v-model.number="appoint.deposittime" />
-        </el-form-item>
-
-        <el-form-item label="你的宠物" prop="petid">
-          <el-select v-model="appoint.petid" placeholder="请选择">
-            <el-option
-              v-for=" i in options"
-              :key="i.petid"
-              :label="i.name"
-              :value="i.petid"
-            />
-          </el-select>
+          <el-input />
         </el-form-item>
 
         <el-form-item>
@@ -77,7 +57,6 @@
 
 import tablePane from '@/components/tablePane2.vue'
 import { getPetListByUserId } from '@/api/pet'
-import { addDeposit } from '@/api/appoint'
 
 import { getRoomList } from '@/api/room'
 import moment from 'moment'
@@ -91,22 +70,6 @@ export default {
     return {
       userId: store.getters.userId,
       roomid: '',
-      itemid: 1,
-      appoint: {
-        itemid: 1,
-        petid: '',
-        roomid: '',
-        appointdate: '',
-        deposittime: ''
-      },
-      options: [
-      ],
-      DateOptions: [
-        { date: moment().add(1, 'days').format('L') },
-        { date: moment().add(2, 'days').format('L') },
-        { date: moment().add(3, 'days').format('L') }
-
-      ],
 
       appointDialogVisible: false,
       rules: {
@@ -117,6 +80,12 @@ export default {
       // 表格配置
       dataSource: {
         tool: [
+          {
+            name: '新增房间',
+            key: 'addRoom',
+            permission: 'addRoom',
+            handleClick: this.addRoom
+          }
         ],
         data: [], // 表格数据
         cols: [
@@ -138,10 +107,20 @@ export default {
 
           },
           {
-            label: '宠物id',
-            prop: 'petid',
+            label: '预约id',
+            prop: 'appointid',
             width: 100
 
+          },
+          {
+            label: '开始时间',
+            prop: 'startdate',
+            width: 200
+          },
+          {
+            label: '结束时间',
+            prop: 'enddate',
+            width: 200
           }
 
         ], // 表格的列数据
@@ -182,23 +161,11 @@ export default {
     //  this.getList()
     // moment.updateLocale('zh-cn')
     moment.updateLocale()
-    this.getYourPetList()
+
     this.getList()
   },
   methods: {
-    getYourPetList() {
-      // console.log('getRoleList')
-      const data = {
-        pageSize: -1,
-        pageNum: -1,
-        userId: this.userId
 
-      }
-      getPetListByUserId(data).then(res => {
-        // alert(res.mesage)
-        this.options = res.data
-      })
-    },
     // 获取列表数据
     getList() {
       const data = {
@@ -222,22 +189,18 @@ export default {
         // }
       })
     },
-    choose(index, row) {
+    editRoom(index, row) {
       // alert(666)
       this.appointDialogVisible = true
       // this.appoint.employeeid = row.employeeid
       this.appoint.itemid = this.itemid
       this.appoint.roomid = row.roomid
     },
+    deleteRoom(index, row) {
+
+    },
     submitForm() {
       const data = this.appoint
-
-      addDeposit(data).then(res => {
-        if (res.total > 0) {
-          alert(res.message)
-          this.appointDialogVisible = false
-        }
-      })
     },
 
     // 搜索层事件

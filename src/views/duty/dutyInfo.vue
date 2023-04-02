@@ -127,7 +127,7 @@ export default {
           {
             label: '名字',
             prop: 'user.name',
-            width: 40
+            width: 100
           },
 
           {

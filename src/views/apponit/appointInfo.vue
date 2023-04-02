@@ -35,12 +35,12 @@ export default {
         cols: [
           {
             label: 'appointid',
-            prop: 'appointId',
+            prop: 'appointid',
             width: 100
           },
           {
             label: 'itemId',
-            prop: 'itemId',
+            prop: 'itemid',
             width: 100
           },
 
@@ -53,7 +53,7 @@ export default {
 
           {
             label: 'employeeId',
-            prop: 'employeeId',
+            prop: 'employeeid',
             width: 300
           },
           {
@@ -63,7 +63,7 @@ export default {
 
           {
             label: 'appointtime',
-            prop: 'appointtime'
+            prop: 'appointTime'
           }
 
         ], // 表格的列数据

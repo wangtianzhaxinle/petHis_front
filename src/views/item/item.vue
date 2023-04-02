@@ -4,7 +4,44 @@
                                 :data-source="dataSource"
                                 @changeSize="changeSize"
                                 @changeNum="changeNum"
-                              />
+                              >
+                                <template v-slot:operator="scopedata">
+
+                                  <div
+                                    class="btn"
+                                  >
+                                    <div key="删除">
+                                      <el-button
+                                        v-permission="['deleteItem']"
+                                        type="danger"
+                                        size="mini"
+                                        @click.native.prevent="deleteItem(scopedata.scope.$index, scopedata.scope.row)"
+                                      >
+                                        删除
+                                      </el-button>
+                                    </div>
+
+                                    <div key="修改">
+                                      <el-button
+                                        type="warning"
+                                        size="mini"
+                                        @click.native.prevent="editItem(scopedata.scope.$index, scopedata.scope.row)"
+                                      >
+                                        修改
+                                      </el-button></div>
+                                    <div v-if="scopedata.scope.row.isSpecial===0" key="预约">
+                                      <el-button
+                                        type="info"
+                                        size="mini"
+                                        @click.native.prevent="appointItem(scopedata.scope.$index, scopedata.scope.row)"
+                                      >
+                                        预约
+                                      </el-button></div>
+
+                                  </div>
+
+                                </template>
+                              </table-pane>
     <el-dialog
       title="添加项目"
       :visible.sync="dialogVisible"
@@ -70,7 +107,9 @@
   </div></template>
 <script>
 
-import tablePane from '@/components/tablePane.vue'
+import tablePane from '@/components/tablePane2.vue'
+
+import permission from '@/directive/permission/index.js' // 权限判断指令
 import { getItemInfoList, addItem, deleteItembyId, updateItemById } from '@/api/item'
 import { getAllRoleList } from '@/api/role'
 // import { addAppoint } from '@/api/appoint'
@@ -79,6 +118,8 @@ import store from '@/store'
 export default {
   name: 'ItemInfo',
   components: { tablePane },
+
+  directives: { permission }, // 自定义指令
 
   data() {
     return {
@@ -171,6 +212,12 @@ export default {
             prop: 'chargingmethod',
             width: 300
           },
+          // {
+          //   label: 'isSpecial',
+          //   prop: 'isSpecial',
+          //   hidden: true
+
+          // },
           {
             label: '负责职位',
             prop: 'role.description',
@@ -333,15 +380,22 @@ export default {
       })
     },
 
-    apponit(index, row) {
+    appointItem(index, row) {
       console.log('预约按钮')
-      console.log(row)
-      if (row.roleid === 4) {
-        // 选择医生预约看病
-        this.$router.push({ path: '/doctorInfo/' + row.itemid })
-      } else {
-        this.$router.push({ path: '/appointform/' + row.itemid })
-      }
+      // console.log(row.isSpecial)
+      this.$router.push({
+        name: 'chooseAppoint',
+        query: {
+          itemid: row.itemid,
+          roleid: row.roleid
+        }
+      })
+      // if (row.roleid === 4) {
+      //   // 选择医生预约看病
+      //   this.$router.push({ path: '/doctorInfo/' + row.itemid })
+      // } else {
+      //   this.$router.push({ path: '/appointform/' + row.itemid })
+      // }
 
       /*
       if (row.roleid === 4) {
@@ -426,3 +480,14 @@ export default {
 }
 
 </script>
+<style lang="scss" scoped>
+
+.btn{
+ display: flex;
+ justify-content: center;
+}
+.btn div{
+ margin-left: 5px;
+}
+
+</style>

@@ -66,109 +66,111 @@ export const constantRoutes = [
 
     }]
   }
+  /**
+   *
+   *{
+    path: '/example',
+    component: Layout,
+    redirect: '/example/table',
+    name: 'Example',
+    meta: { title: 'Example', icon: 'el-icon-s-help' },
+    children: [
+      {
+        path: 'table',
+        name: 'Table',
+        component: () => import('@/views/table/index'),
+        meta: { title: 'Table', icon: 'table' }
+      },
+      {
+        path: 'tree',
+        name: 'Tree',
+        component: () => import('@/views/tree/index'),
+        meta: { title: 'Tree', icon: 'tree' }
+      }
+    ]
+  },
+  {
+    path: '/form',
+    component: Layout,
+    children: [
+      {
+        path: 'index',
+        name: 'Form',
+        component: () => import('@/views/form/index'),
+        meta: { title: 'Form', icon: 'form' }
+      }
+    ]
+  },
+  {
+    path: '/nested',
+    component: Layout,
+    redirect: '/nested/menu1',
+    name: 'Nested',
+    meta: {
+      title: 'Nested',
+      icon: 'nested'
+    },
+    children: [
+      {
+        path: 'menu1',
+        component: () => import('@/views/nested/menu1/index'), // Parent router-view
+        name: 'Menu1',
+        meta: { title: 'Menu1' },
+        children: [
+          {
+            path: 'menu1-1',
+            component: () => import('@/views/nested/menu1/menu1-1'),
+            name: 'Menu1-1',
+            meta: { title: 'Menu1-1' }
+          },
+          {
+            path: 'menu1-2',
+            component: () => import('@/views/nested/menu1/menu1-2'),
+            name: 'Menu1-2',
+            meta: { title: 'Menu1-2' },
+            children: [
+              {
+                path: 'menu1-2-1',
+                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-1'),
+                name: 'Menu1-2-1',
+                meta: { title: 'Menu1-2-1' }
+              },
+              {
+                path: 'menu1-2-2',
+                component: () => import('@/views/nested/menu1/menu1-2/menu1-2-2'),
+                name: 'Menu1-2-2',
+                meta: { title: 'Menu1-2-2' }
+              }
+            ]
+          },
+          {
+            path: 'menu1-3',
+            component: () => import('@/views/nested/menu1/menu1-3'),
+            name: 'Menu1-3',
+            meta: { title: 'Menu1-3' }
+          }
+        ]
+      },
+      {
+        path: 'menu2',
+        component: () => import('@/views/nested/menu2/index'),
+        name: 'Menu2',
+        meta: { title: 'menu2' }
+      }
+    ]
+  },
 
-  //  {
-  //   path: '/example',
-  //   component: Layout,
-  //   redirect: '/example/table',
-  //   name: 'Example',
-  //   meta: { title: 'Example', icon: 'el-icon-s-help' },
-  //   children: [
-  //     {
-  //       path: 'table',
-  //       name: 'Table',
-  //       component: () => import('@/views/table/index'),
-  //       meta: { title: 'Table', icon: 'table' }
-  //     },
-  //     {
-  //       path: 'tree',
-  //       name: 'Tree',
-  //       component: () => import('@/views/tree/index'),
-  //       meta: { title: 'Tree', icon: 'tree' }
-  //     }
-  //   ]
-  // },
-  // {
-  //   path: '/form',
-  //   component: Layout,
-  //   children: [
-  //     {
-  //       path: 'index',
-  //       name: 'Form',
-  //       component: () => import('@/views/form/index'),
-  //       meta: { title: 'Form', icon: 'form' }
-  //     }
-  //   ]
-  // },
-  // {
-  //   path: '/nested',
-  //   component: Layout,
-  //   redirect: '/nested/menu1',
-  //   name: 'Nested',
-  //   meta: {
-  //     title: 'Nested',
-  //     icon: 'nested'
-  //   },
-  //   children: [
-  //     {
-  //       path: 'menu1',
-  //       component: () => import('@/views/nested/menu1/index'), // Parent router-view
-  //       name: 'Menu1',
-  //       meta: { title: 'Menu1' },
-  //       children: [
-  //         {
-  //           path: 'menu1-1',
-  //           component: () => import('@/views/nested/menu1/menu1-1'),
-  //           name: 'Menu1-1',
-  //           meta: { title: 'Menu1-1' }
-  //         },
-  //         {
-  //           path: 'menu1-2',
-  //           component: () => import('@/views/nested/menu1/menu1-2'),
-  //           name: 'Menu1-2',
-  //           meta: { title: 'Menu1-2' },
-  //           children: [
-  //             {
-  //               path: 'menu1-2-1',
-  //               component: () => import('@/views/nested/menu1/menu1-2/menu1-2-1'),
-  //               name: 'Menu1-2-1',
-  //               meta: { title: 'Menu1-2-1' }
-  //             },
-  //             {
-  //               path: 'menu1-2-2',
-  //               component: () => import('@/views/nested/menu1/menu1-2/menu1-2-2'),
-  //               name: 'Menu1-2-2',
-  //               meta: { title: 'Menu1-2-2' }
-  //             }
-  //           ]
-  //         },
-  //         {
-  //           path: 'menu1-3',
-  //           component: () => import('@/views/nested/menu1/menu1-3'),
-  //           name: 'Menu1-3',
-  //           meta: { title: 'Menu1-3' }
-  //         }
-  //       ]
-  //     },
-  //     {
-  //       path: 'menu2',
-  //       component: () => import('@/views/nested/menu2/index'),
-  //       name: 'Menu2',
-  //       meta: { title: 'menu2' }
-  //     }
-  //   ]
-  // },
-
-  // {
-  //   path: 'external-link',
-  //   component: Layout,
-  //   children: [
-  //     {
-  //       path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
-  //       meta: { title: 'External Link', icon: 'link' }
-  //     }
-  //   ]
-  // },
+  {
+    path: 'external-link',
+    component: Layout,
+    children: [
+      {
+        path: 'https://panjiachen.github.io/vue-element-admin-site/#/',
+        meta: { title: 'External Link', icon: 'link' }
+      }
+    ]
+  },
+   */
 
 ]
 
@@ -185,13 +187,13 @@ export const asyncRoutes = [
         path: 'userInfo',
         name: 'userInfo',
         component: () => import('@/views/user/userInfo'),
-        meta: { title: '用户信息', icon: 'form' }
+        meta: { title: '用户信息', icon: 'form', permission: ['allUserInfo'] }
       },
       {
         path: 'personalInfo',
         name: 'personalInfo',
         component: () => import('@/views/user/personalInfo'),
-        meta: { title: '个人信息', icon: 'form' }
+        meta: { title: '个人信息', icon: 'form', permission: ['myUserInfo'] }
 
       }
     ]
@@ -200,19 +202,19 @@ export const asyncRoutes = [
     path: '/petManager',
     component: Layout,
     name: 'PetManager',
-    meta: { title: '宠物管理', icon: 'form' },
+    meta: { title: '宠物管理', icon: 'form', permission: ['petManager'] },
     children: [
       {
         path: 'allPetInfo',
         name: 'allPetInfo',
         component: () => import('@/views/pet/petInfo'),
-        meta: { title: '全部宠物信息', icon: 'form' }
+        meta: { title: '全部宠物信息', icon: 'form', permission: ['allPetInfo'] }
       },
       {
         path: 'personalPetInfo',
         name: 'personalPetInfo',
         component: () => import('@/views/pet/personalPetInfo'),
-        meta: { title: '个人宠物信息', icon: 'form' }
+        meta: { title: '个人宠物信息', icon: 'form', permission: ['myPetInfo'] }
       }
     ]
   },
@@ -220,19 +222,19 @@ export const asyncRoutes = [
     path: '/employeeManager',
     component: Layout,
     name: 'EmployeeManager',
-    meta: { title: '员工管理', icon: 'form' },
+    meta: { title: '员工管理', icon: 'form', permission: ['employeemanager'] },
     children: [
       {
         path: 'employeeInfo',
         name: 'EmployeeInfo',
         component: () => import('@/views/employee/employeeInfo'),
-        meta: { title: '员工信息', icon: 'form' }
+        meta: { title: '员工信息', icon: 'form', permission: ['allEmployeeInfo'] }
       },
       {
         path: 'employeePersoanlInfo',
         name: 'employeePersoanlInfo',
         component: () => import('@/views/employee/employeePersoanlInfo'),
-        meta: { title: '员工个人信息', icon: 'form' }
+        meta: { title: '员工个人信息', icon: 'form', permission: ['myEmployeeInfo'] }
       }
     ]
   },
@@ -241,7 +243,7 @@ export const asyncRoutes = [
     path: '/itemManager',
     component: Layout,
     name: 'itemManager',
-    meta: { title: '项目管理', icon: 'form' },
+    meta: { title: '项目管理', icon: 'form', permission: ['itemManager'] },
     children: [
 
       {
@@ -249,26 +251,34 @@ export const asyncRoutes = [
         path: '/itemInfo',
         name: 'itemInfo',
         component: () => import('@/views/item/item'),
-        meta: { title: '项目信息', icon: 'form' }
+        meta: { title: '项目信息', icon: 'form', permission: ['itemInfo'] }
 
       },
       {
-        path: '/apponitDoctor',
-        name: 'apponitDoctor',
-        component: () => import('@/views/item/apponitDoctor'),
-        meta: { title: '预约看病', icon: 'form' }
+        path: '/chooseAppoint',
+        name: 'chooseAppoint',
+        component: () => import('@/views/item/chooseAppoint'),
+        meta: { title: '选择预约人员', icon: 'form', permission: ['chooseEmployee'] },
+        hidden: true
       },
-      {
-        path: '/apponitInjection',
-        name: 'apponitInjection',
-        component: () => import('@/views/item/apponitInjection'),
-        meta: { title: '预约打疫苗', icon: 'form' }
-      },
+      // {
+      //   path: '/apponitDoctor',
+      //   name: 'apponitDoctor',
+      //   component: () => import('@/views/item/apponitDoctor'),
+      //   meta: { title: '预约看病', icon: 'form' }
+      // },
+
+      // {
+      //   path: '/apponitInjection',
+      //   name: 'apponitInjection',
+      //   component: () => import('@/views/item/apponitInjection'),
+      //   meta: { title: '预约打疫苗', icon: 'form' }
+      // },
       {
         path: '/appointDeposit',
         name: 'appointDeposit',
         component: () => import('@/views/item/appointDeposit'),
-        meta: { title: '预约托管', icon: 'form' }
+        meta: { title: '预约托管', icon: 'form', permission: ['appointDeposit'] }
       }
     ]
   },
@@ -276,16 +286,26 @@ export const asyncRoutes = [
     path: '/appointManager',
     component: Layout,
     name: 'appointManager',
-    meta: { title: '预约管理', icon: 'form' },
+    meta: { title: '预约管理', icon: 'form', permission: ['apponitManager'] },
     children: [
       {
 
         path: '/personalAppointList',
         name: 'personalAppointList',
         component: () => import('@/views/apponit/personalAppointList'),
-        meta: { title: '个人预约列表', icon: 'form' }
+        meta: { title: '历史预约', icon: 'form', permission: ['historyAppoint'] }
 
-      }, {
+      },
+      {
+
+        path: '/myAppointCustomer',
+        name: 'myAppointCustomer',
+        component: () => import('@/views/apponit/myAppointCustomer'),
+        meta: { title: '我的预约用户', icon: 'form', permission: ['myAppointCustomer'] }
+
+      },
+      /*
+      {
 
         path: '/checkAppointList',
         name: 'checkAppointList',
@@ -301,19 +321,22 @@ export const asyncRoutes = [
         meta: { title: '打疫苗预约列表', icon: 'form' }
 
       },
+      */
       {
 
         path: '/depositAppointList',
         name: 'depositAppointList',
         component: () => import('@/views/apponit/depositAppointList'),
-        meta: { title: '托管预约列表', icon: 'form' }
+        meta: { title: '托管预约列表', icon: 'form', permission: ['appointDepositList'] }
 
-      }, {
+      },
+
+      {
 
         path: '/todayAppointList',
         name: 'todayAppointList',
         component: () => import('@/views/apponit/todayAppointList'),
-        meta: { title: '本日预约列表', icon: 'form' }
+        meta: { title: '本日预约列表', icon: 'form', permission: ['todayAppointList'] }
 
       },
       /*
@@ -330,40 +353,80 @@ export const asyncRoutes = [
         path: '/appointInfo',
         name: 'appointInfo',
         component: () => import('@/views/apponit/appointInfo'),
-        meta: { title: '全部预约列表', icon: 'form' }
+        meta: { title: '全部预约列表', icon: 'form', permission: ['allAppointList'] }
 
       }
     ]
   },
-  {
-    path: '/depositManager',
-    component: Layout,
-    name: 'depositManager',
-    meta: { title: '托管管理', icon: 'form' },
-    children: [
-      {
+  // {
+  //   path: '/depositManager',
+  //   component: Layout,
+  //   name: 'depositManager',
+  //   meta: { title: '托管管理', icon: 'form' },
+  //   children: [
+  //     {
 
-        path: '/depositInfo',
-        name: 'depositInfo',
-        component: () => import('@/views/deposit/depositInfo'),
-        meta: { title: '托管信息', icon: 'form' }
+  //       path: '/depositInfo',
+  //       name: 'depositInfo',
+  //       component: () => import('@/views/deposit/depositInfo'),
+  //       meta: { title: '托管信息', icon: 'form' }
 
-      }
-    ]
-  },
+  //     }
+  //   ]
+  // },
 
   {
     path: '/medicalRecordManager',
     component: Layout,
     name: 'medicalRecord',
-    meta: { title: '病历管理', icon: 'form' },
+    meta: { title: '病历管理', icon: 'form', permission: ['medicaRecordManager'] },
     children: [
       {
 
         path: '/medicalRecordInfo',
         name: 'medicalRecordInfo',
         component: () => import('@/views/medicalRecord/medicalRecordInfo'),
-        meta: { title: '宠物病历信息', icon: 'form' }
+        meta: { title: '宠物病历信息', icon: 'form', permission: ['medicalRecordList'] }
+
+      }
+    ]
+  },
+  {
+    path: '/roomManager',
+    component: Layout,
+    name: 'roomManager',
+    meta: { title: '宠物房间管理', icon: 'form', permission: ['roomManager'] },
+    children: [
+      {
+
+        path: '/roomlist',
+        name: 'roomlist',
+        component: () => import('@/views/room/roomlist'),
+        meta: { title: '宠物房间列表', icon: 'form', permission: ['roomList'] }
+
+      }
+    ]
+  },
+  {
+    path: '/prescirbeManager',
+    component: Layout,
+    name: 'prescirbeManager',
+    meta: { title: '配药管理', icon: 'form', permission: ['prescribeManager'] },
+    children: [
+      {
+
+        path: '/allPrescribeList',
+        name: 'allPrescribeList',
+        component: () => import('@/views/prescribe/allPrescribeList'),
+        meta: { title: '配药列表', icon: 'form', permission: ['prescribeList'] }
+
+      },
+      {
+
+        path: '/myPrescribe',
+        name: 'myPrescribe',
+        component: () => import('@/views/prescribe/myPrescribe'),
+        meta: { title: '我的配药', icon: 'form', permission: ['myPrescribe'] }
 
       }
     ]
@@ -372,14 +435,14 @@ export const asyncRoutes = [
     path: '/permissionControl',
     component: Layout,
     name: 'permissionControl',
-    meta: { title: '权限控制', icon: 'form' },
+    meta: { title: '权限控制', icon: 'form', permission: ['permissionControl'] },
     children: [
       {
 
         path: '/roleManager',
         name: 'roleManager',
         component: () => import('@/views/role/roleManager'),
-        meta: { title: '角色管理', icon: 'form' }
+        meta: { title: '角色管理', icon: 'form', permission: ['roleManager'] }
 
       },
       {
@@ -387,7 +450,7 @@ export const asyncRoutes = [
         path: '/permissionManager',
         name: 'permissionManager',
         component: () => import('@/views/permission/permissionManager'),
-        meta: { title: '权限管理', icon: 'form' }
+        meta: { title: '权限管理', icon: 'form', permission: ['permissionManager'] }
 
       }
     ]
@@ -396,14 +459,14 @@ export const asyncRoutes = [
     path: '/medicineManager',
     component: Layout,
     name: 'medicineManager',
-    meta: { title: '药品管理', icon: 'form' },
+    meta: { title: '药品管理', icon: 'form', permission: ['medicineManager'] },
     children: [
       {
 
         path: '/medicineInfo',
         name: 'medicineInfo',
         component: () => import('@/views/medicine/medicineInfo'),
-        meta: { title: '药品信息', icon: 'form' }
+        meta: { title: '药品信息', icon: 'form', permission: ['medicineInfo'] }
 
       }
     ]
@@ -412,14 +475,14 @@ export const asyncRoutes = [
     path: '/dutyManager',
     component: Layout,
     name: 'dutyManager',
-    meta: { title: '值班管理', icon: 'form' },
+    meta: { title: '值班管理', icon: 'form', permission: ['dutyManager'] },
     children: [
       {
 
         path: '/dutyInfo',
         name: 'dutyInfo',
         component: () => import('@/views/duty/dutyInfo'),
-        meta: { title: '值班信息', icon: 'form' }
+        meta: { title: '值班信息', icon: 'form', permission: ['dutyInfo'] }
 
       }
     ]

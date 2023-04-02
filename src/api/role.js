@@ -76,3 +76,11 @@ export function updateRoleByRoleId(data) {
     data
   })
 }
+
+export async function updateRoleByUserId(data) {
+  return request({
+    url: '/role/updateRoleByUserId',
+    method: 'post',
+    data
+  })
+}

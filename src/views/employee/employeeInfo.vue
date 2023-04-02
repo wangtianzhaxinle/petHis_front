@@ -9,8 +9,29 @@
         style="width: 100px; height: 100px"
         :src="data.scope.row.image"
       />
-    </template></table-pane>
+    </template>
 
+    </table-pane>
+    <el-dialog
+      title="角色"
+      :visible.sync="roleDialogVisible"
+      width="30%"
+      :before-close="handleClose"
+    >
+      <el-tree
+        ref="roleTree"
+        :data="roleData"
+        highlight-current
+        default-expand-all
+        show-checkbox
+        node-key="roleid"
+        :props="defaultProps"
+        @check="handleCheckChange"
+      />
+      <div slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="submit">修改</el-button>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -18,12 +39,20 @@
 
 import { getEmployeeList } from '@/api/employee.js'
 import tablePane from '@/components/tablePane.vue'
+import { getAllRoleList, getRoleByUserId, updateRoleByUserId } from '@/api/role'
 
 export default {
   name: 'EmployeeInfo',
   components: { tablePane },
   data() {
     return {
+      userId: '',
+      roleIds: [],
+      roleData: {},
+      roleDialogVisible: false,
+      defaultProps: {
+        label: 'description'
+      },
       // 搜索栏配置
 
       // 表格配置
@@ -107,7 +136,7 @@ export default {
         operation: {
           // 表格有操作列时设置
           label: '操作', // 列名
-          width: '100', // 根据实际情况给宽度
+          width: '250', // 根据实际情况给宽度
           data: [
             {
               label: '删除', // 操作名称
@@ -120,6 +149,12 @@ export default {
               type: 'warming',
               permission: 'editRow', // 后期这个操作的权限，用来控制权限
               handleRow: this.editRow
+            },
+            {
+              label: '查看角色', // 操作名称
+              type: 'info',
+              permission: 'viewRole', // 后期这个操作的权限，用来控制权限
+              handleRow: this.viewRole
             }
           ]
         }
@@ -131,8 +166,68 @@ export default {
   },
   created() {
     this.getList()
+    this.getRoleList()
   },
   methods: {
+    submit() {
+      const data = {
+        roleIds: this.roleIds,
+        userId: this.userId
+      }
+      updateRoleByUserId(data).then(res => {
+        alert(res.message)
+        if (res.total > 0) {
+          this.roleDialogVisible = false
+        }
+      })
+    },
+    getRoleList() {
+      getAllRoleList().then(res => {
+        this.roleData = res.data
+      })
+    },
+    handleClose(done) {
+      // this.userInfo = {}
+      done()
+    },
+    viewRole(index, row) {
+      this.roleDialogVisible = true
+      this.userId = ''
+      this.userId = row.userid
+      getRoleByUserId(this.userId).then(res => {
+        this.roleIds = this.getIdsFromJson(res.data)
+
+        // console.log(this.permissionids)
+        if (this.roleIds) {
+          this.$nextTick(() => {
+            this.$refs.roleTree.setCheckedKeys([])// 不放在这里在的话在进入页面的第一次调用时,el-tree还
+            // 未渲染,此时如果不放在nextTick里面会报错找不到setCheckedKeys属性,没有默认选中效果,只有在第二次开始显示才正常
+            this.roleIds.forEach(value => { // 真的大坑，我自己摸索好久！！！
+              this.$refs.roleTree.setChecked(value, true, false) // 给树节点赋值
+            })
+            this.checkStrictly = false // 重点： 赋值完成后 设置为false
+          })
+        }
+      })
+    },
+    handleCheckChange(data, checked) {
+      // checked.checkedKeys  选中的节点id数组z
+      // checked.halfCheckedKeys 半选中节点id数组
+      this.roleIds = checked.halfCheckedKeys.concat(checked.checkedKeys) // 选中节点和半选中节点所有的id
+    },
+    getIdsFromJson(json) {
+      // console.log(json)
+      const ids = []
+      if (json) {
+        const array = json
+        for (let i = 0; i < array.length; i++) {
+          const tep = array[i].roleid
+          ids.push(tep)
+        }
+        console.log(ids)
+        return ids
+      }
+    },
     // 获取列表数据
     getList() {
       const data = {

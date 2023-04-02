@@ -29,13 +29,15 @@ router.beforeEach(async(to, from, next) => {
       //  进度条走到尽头
       NProgress.done()
     } else {
-      const hasGetUserInfo = store.getters.name
+      // const hasGetUserInfo = store.getters.name
       // 确定用户是否通过getInfo获得了权限角色
       const hasPerm = store.getters.permissions && store.getters.permissions.length > 0 // 这里指的是src/store/getters.js的roles
       if (hasPerm) {
+        console.log('hasPerm')
         next()
       } else {
         try {
+          console.log('hasPerm else')
           // 获取用户信息
           const {
             permissions

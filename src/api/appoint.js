@@ -44,3 +44,70 @@ export function getAppointListByEmpAndItem(data) {
 
   })
 }
+
+export function getAppointListByEmp(data) {
+  return request({
+    url: '/appoint/getAppointListByEmp',
+    method: 'get',
+    params: {
+      pageSize: data.pageSize,
+      pageNum: data.pageNum,
+      employeeid: data.employeeid
+    }
+
+  })
+}
+
+export function addCheck(data) {
+  return request({
+    url: '/appoint/addCheck',
+    method: 'post',
+    data
+
+  })
+}
+
+export function getUserAppointList(data) {
+  return request({
+    url: '/appoint/getUserAppointList',
+    method: 'get',
+    params: {
+      pageSize: data.pageSize,
+      pageNum: data.pageNum,
+      userId: data.userId
+    }
+
+  })
+}
+
+export function getTodayAppointList(data) {
+  return request({
+    url: '/appoint/getTodayAppointList',
+    method: 'get',
+    params: {
+      pageSize: data.pageSize,
+      pageNum: data.pageNum
+    }
+
+  })
+}
+
+export function addDeposit(data) {
+  return request({
+    url: '/appoint/addDeposit',
+    method: 'post',
+    data
+
+  })
+}
+
+export function confirmAppoint(appointid) {
+  return request({
+    url: '/appoint/confirmAppoint',
+    method: 'get',
+    params: {
+      appointid: appointid
+    }
+
+  })
+}

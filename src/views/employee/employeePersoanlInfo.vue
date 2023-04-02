@@ -2,23 +2,23 @@
 <template>
   <el-form ref="ruleForm" :model="employeePerosanlInfo" :rules="rules" label-width="100px" class="demo-ruleForm">
     <el-form-item label="姓名">
-      <el-input v-model="employeePerosanlInfo.name" :disabled="true" />
+      <el-input v-model="employeePerosanlInfo.user.name" :disabled="true" />
     </el-form-item>
 
     <el-form-item label="年龄">
-      <el-input v-model="employeePerosanlInfo.age" :disabled="true" />
+      <el-input v-model="employeePerosanlInfo.user.age" :disabled="true" />
     </el-form-item>
     <el-form-item label="性别" required>
-      <el-radio-group v-model="employeePerosanlInfo.sex" :disabled="true">
+      <el-radio-group v-model="employeePerosanlInfo.user.sex" :disabled="true">
         <el-radio :label="1">男</el-radio>
         <el-radio :label="0">女</el-radio>
       </el-radio-group>
     </el-form-item>
     <el-form-item label="手机号">
-      <el-input v-model="employeePerosanlInfo.phone" :disabled="true" />
+      <el-input v-model="employeePerosanlInfo.user.phonenumber" :disabled="true" />
     </el-form-item>
     <el-form-item label="地址">
-      <el-input v-model="employeePerosanlInfo.address" :disabled="true" />
+      <el-input v-model="employeePerosanlInfo.user.address" :disabled="true" />
     </el-form-item>
     <el-form-item label="入职时间">
 

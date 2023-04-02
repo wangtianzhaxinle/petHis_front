@@ -190,7 +190,7 @@
         @check="handleCheckChange"
       />
       <div slot="footer" class="dialog-footer">
-        <!-- <el-button type="primary" @click="submit">提交</el-button> -->
+        <el-button type="primary" @click="submit">修改</el-button>
       </div>
     </el-dialog>
   </div>
@@ -199,7 +199,7 @@
 
 <script>
 import { getUserInfoList, deleteUserById, deleteUserByIds } from '@/api/user'
-import { getAllRoleList, getRoleByUserId } from '@/api/role'
+import { getAllRoleList, getRoleByUserId, updateRoleByUserId } from '@/api/role'
 import tablePane from '@/components/tablePane.vue'
 
 export default {
@@ -424,6 +424,18 @@ export default {
           this.dataSource.pageData.total = 0
         }
         // }
+      })
+    },
+    submit() {
+      const data = {
+        roleIds: this.roleIds,
+        userId: this.userId
+      }
+      updateRoleByUserId(data).then(res => {
+        alert(res.message)
+        if (res.total > 0) {
+          this.roleDialogVisible = false
+        }
       })
     },
     getRoleList() {

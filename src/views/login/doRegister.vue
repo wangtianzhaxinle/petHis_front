@@ -164,8 +164,8 @@
 
       </el-form-item>
 
-      <!-- <el-button v-if="show" type="primary" style="width:100%;margin-bottom:30px;" @click="getPhoneCode">获取验证码</el-button>
-       -->
+      <el-button v-if="show" type="primary" style="width:100%;margin-bottom:30px;" @click="getPhoneCode">获取验证码</el-button>
+
       <el-button v-if="!show" type="primary" style="width:100%;margin-bottom:30px;" disabled="true"><span v-if="!show" style="color: #707070;">{{ count }}s后重新获取</span></el-button>
       <el-row />
       <!-- 这里一直提示handleRegister不是一个方法,原来我把handleRegister写在methods括号外面了,获取不到 -->
@@ -400,6 +400,22 @@ export default {
           return false
         }
       })
+    },
+    getPhoneCode() {
+      const TIME_COUNT = 60
+      if (!this.timer) {
+        this.count = TIME_COUNT
+        this.show = false
+        this.timer = setInterval(() => {
+          if (this.count > 0 && this.count <= TIME_COUNT) {
+            this.count--
+          } else {
+            this.show = true
+            clearInterval(this.timer)
+            this.timer = null
+          }
+        }, 1000)
+      }
     }
 
   }

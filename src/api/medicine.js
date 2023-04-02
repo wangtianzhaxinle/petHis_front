@@ -46,3 +46,13 @@ export function updateMedicineInfo(data) {
 
   })
 }
+export function getMedicineListByName(name) {
+  return request({
+    url: '/medicine/getMedicineListByName',
+    method: 'get',
+    params: {
+      name: name
+    }
+
+  })
+}

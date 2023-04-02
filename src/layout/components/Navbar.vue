@@ -10,6 +10,7 @@
         <div class="avatar-wrapper">
           <!-- 头像 -->
           <!-- '?imageView2/1/w/80/h/80'表示限制缩略图最大宽高,即缩小图片 -->
+          <span>{{ name }}</span>
           <img :src="avatar+'?imageView2/1/w/80/h/80'" class="user-avatar">
           <!-- 下拉菜单按钮 -->
           <i class="el-icon-caret-bottom" />
@@ -55,7 +56,8 @@ export default {
     // 获取侧边栏是否展开,以及头像地址
     ...mapGetters([
       'sidebar',
-      'avatar'
+      'avatar',
+      'name'
     ])
   },
   methods: {

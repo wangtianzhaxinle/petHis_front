@@ -98,7 +98,7 @@ const actions = {
           return reject('Verification failed, please Login again.')
         }
 
-        const { name, avatar, address, age, sex, phonenumber, userid, username, createtime, email, role, permissions } = data
+        const { name, avatar, address, age, sex, phoneNumber, userid, username, createtime, email, role, permissions } = data
         if (!permissions || permissions.length <= 0) {
           reject('getInfo:permissions must be a non-null array!')
         }
@@ -107,7 +107,7 @@ const actions = {
         commit('SET_ADDRESS', address)
         commit('SET_AGE', age)
         commit('SET_SEX', sex)
-        commit('SET_PHONENUMBER', phonenumber)
+        commit('SET_PHONENUMBER', phoneNumber)
         commit('SET_USERID', userid)
         commit('SET_USERNAME', username)
         commit('SET_CREATETIME', createtime)

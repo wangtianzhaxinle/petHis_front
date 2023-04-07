@@ -6,7 +6,13 @@ export function getUserInfoList(data) {
     method: 'get',
     params: {
       pageSize: data.pageSize,
-      pageNum: data.pageNum
+      pageNum: data.pageNum,
+      name: data.name,
+      username: data.username,
+      address: data.address,
+      sex: data.sex,
+      isEmployee: data.isEmployee,
+      isDelete: data.isDelete
     }
 
   })
@@ -22,9 +28,9 @@ export function getUserInfoList(data) {
 }
 export function deleteUserById(userId) {
   return request({
-    url: '/user/deleteUserById/' + userId,
-    method: 'delete'
-
+    url: '/user/deleteUserById',
+    method: 'delete',
+    params: { userId: userId }
   })
 }
 export function deleteUserByIds(data) {
@@ -38,6 +44,20 @@ export function deleteUserByIds(data) {
 export function registerUser(data) {
   return request({
     url: '/user/registerUser',
+    method: 'post',
+    data
+  })
+}
+export function addUser(data) {
+  return request({
+    url: '/user/addUser',
+    method: 'post',
+    data
+  })
+}
+export function updateUserById(data) {
+  return request({
+    url: '/user/updateUserById',
     method: 'post',
     data
   })

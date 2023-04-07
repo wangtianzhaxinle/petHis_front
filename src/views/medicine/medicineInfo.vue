@@ -92,7 +92,7 @@ https://blog.csdn.net/weixin_44345975/article/details/123697991
         </el-form-item>
 
         <el-form-item label="公司" prop="company">
-          <el-input v-model.number="medicine.company" />
+          <el-input v-model="medicine.company" />
         </el-form-item>
         <el-form-item label="价格" prop="price">
           <el-input v-model.number="medicine.price" />
@@ -224,7 +224,7 @@ export default {
         tool: [{
           name: '新增药物',
           key: 'addMedicine',
-          permission: 'addMedicine',
+          // permission: 'addMedicine',
           handleClick: this.addMedicine
         }],
         data: [], // 表格数据
@@ -308,13 +308,13 @@ export default {
             {
               label: '删除', // 操作名称
               type: 'deleteMedicine',
-              permission: 'deleteMedicine', // 后期这个操作的权限，用来控制权限
+              // permission: 'deleteMedicine', // 后期这个操作的权限，用来控制权限
               handleRow: this.deleteMedicine
             },
             {
               label: '修改', // 操作名称
               type: 'editMedicine',
-              permission: 'editMedicine', // 后期这个操作的权限，用来控制权限
+              //  permission: 'editMedicine', // 后期这个操作的权限，用来控制权限
               handleRow: this.editMedicine
             }
           ]
@@ -332,15 +332,13 @@ export default {
     handleClose(done) {
       this.$confirm('确认关闭？')
         .then(_ => {
-          // console.log('hs11111')
           this.resetForm()
-          // console.log('hs22222')
+
           // this.$refs.pictureUpload.clearFiles()
-          alert('filelist清空')
+          //  alert('filelist清空')
           this.filelist = []
-          // console.log('hs33333')
+
           done()
-        //  console.log('hs44444')
         })
         .catch(_ => {})
     },
@@ -500,7 +498,7 @@ export default {
         // console.log(this.medicine)
         this.filelist.push({ 'url': this.medicine.image })
       })
-      console.log(this.medicine)
+      // console.log(this.medicine)
       // this.filelist.push({ 'url': this.medicine.image })
     },
     deleteMedicine(index, row) {
@@ -547,7 +545,7 @@ export default {
 
       this.medicine.medicineid = ''
       // alert(this.medicine.medicineid)
-      console.log('filelist')
+      // console.log('filelist')
       console.log(this.filelist)
       this.filelist = []// 不加这行,在修改时删掉原先图片在上传新的图片,提交成功后,再点击修改进去表单会发现有两张图片
       // alert(this.medicineid)

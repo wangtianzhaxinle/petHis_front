@@ -1,9 +1,49 @@
 <template>
-  <table-pane
-    :data-source="dataSource"
-    @changeSize="changeSize"
-    @changeNum="changeNum"
-  />
+  <div> <table-pane
+          :data-source="dataSource"
+          @changeSize="changeSize"
+          @changeNum="changeNum"
+        />
+    <el-dialog
+      title="提示"
+      :visible.sync="petDialogVisible"
+      width="30%"
+      :before-close="handleClose"
+    >
+      <el-form ref="petForm" :model="petInfo" :rules="rules" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="宠物id" hidden>
+          <el-input v-model="petInfo.petid" />
+        </el-form-item>
+
+        <el-form-item label="宠物名" prop="name">
+          <el-input v-model="petInfo.name" />
+        </el-form-item>
+        <el-form-item label="品种" prop="breed">
+          <el-input v-model="petInfo.breed" />
+        </el-form-item>
+        <el-form-item label="是否健康" required>
+          <el-radio-group v-model="petInfo.ishealth">
+            <el-radio :label="1">健康</el-radio>
+            <el-radio :label="0">生病</el-radio>
+          </el-radio-group>
+        </el-form-item>
+        <el-form-item label="年龄" prop="age">
+          <el-input v-model="petInfo.age" />
+        </el-form-item>
+        <el-form-item label="性别" prop="sex">
+          <el-radio-group v-model="petInfo.sex">
+            <el-radio :label="1">公</el-radio>
+            <el-radio :label="0">母</el-radio>
+          </el-radio-group>
+        </el-form-item>
+
+        <el-form-item>
+          <el-button type="primary" @click="submitForm">提交</el-button>
+          <!-- <el-button @click="resetForm('ruleForm')">重置</el-button> -->
+        </el-form-item>
+
+      </el-form>
+    </el-dialog></div>
 
 </template>
 
@@ -18,14 +58,24 @@ export default {
     return {
       // 搜索栏配置
       userId: store.getters.userId,
+      petInfo: {},
+      petDialogVisible: false,
       // 表格配置
       dataSource: {
         tool: [{
           name: '新增宠物',
-          key: 1,
-          permission: 2010701,
-          handleClick: this.handleAdd
-        }],
+          key: 'addPet',
+          // permission: 2010701,
+          handleClick: this.addPet
+        },
+        {
+          name: '批量删除',
+          key: 'batchDelete',
+          // permission: 2010701,
+          handleClick: this.batchDelete
+        }
+
+        ],
         data: [], // 表格数据
         cols: [
           {
@@ -95,13 +145,13 @@ export default {
             {
               label: '修改', // 操作名称
               type: 'warning',
-              permission: '2010702', // 后期这个操作的权限，用来控制权限
+              // permission: '2010702', // 后期这个操作的权限，用来控制权限
               handleRow: this.handleRow
             },
             {
               label: '删除', // 操作名称
               type: 'danger',
-              permission: '2010702', // 后期这个操作的权限，用来控制权限
+              // permission: '2010702', // 后期这个操作的权限，用来控制权限
               handleRow: this.handleRow
             }
           ]
@@ -139,6 +189,9 @@ export default {
         }
         // }
       })
+    },
+    addPet() {
+      this.petDialogVisible = true
     },
     // 搜索层事件
 

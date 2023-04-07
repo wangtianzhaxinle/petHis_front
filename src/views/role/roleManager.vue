@@ -10,7 +10,6 @@
       title="权限"
       :visible.sync="perDialogVisible"
       width="30%"
-      :before-close="handleClose"
     >
       <el-tree
         ref="permissionTree"
@@ -34,29 +33,28 @@
       :title="title"
       :visible.sync="roleDialogVisible"
       width="30%"
-      :before-close="handleClose"
     >
-      <el-form ref="RoleForm" :model="role" :rule="rules" label-width="100px" class="demo-ruleForm">
-        <el-form-item label="roleId" hidden>
+      <!-- :rules少了一个s写成了:rule所以验证一直不生效...... -->
+      <el-form ref="RoleForm" :model="role" :rules="rules" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="角色id" hidden>
           <el-input v-model="role.roleid" />
         </el-form-item>
 
-        <el-form-item label="角色名" prop="name">
+        <el-form-item label="名字" prop="name">
           <el-input v-model="role.name" />
         </el-form-item>
 
         <el-form-item label="描述" prop="description">
           <el-input v-model="role.description" />
-
         </el-form-item>
+
         <el-form-item>
-
           <el-button type="primary" @click="submitForm()">提交</el-button>
-
         </el-form-item>
 
       </el-form>
     </el-dialog>
+
   </div>
 
 </template>
@@ -83,21 +81,23 @@ export default {
       roleId: '',
       title: '',
       roleDialogVisible: false,
-      role: {
 
-      },
       submitType: '',
 
       rules: {
         name: [
           { required: true, message: '请输入名字', trigger: 'blur' }
-
+          // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
         ],
         description: [
           { required: true, message: '请输入描述', trigger: 'blur' }
-
         ]
 
+      },
+      role: {
+        roleid: '',
+        name: '',
+        description: ''
       },
 
       // 表格配置
@@ -105,13 +105,13 @@ export default {
         tool: [{
           name: '新增角色',
           key: 'AddRole',
-          permission: 'AddRole',
+          // permission: 'AddRole',
           handleClick: this.AddRole
         },
         {
           name: '全部删除',
           key: 'AllDeleteRole',
-          permission: 'AllDeleteRole',
+          // permission: 'AllDeleteRole',
           handleClick: this.AllDeleteRole
         }
         ],
@@ -155,19 +155,19 @@ export default {
             {
               label: '删除', // 操作名称
               type: 'danger',
-              permission: 'deleteRole', // 后期这个操作的权限，用来控制权限
+              // permission: 'deleteRole', // 后期这个操作的权限，用来控制权限
               handleRow: this.deleteRole
             },
             {
               label: '修改', // 操作名称
               type: 'warning',
-              permission: 'editRole', // 后期这个操作的权限，用来控制权限
+              // permission: 'editRole', // 后期这个操作的权限，用来控制权限
               handleRow: this.editRole
             },
             {
               label: '查看权限', // 操作名称
               type: 'warning',
-              permission: 'viewPermission', // 后期这个操作的权限，用来控制权限
+              // permission: 'viewPermission', // 后期这个操作的权限，用来控制权限
               handleRow: this.viewPermission
             }
           ]

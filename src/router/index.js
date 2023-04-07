@@ -66,6 +66,7 @@ export const constantRoutes = [
 
     }]
   }
+  // #region
   /**
    *
    *{
@@ -171,6 +172,7 @@ export const constantRoutes = [
     ]
   },
    */
+  // #endregion
 
 ]
 
@@ -261,6 +263,7 @@ export const asyncRoutes = [
         meta: { title: '选择预约人员', icon: 'form', permission: ['chooseEmployee'] },
         hidden: true
       },
+      // #region
       // {
       //   path: '/apponitDoctor',
       //   name: 'apponitDoctor',
@@ -274,6 +277,7 @@ export const asyncRoutes = [
       //   component: () => import('@/views/item/apponitInjection'),
       //   meta: { title: '预约打疫苗', icon: 'form' }
       // },
+      // #endregion
       {
         path: '/appointDeposit',
         name: 'appointDeposit',
@@ -304,33 +308,34 @@ export const asyncRoutes = [
         meta: { title: '我的预约用户', icon: 'form', permission: ['myAppointCustomer'] }
 
       },
-      /*
-      {
 
-        path: '/checkAppointList',
-        name: 'checkAppointList',
-        component: () => import('@/views/apponit/checkAppointList'),
-        meta: { title: '看病预约列表', icon: 'form' }
+      // #region
+      // {
 
-      },
-      {
+      //   path: '/checkAppointList',
+      //   name: 'checkAppointList',
+      //   component: () => import('@/views/apponit/checkAppointList'),
+      //   meta: { title: '看病预约列表', icon: 'form' }
 
-        path: '/injectAppointList',
-        name: 'injectAppointList',
-        component: () => import('@/views/apponit/injectAppointList'),
-        meta: { title: '打疫苗预约列表', icon: 'form' }
+      // },
+      // {
 
-      },
-      */
-      {
+      //   path: '/injectAppointList',
+      //   name: 'injectAppointList',
+      //   component: () => import('@/views/apponit/injectAppointList'),
+      //   meta: { title: '打疫苗预约列表', icon: 'form' }
 
-        path: '/depositAppointList',
-        name: 'depositAppointList',
-        component: () => import('@/views/apponit/depositAppointList'),
-        meta: { title: '托管预约列表', icon: 'form', permission: ['appointDepositList'] }
+      // },
 
-      },
+      // {
 
+      //   path: '/depositAppointList',
+      //   name: 'depositAppointList',
+      //   component: () => import('@/views/apponit/depositAppointList'),
+      //   meta: { title: '托管预约列表', icon: 'form', permission: ['appointDepositList'] }
+
+      // },
+      // #endregion
       {
 
         path: '/todayAppointList',
@@ -339,6 +344,7 @@ export const asyncRoutes = [
         meta: { title: '本日预约列表', icon: 'form', permission: ['todayAppointList'] }
 
       },
+      // #region
       /*
       {
 
@@ -347,7 +353,9 @@ export const asyncRoutes = [
         component: () => import('@/views/apponit/appointInfo'),
         meta: { title: '明日预约列表', icon: 'form' }
 
-      },*/
+      },
+      */
+      // #endregion
       {
 
         path: '/appointInfo',
@@ -358,6 +366,7 @@ export const asyncRoutes = [
       }
     ]
   },
+  // #region
   // {
   //   path: '/depositManager',
   //   component: Layout,
@@ -374,7 +383,7 @@ export const asyncRoutes = [
   //     }
   //   ]
   // },
-
+  // #endregion
   {
     path: '/medicalRecordManager',
     component: Layout,
@@ -386,7 +395,7 @@ export const asyncRoutes = [
         path: '/medicalRecordInfo',
         name: 'medicalRecordInfo',
         component: () => import('@/views/medicalRecord/medicalRecordInfo'),
-        meta: { title: '宠物病历信息', icon: 'form', permission: ['medicalRecordList'] }
+        meta: { title: '宠物病历信息列表', icon: 'form', permission: ['medicalRecordList'] }
 
       }
     ]

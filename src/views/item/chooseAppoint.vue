@@ -79,8 +79,7 @@ export default {
       roleid: '',
       userId: store.getters.userId,
       appointDialogVisible: false,
-      options: {
-      },
+      options: [],
       appoint: {
         itemid: '',
         petid: '',
@@ -170,7 +169,7 @@ export default {
             {
               label: '选择', // 操作名称
               type: 'info',
-              permission: '2010702', // 后期这个操作的权限，用来控制权限
+              // permission: '2010702', // 后期这个操作的权限，用来控制权限
               handleRow: this.choose
             }
 

@@ -134,7 +134,19 @@ export default {
           {
             label: '状态',
             prop: 'status',
-            width: 100
+            width: 100,
+
+            isCodeTableFormatter: function(val) {
+              if (val.status === 0) {
+                return '未使用'
+              } else if (val.status === 1) {
+                return '已预订'
+              } else if (val.status === 2) {
+                return '使用中'
+              } else if (val.status === 3) {
+                return '已超时'
+              }
+            }
 
           },
           {

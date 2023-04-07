@@ -40,19 +40,16 @@ export function filterAsyncRoutes(routes, permissions) {
 
   return res
 }
-
 const state = {
   routes: [],
   addRoutes: []
 }
-
 const mutations = {
   SET_ROUTES: (state, routes) => {
     state.addRoutes = routes
     state.routes = constantRoutes.concat(routes) // 将过滤后的路由和constantRoutes存起来
   }
 }
-
 // 筛选
 const actions = {
   generateRoutes({
@@ -75,7 +72,6 @@ const actions = {
     })
   }
 }
-
 export default {
   namespaced: true,
   state,

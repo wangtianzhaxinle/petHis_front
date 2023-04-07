@@ -24,12 +24,12 @@ export default {
       // 表格配置
       dataSource: {
         tool: [
-          {
-            name: '批量删除',
-            key: 'batchDeleteApponit',
-            permission: 'batchDeleteApponit',
-            handleClick: this.batchDeleteApponit
-          }
+          // {
+          //   name: '批量删除',
+          //   key: 'batchDeleteApponit',
+          //   permission: 'batchDeleteApponit',
+          //   handleClick: this.batchDeleteApponit
+          // }
         ],
         data: [], // 表格数据
         cols: [
@@ -39,22 +39,27 @@ export default {
             width: 100
           },
           {
-            label: 'itemId',
-            prop: 'itemid',
+            label: '项目名',
+            prop: 'item.name',
+            width: 100
+          },
+          {
+            label: '宠物名',
+            prop: 'pet.name',
             width: 100
           },
 
           {
-            label: 'userId',
-            prop: 'userId',
+            label: '主人名',
+            prop: 'user.name',
             width: 100
 
           },
 
           {
-            label: 'employeeId',
-            prop: 'employeeid',
-            width: 300
+            label: '员工名',
+            prop: 'emp.name',
+            width: 100
           },
           {
             label: 'status',
@@ -62,8 +67,12 @@ export default {
           },
 
           {
-            label: 'appointtime',
-            prop: 'appointTime'
+            label: '预约看病时间',
+            prop: 'appointdate'
+          },
+          {
+            label: '下单时间',
+            prop: 'createtime'
           }
 
         ], // 表格的列数据
@@ -83,18 +92,18 @@ export default {
           label: '操作', // 列名
           width: '100', // 根据实际情况给宽度
           data: [
-            {
-              label: '删除', // 操作名称
-              type: 'danger',
-              permission: 'deleteRow', // 后期这个操作的权限，用来控制权限
-              handleRow: this.deleteRow
-            },
-            {
-              label: '修改', // 操作名称
-              type: 'warming',
-              permission: 'editRow', // 后期这个操作的权限，用来控制权限
-              handleRow: this.editRow
-            }
+            // {
+            //   label: '删除', // 操作名称
+            //   type: 'danger',
+            //   permission: 'deleteRow', // 后期这个操作的权限，用来控制权限
+            //   handleRow: this.deleteRow
+            // },
+            // {
+            //   label: '修改', // 操作名称
+            //   type: 'warming',
+            //   permission: 'editRow', // 后期这个操作的权限，用来控制权限
+            //   handleRow: this.editRow
+            // }
           ]
         }
       },

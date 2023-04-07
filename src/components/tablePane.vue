@@ -74,7 +74,10 @@
           <template slot-scope="scope">
             <span>
               <span>{{ item.filter(scope.row[scope.column.property]) }}</span>
-              <i v-if="item.icon" :class="[item.icon(scope.row[scope.column.property]),'icon-normal']" @click="item.handlerClick(scope.row)" />
+              <!-- 原本的内容 -->
+              <!-- <i v-if="item.icon" :class="[item.icon(scope.row[scope.column.property]),'icon-normal']" @click="item.handlerClick(scope.row)" /> -->
+
+              <i v-if="item.icon" :class="[item.icon(scope.row[scope.column.property]),'icon-normal']" />
             </span>
             <!-- 比如要输入框 显示图片等等 自己定义 -->
             <slot :name="item.prop" :scope="scope" />
@@ -129,7 +132,7 @@
                 <template v-if="item.type!=='icon'">
                   <!-- 下面buttopn标签应该有个v-permission="item.permission" -->
                   <el-button
-
+                    v-permission="item.permission!==undefined?[item.permission]:[]"
                     v-bind="item"
                     :type="item.type?item.type:''"
                     size="mini"
@@ -163,7 +166,9 @@
 </template>
 
 <script>
+import permission from '@/directive/permission/index.js' // 权限判断指令
 export default {
+  directives: { permission },
   // 接收父组件传递过来的值
   props: {
     //  表格数据和表格部分属性的对象

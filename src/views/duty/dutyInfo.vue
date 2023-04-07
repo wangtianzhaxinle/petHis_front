@@ -133,16 +133,28 @@ export default {
           {
             label: '周一',
             prop: 'monday',
-            width: 100,
+            width: 200,
 
             // isIcon: true,
-            isCodeTableFormatter: function(val) {
-              if (val.monday === 1) {
-                return '上班'
+            // isCodeTableFormatter: function(val) {
+            //   if (val.monday === 1) {
+            //     return '上班'
+            //   } else {
+            //     return '休息'
+            //   }
+            // }
+            filter: function(val) {
+
+            },
+            isIcon: true,
+            icon: function(val) {
+              if (val === 1) {
+                return 'el-icon-check'
               } else {
-                return '休息'
+                return 'el-icon-close'
               }
-            } },
+            }
+          },
           /*,
             isTemplateClass: function(val) {
               if (val.mondayam === 1) {
@@ -177,12 +189,23 @@ export default {
           {
             label: '周二',
             prop: 'tuesday',
-            width: 100,
-            isCodeTableFormatter: function(val) {
-              if (val.tuesday === 1) {
-                return '上班'
+            width: 200,
+            // isCodeTableFormatter: function(val) {
+            //   if (val.tuesday === 1) {
+            //     return '上班'
+            //   } else {
+            //     return '休息'
+            //   }
+            // }
+            filter: function(val) {
+
+            },
+            isIcon: true,
+            icon: function(val) {
+              if (val === 1) {
+                return 'el-icon-check'
               } else {
-                return '休息'
+                return 'el-icon-close'
               }
             }
 
@@ -191,12 +214,28 @@ export default {
           {
             label: '周三',
             prop: 'wednesday',
-            width: 100,
-            isCodeTableFormatter: function(val) {
-              if (val.wednesday === 1) {
-                return '上班'
+            width: 200,
+            // isCodeTableFormatter: function(val) {
+            //   if (val.wednesday === 1) {
+            //     return '上班'
+            //   } else {
+            //     return '休息'
+            //   }
+            // }
+            filter: function(val) {
+              // if (val === 1) {
+              //   return '上班'
+              // } else {
+              //   return '休息'
+              // }
+            },
+            isIcon: true,
+            icon: function(val) {
+              // alert(val)
+              if (val === 1) {
+                return 'el-icon-check'
               } else {
-                return '休息'
+                return 'el-icon-close'
               }
             }
           },
@@ -204,12 +243,23 @@ export default {
           {
             label: '周四',
             prop: 'thursday',
-            width: 100,
-            isCodeTableFormatter: function(val) {
-              if (val.thursday === 1) {
-                return '上班'
+            width: 200,
+            // isCodeTableFormatter: function(val) {
+            //   if (val.thursday === 1) {
+            //     return '上班'
+            //   } else {
+            //     return '休息'
+            //   }
+            // }
+            filter: function(val) {
+
+            },
+            isIcon: true,
+            icon: function(val) {
+              if (val === 1) {
+                return 'el-icon-check'
               } else {
-                return '休息'
+                return 'el-icon-close'
               }
             }
           },
@@ -217,12 +267,23 @@ export default {
           {
             label: '周五',
             prop: 'friday',
-            width: 100,
-            isCodeTableFormatter: function(val) {
-              if (val.friday === 1) {
-                return '上班'
+            width: 200,
+            // isCodeTableFormatter: function(val) {
+            //   if (val.friday === 1) {
+            //     return '上班'
+            //   } else {
+            //     return '休息'
+            //   }
+            // }
+            filter: function(val) {
+
+            },
+            isIcon: true,
+            icon: function(val) {
+              if (val === 1) {
+                return 'el-icon-check'
               } else {
-                return '休息'
+                return 'el-icon-close'
               }
             }
           },
@@ -230,12 +291,16 @@ export default {
           {
             label: '周六',
             prop: 'saturday',
-            width: 100,
-            isCodeTableFormatter: function(val) {
-              if (val.saturday === 1) {
-                return '上班'
+            width: 200,
+            filter: function(val) {
+
+            },
+            isIcon: true,
+            icon: function(val) {
+              if (val === 1) {
+                return 'el-icon-check'
               } else {
-                return '休息'
+                return 'el-icon-close'
               }
             }
           },
@@ -243,12 +308,23 @@ export default {
           {
             label: '周日',
             prop: 'sunday',
-            width: 100,
-            isCodeTableFormatter: function(val) {
-              if (val.sunday === 1) {
-                return '上班'
+
+            // isCodeTableFormatter: function(val) {
+            //   if (val.sunday === 1) {
+            //     return '上班'
+            //   } else {
+            //     return '休息'
+            //   }
+            // }
+            filter: function(val) {
+
+            },
+            isIcon: true,
+            icon: function(val) {
+              if (val === 1) {
+                return 'el-icon-check'
               } else {
-                return '休息'
+                return 'el-icon-close'
               }
             }
           }
@@ -273,7 +349,7 @@ export default {
 
             {
               label: '修改', // 操作名称
-              type: 'warming',
+              type: 'warning',
               permission: 'editDuty', // 后期这个操作的权限，用来控制权限
               handleRow: this.editDuty
             }

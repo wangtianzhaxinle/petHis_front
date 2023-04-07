@@ -3,8 +3,23 @@
     :data-source="dataSource"
     @changeSize="changeSize"
     @changeNum="changeNum"
-  />
+  >
+    <template v-slot:operator="scopedata">
+      <div class="btn">
+        <el-button
+          v-if="scopedata.scope.row.itemid===1"
+          type="info"
+          size="mini"
+          @click.native.prevent="editRoom(scopedata.scope.$index, scopedata.scope.row)"
+        >
 
+          办理
+        </el-button>
+
+      </div>
+
+    </template>
+  </table-pane>
   </div>
 
 </template>
@@ -12,7 +27,7 @@
 <script>
 
 import { getTodayAppointList } from '@/api/appoint'
-import tablePane from '@/components/tablePane.vue'
+import tablePane from '@/components/tablePane2.vue'
 import store from '@/store'
 
 export default {
@@ -34,6 +49,11 @@ export default {
             width: 100
           },
           {
+            label: '项目名',
+            prop: 'item.name',
+            width: 100
+          },
+          {
             label: '宠物名',
             prop: 'pet.name',
             width: 100
@@ -47,8 +67,8 @@ export default {
           },
 
           {
-            label: 'employeeId',
-            prop: 'employeeid',
+            label: '员工名',
+            prop: 'emp.name',
             width: 100
           },
           {

@@ -2,15 +2,15 @@
 <template>
   <el-form ref="ruleForm" :model="perosanlInfo" :rules="rules" label-width="100px" class="demo-ruleForm">
     <el-form-item label="姓名" prop="name">
-      <el-input v-model="name" :disabled="true" />
+      <el-input v-model="name" :disabled="disable" />
     </el-form-item>
 
     <el-form-item label="头像" prop="desc">
-      <el-avatar g :src="avatar" class="user-avatar" />
+      <el-avatar :src="avatar" class="user-avatar" />
     </el-form-item>
 
     <el-form-item label="年龄" prop="region">
-      <el-input v-model="age" :disabled="true" />
+      <el-input v-model="age" :disabled="disable" />
     </el-form-item>
     <el-form-item label="性别" required>
       <el-radio-group v-model="sex">
@@ -19,27 +19,32 @@
       </el-radio-group>
     </el-form-item>
     <el-form-item label="手机号" prop="delivery">
-      <el-input v-model="phoneNumber" :disabled="true" />
+      <el-input v-model="phoneNumber" :disabled="disable" />
     </el-form-item>
     <el-form-item label="地址" prop="type">
-      <el-input v-model="address" :disabled="true" />
+      <el-input v-model="address" :disabled="disable" />
     </el-form-item>
     <el-form-item label="注册时间" prop="resource">
 
       <el-col :span="11">
         <el-form-item prop="date2">
-          <el-date-picker v-model="createtime" placeholder="选择时间" style="width: 100%;" :disabled="true" />
+          <el-date-picker v-model="createtime" placeholder="选择时间" style="width: 100%;" :disabled="disable" />
         </el-form-item>
       </el-col>
     </el-form-item>
     <el-form-item label="电子邮件" prop="desc">
-      <el-input v-model="email" :disabled="true" />
+      <el-input v-model="email" :disabled="disable" />
     </el-form-item>
 
-    <!-- <el-form-item>
-      <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
-      <el-button @click="resetForm('ruleForm')">重置</el-button>
-    </el-form-item>  -->
+    <el-form-item>
+      <el-button type="primary" @click="resetPassword">修改密码</el-button>
+      <el-button v-if="disable===true" @click="editUserInfo">修改信息</el-button>
+      <template v-else>
+        <el-button @click="submit">提交</el-button>
+        <el-button @click="cancel">取消</el-button>
+      </template>
+
+    </el-form-item>
 
   </el-form>
 </template>
@@ -61,6 +66,7 @@ export default {
         resource: '',
         desc: ''
       },*/
+      disable: true,
       rules: {
         name: [
           { required: true, message: '请输入活动名称', trigger: 'blur' },
@@ -139,7 +145,17 @@ export default {
     },
     resetForm(formName) {
       this.$refs[formName].resetFields()
+    },
+    editUserInfo() {
+      this.disable = false
+    }, submit() {
+
+    }, resetPassword() {
+
+    }, cancel() {
+      this.disable = true
     }
+
     /* getLoginInfo() {
       this.dataSource.loading = true
 

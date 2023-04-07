@@ -1,21 +1,94 @@
 <template>
 
-  <div class="app-container"> <table-pane
-                                :data-source="dataSource"
-                                @changeSize="changeSize"
-                                @changeNum="changeNum"
-                              >
-                                <!-- 这里终于搞定了妈耶,查了一下午的作用于插槽,没想到是scope后面少了个row,
+  <div class="app-container">
+    <div>
+      <div class="filter-container">
+        <el-input v-model="searchUser.name" style="width:200px" class="filter-item" placeholder="请输入名字" />
+        <el-input v-model="searchUser.username" style="width:200px" class="filter-item" placeholder="请输入用户名" />
+        <el-input v-model="searchUser.address" style="width:200px" class="filter-item" placeholder="请输入地址" />
+        <el-select v-model="searchUser.sex" style="width:200px" class="filter-item" placeholder="性别">
+
+          <el-option label="女" value="0" />
+          <el-option label="男" value="1" />
+
+        </el-select>
+        <el-select v-model="searchUser.isEmployee" style="width:200px" class="filter-item" placeholder="是否员工">
+
+          <el-option label="否" value="0" />
+          <el-option label="是" value="1" />
+
+        </el-select>
+        <el-select v-model="searchUser.isDelete" style="width:200px" class="filter-item" placeholder="是否显示已删除用户">
+          <el-option label="显示全部用户" :value="null" />
+          <el-option label="显示未删除用户" value="0" />
+          <el-option label="显示已删除用户" value="1" />
+        </el-select>
+        <div class="filter-btn">
+          <el-button class="filter-item" type="primary" @click="search">
+            搜索
+          </el-button>
+          <el-button class="filter-item" type="warning" @click="resetFilter">
+            重置
+          </el-button>
+        </div>
+      </div>
+
+    </div>
+    <table-pane
+      :data-source="dataSource"
+      @changeSize="changeSize"
+      @changeNum="changeNum"
+    >
+      <!-- 这里终于搞定了妈耶,查了一下午的作用于插槽,没想到是scope后面少了个row,
                               错误的:scopedata.scope.avatar
                               正确的:scopedata.scope.row.avatar -->
-                                <template v-slot:avatar="scopedata">
-                                  <el-image
-                                    style="width: 100px; height: 100px"
-                                    :src="scopedata.scope.row.avatar"
-                                  />
-                                </template></table-pane>
+      <template v-slot:avatar="scopedata">
+        <el-image
+          style="width: 100px; height: 100px"
+          :src="scopedata.scope.row.avatar"
+        />
+      </template>
+      <template v-slot:operator="scopedata">
 
-    <el-dialog
+        <div class="btn">
+          <el-button
+            v-if="scopedata.scope.row.isDelete!==1"
+            type="danger"
+            size="mini"
+            @click.native.prevent="deleteUser(scopedata.scope.$index, scopedata.scope.row)"
+          >
+            删除
+          </el-button>
+          <el-button
+
+            type="warning"
+            size="mini"
+            @click.native.prevent="editUser(scopedata.scope.$index, scopedata.scope.row)"
+          >
+            修改
+          </el-button>
+          <el-button
+
+            type="info"
+            size="mini"
+            @click.native.prevent="viewRole(scopedata.scope.$index, scopedata.scope.row)"
+          >
+            查看角色
+          </el-button>
+          <el-button
+            v-if="scopedata.scope.row.isEmployee===0"
+            type="info"
+            size="mini"
+            @click.native.prevent="viewRole(scopedata.scope.$index, scopedata.scope.row)"
+          >
+            添加为员工
+          </el-button>
+        </div>
+
+      </template>
+    </table-pane>
+
+    <!-- <el-dialog
       title="提示"
       :visible.sync="editDialogVisible"
       width="30%"
@@ -26,9 +99,9 @@
           <el-input v-model="userInfo.name" />
         </el-form-item>
 
-        <!-- <el-form-item label="头像" prop="desc">
+        <el-form-item label="头像" prop="desc">
           <el-avatar g :src="avatar" class="user-avatar" />
-        </el-form-item> -->
+        </el-form-item>
 
         <el-form-item label="年龄" prop="age">
           <el-input v-model.number="userInfo.age" />
@@ -60,15 +133,15 @@
           <el-input v-model="userInfo.email" />
         </el-form-item>
 
-        <!-- <el-form-item>
+        <el-form-item>
       <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
       <el-button @click="resetForm('ruleForm')">重置</el-button>
-    </el-form-item>  -->
+    </el-form-item>
 
       </el-form>
-    </el-dialog>
+    </el-dialog> -->
 
-    <el-dialog
+    <!-- <el-dialog
       title="提示"
       :visible.sync="viewDialogVisible"
       width="30%"
@@ -113,27 +186,68 @@
           <el-input v-model="userInfo.email" :disabled="true" />
         </el-form-item>
 
-        <!-- <el-form-item>
+        <el-form-item>
       <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
       <el-button @click="resetForm('ruleForm')">重置</el-button>
-    </el-form-item>  -->
+    </el-form-item>
 
       </el-form>
-    </el-dialog>
+    </el-dialog> -->
     <el-dialog
-      title="提示"
-      :visible.sync="editDialogVisible"
+      :title="title"
+      :visible.sync="userDialogVisible"
       width="30%"
       :before-close="handleClose"
     >
-      <el-form ref="editForm" :model="userInfo" :rules="rules" label-width="100px" class="demo-ruleForm">
+      <el-form ref="userForm" :model="userInfo" :rules="userRules" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="用户id" hidden>
+          <el-input v-model="userInfo.userid" />
+        </el-form-item>
         <el-form-item label="姓名" prop="name">
           <el-input v-model="userInfo.name" />
         </el-form-item>
 
-        <!-- <el-form-item label="头像" prop="desc">
-          <el-avatar g :src="avatar" class="user-avatar" />
-        </el-form-item> -->
+        <el-form-item label="头像" prop="avatar">
+
+          <el-upload
+            ref="pictureUpload"
+            class="avatar-uploader"
+            action="#"
+            list-type="picture-card"
+            :limit="1"
+            :http-request="uploadImg"
+            :file-list="filelist"
+            :before-upload="beforeUpload"
+          >
+
+            <i slot="default" class="el-icon-plus" />
+            <div slot="file" slot-scope="{file}">
+              <img
+                class="el-upload-list__item-thumbnail"
+                :src="file.url"
+                alt=""
+              >
+              <span class="el-upload-list__item-actions">
+                <span
+                  class="el-upload-list__item-preview"
+                  @click="handlePictureCardPreview(file)"
+                >
+                  <i class="el-icon-zoom-in" />
+                </span>
+                <span
+                  class="el-upload-list__item-delete"
+                  @click="handleRemove(file)"
+                >
+                  <i class="el-icon-delete" />
+                </span>
+
+              </span>
+            </div>
+          </el-upload>
+
+          <!-- <el-progress v-if="progressShow" :text-inside="true" :stroke-width="15" :percentage="parseInt(fake.progress*100)" status="success" /> -->
+
+        </el-form-item>
 
         <el-form-item label="年龄" prop="age">
           <el-input v-model.number="userInfo.age" />
@@ -141,23 +255,27 @@
         <el-form-item label="用户名" prop="username">
           <el-input v-model="userInfo.username" />
         </el-form-item>
+
+        <el-form-item label="密码" prop="password">
+          <el-input v-model="userInfo.password" />
+        </el-form-item>
         <el-form-item label="性别" required>
           <el-radio-group v-model="userInfo.sex">
             <el-radio :label="1">男</el-radio>
             <el-radio :label="0">女</el-radio>
           </el-radio-group>
         </el-form-item>
-        <el-form-item label="手机号" prop="phoneNumber">
-          <el-input v-model="userInfo.phonenumber" />
+        <el-form-item label="手机号" prop="phonenumber">
+          <el-input v-model.number="userInfo.phonenumber" />
         </el-form-item>
         <el-form-item label="地址" prop="address">
           <el-input v-model="userInfo.address" />
         </el-form-item>
-        <el-form-item label="注册时间" required>
+        <el-form-item v-if="submitType==='edit'" label="注册时间" required>
 
           <el-col :span="11">
             <el-form-item prop="createtime">
-              <el-date-picker v-model="userInfo.createtime" placeholder="选择日期" style="width: 100%;" :disabled="true" />
+              <el-date-picker v-model="userInfo.createtime" placeholder="选择日期" style="width: 100%;" />
             </el-form-item>
           </el-col>
         </el-form-item>
@@ -165,10 +283,10 @@
           <el-input v-model="userInfo.email" />
         </el-form-item>
 
-        <!-- <el-form-item>
-      <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
-      <el-button @click="resetForm('ruleForm')">重置</el-button>
-    </el-form-item>  -->
+        <el-form-item>
+          <el-button type="primary" @click="submitForm">提交</el-button>
+          <!-- <el-button @click="resetForm('ruleForm')">重置</el-button> -->
+        </el-form-item>
 
       </el-form>
     </el-dialog>
@@ -177,7 +295,6 @@
       title="角色"
       :visible.sync="roleDialogVisible"
       width="30%"
-      :before-close="handleClose"
     >
       <el-tree
         ref="roleTree"
@@ -193,59 +310,192 @@
         <el-button type="primary" @click="submit">修改</el-button>
       </div>
     </el-dialog>
+    <el-dialog
+      title="加为员工"
+      :visible.sync="empDialogVisible"
+      width="30%"
+      :before-close="handleClose"
+    >
+      <el-form ref="empForm" :model="employee" :rules="empRules" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="用户id">
+          <el-input v-model="employee.userid" />
+        </el-form-item>
+        <el-form-item label="入职日期" required>
+          <el-col :span="11">
+            <el-form-item prop="hiredate">
+              <el-date-picker v-model="userInfo.createtime" placeholder="选择日期" style="width: 100%;" />
+            </el-form-item>
+          </el-col>
+        </el-form-item>
+
+        <el-form-item label="照片" prop="image">
+
+          <el-upload
+            ref="pictureUpload"
+            class="avatar-uploader"
+            action="#"
+            list-type="picture-card"
+            :limit="1"
+            :http-request="uploadImg"
+            :file-list="filelist"
+          >
+
+            <i slot="default" class="el-icon-plus" />
+            <div slot="file" slot-scope="{file}">
+              <img
+                class="el-upload-list__item-thumbnail"
+                :src="file.url"
+                alt=""
+              >
+              <span class="el-upload-list__item-actions">
+                <span
+                  class="el-upload-list__item-preview"
+                  @click="handlePictureCardPreview(file)"
+                >
+                  <i class="el-icon-zoom-in" />
+                </span>
+                <span
+                  class="el-upload-list__item-delete"
+                  @click="handleRemove(file)"
+                >
+                  <i class="el-icon-delete" />
+                </span>
+
+              </span>
+            </div>
+          </el-upload>
+
+        </el-form-item>
+
+        <el-form-item label="薪水" prop="salary">
+          <el-input v-model.number="employee.salary" />
+        </el-form-item>
+        <el-form-item label="银行卡" prop="bankcard">
+          <el-input v-model="employee.bankcard" />
+        </el-form-item>
+
+        <el-form-item label="最大容量" prop="maxAppoint">
+          <el-input v-model.number="employee.maxAppoint" />
+        </el-form-item>
+        <el-form-item label="身份证" prop="card">
+          <el-input v-model="employee.card" />
+        </el-form-item>
+        <el-form-item label="籍贯" prop="nativePlace">
+          <el-input v-model="employee.nativePlace" />
+        </el-form-item>
+        <el-form-item label="学历" prop="educationBackground">
+          <el-input v-model="employee.educationBackground" />
+        </el-form-item>
+
+        <el-form-item>
+          <el-button type="primary" @click="submitEmpForm">提交</el-button>
+          <!-- <el-button @click="resetForm('ruleForm')">重置</el-button> -->
+        </el-form-item>
+
+      </el-form>
+    </el-dialog>
+
   </div>
 
 </template>
 
 <script>
-import { getUserInfoList, deleteUserById, deleteUserByIds } from '@/api/user'
+import { getUserInfoList, deleteUserById, deleteUserByIds, addUser, updateUserById } from '@/api/user'
 import { getAllRoleList, getRoleByUserId, updateRoleByUserId } from '@/api/role'
-import tablePane from '@/components/tablePane.vue'
+import { upload } from '@/api/upload'
+import tablePane from '@/components/tablePane2.vue'
+import FakeProgress from 'fake-progress'
 
 export default {
   name: 'UserInfo',
   components: { tablePane },
 
   data() {
+    const telCheck = (rule, value, callback) => {
+      var reg = /^1[3-9]\d{9}$/
+      // console.log(value)
+      // console.log(Number.isInteger(value))
+      if (!Number.isInteger(value)) {
+        // 这里输入框必须是v-model.number不然Number.isInteger(value)结果始终为false
+        return callback(new Error('手机号码必须是数字'))
+      } else if (value.toString().length !== 11) {
+        return callback(new Error('手机号码必须是11位数字'))
+      } else if (!reg.test(value)) {
+        return callback(new Error('请输入有效的手机号码'))
+      } else {
+        callback()
+      }
+    }
     return {
-
-      editDialogVisible: false,
-      addDialogVisible: false,
-      viewDialogVisible: false,
+      title: '',
+      empDialogVisible: false,
+      userDialogVisible: false,
 
       roleDialogVisible: false,
+      submitType: '',
+      baseurl: 'http://localhost:8080/petHis',
+      filelist: [],
+      progressShow: false,
+      fake: '',
       userInfo: {
-        /* name: '',
+        userid: '',
+        name: '',
         age: '',
         sex: '',
         username: '',
+        password: '',
         createtime: '',
         phonenumber: '',
         address: '',
-        email: ''
-*/
+        email: '',
+        avatar: ''
+
       },
+      employee: {
+
+      },
+      searchUser: {
+        name: null,
+        username: null,
+        sex: null,
+        address: null,
+        isEmployee: null,
+        isDelete: null
+      },
+
       defaultProps: {
         label: 'description'
       },
       userId: '',
       roleData: {},
       roleIds: [],
-      rules: {
+      userRules: {
         name: [
-          { required: true, message: '请输入名字', trigger: 'blur' }
-          // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+          { required: true, message: '请输入名字', trigger: 'blur' },
+          { min: 3, max: 5, message: '长度至少有三个字符', trigger: 'blur' }
         ],
         age: [
-          { required: true, message: '请输入年龄', trigger: 'blur' },
-          { type: 'number', required: true, message: '请输入正确的年龄', trigger: ['blur', 'change'] }
+          { required: true, trigger: 'blur', message: '请输入年龄' },
+          { type: 'number', required: true, trigger: 'blur', message: '请输入数字' },
+          {
+            validator(rule, value, callback) {
+              if (value > 0 && value < 150) {
+                callback()
+              } else {
+                callback(new Error('年龄范围不正确'))
+              }
+            },
+            trigger: 'blur'
+          }
         ],
         sex: [
 
           { type: 'array', message: '请选择性别', trigger: 'blur' }
         ],
-        phoneNumber: [
-          { required: true, message: '请选择手机号', trigger: 'blur' }
+        phonenumber: [
+          { required: true, trigger: 'blur', message: '请输入手机号码' },
+
+          { validator: telCheck, trigger: 'blur' }
         ],
         address: [
           { required: true, message: '请输入地址', trigger: 'blur' }
@@ -259,7 +509,14 @@ export default {
         ], createtime: [
           { required: true, message: '请选择日期', trigger: 'blur' }
 
+        ], avatar: [
+          { required: true, message: '请选择头像', trigger: 'blur' }
+        ], password: [
+          { required: true, message: '请输入密码', trigger: 'blur' }
         ]
+
+      },
+      empRules: {
 
       },
 
@@ -267,22 +524,22 @@ export default {
       dataSource: {
         tool: [{
           name: '新增用户',
-          key: 'Adduser',
+          //  key: 'Adduser',
           permission: 'AddUser',
           handleClick: this.AddUser
         },
         {
-          name: '全部删除',
-          key: 'AllDelete',
-          permission: 'AllDelete',
-          handleClick: this.AllDelete
+          name: '批量删除',
+          //   key: 'AllDelete',
+          permission: 'batchDelete',
+          handleClick: this.batchDelete
         }
         ],
         data: [], // 表格数据
         cols: [
           {
             label: 'id',
-            prop: 'userId',
+            prop: 'userid',
             width: 30
 
           },
@@ -346,6 +603,36 @@ export default {
           {
             label: '邮箱',
             prop: 'email'
+          },
+          {
+            label: '是否员工',
+            prop: 'isEmployee',
+            filter: function(val) {
+
+            },
+            isIcon: true,
+            icon: function(val) {
+              if (val === 1) {
+                return 'el-icon-check'
+              } else {
+                return 'el-icon-close'
+              }
+            }
+          },
+          {
+            label: '是否删除',
+            prop: 'isDelete',
+            filter: function(val) {
+
+            },
+            isIcon: true,
+            icon: function(val) {
+              if (val === 1) {
+                return 'el-icon-check'
+              } else {
+                return 'el-icon-close'
+              }
+            }
           }
 
         ], // 表格的列数据
@@ -363,23 +650,23 @@ export default {
         operation: {
           // 表格有操作列时设置
           label: '操作', // 列名
-          width: '250', // 根据实际情况给宽度
+          width: '350', // 根据实际情况给宽度
           data: [
             {
               label: '删除', // 操作名称
               type: 'danger',
-              permission: 'deleteUser', // 后期这个操作的权限，用来控制权限
+              // permission: 'deleteUser', // 后期这个操作的权限，用来控制权限
               handleRow: this.deleteUser
             }, {
               label: '查看角色', // 操作名称
               type: 'info',
-              permission: 'viewRole', // 后期这个操作的权限，用来控制权限
+              // permission: 'viewRole', // 后期这个操作的权限，用来控制权限
               handleRow: this.viewRole
             },
             {
               label: '修改', // 操作名称
               type: 'warning',
-              permission: 'editUser', // 后期这个操作的权限，用来控制权限
+              // permission: 'editUser', // 后期这个操作的权限，用来控制权限
               handleRow: this.editUser
             }
           ]
@@ -392,22 +679,35 @@ export default {
   },
   created() {
     this.getList()
-    this.getRoleList()
   },
   methods: {
     handleClose(done) {
-      this.$confirm('确认关闭？')
-        .then(_ => {
-          this.userInfo = {}
-          done()
-        })
-        .catch(_ => {})
+      this.resetForm()
+      this.userInfo = {}
+      done()
+    },
+    resetFilter() {
+      this.searchUser.name = null
+      this.searchUser.username = null
+      this.searchUser.address = null
+      this.searchUser.sex = null
+      this.searchUser.isEmployee = null
+      this.searchUser.isDelete = null
+    },
+    search() {
+      this.getList()
     },
     // 获取列表数据
     getList() {
       const data = {
         pageSize: this.dataSource.pageData.pageSize,
-        pageNum: this.dataSource.pageData.pageNum
+        pageNum: this.dataSource.pageData.pageNum,
+        name: this.searchUser.name,
+        username: this.searchUser.username,
+        address: this.searchUser.address,
+        sex: this.searchUser.sex,
+        isEmployee: this.searchUser.isEmployee,
+        isDelete: this.searchUser.isDelete
       }
 
       this.dataSource.loading = true
@@ -418,7 +718,8 @@ export default {
         if (res.total > 0) {
           this.dataSource.pageData.total = res.total
           this.dataSource.data = res.data.records
-          console.log(res.data)
+          // console.log(res.data)
+          this.getRoleList()
         } else {
           this.dataSource.data = []
           this.dataSource.pageData.total = 0
@@ -432,7 +733,7 @@ export default {
         userId: this.userId
       }
       updateRoleByUserId(data).then(res => {
-        alert(res.message)
+        // alert(res.message)
         if (res.total > 0) {
           this.roleDialogVisible = false
         }
@@ -493,17 +794,17 @@ export default {
     }
     **/
     deleteUser(index, row) {
-      console.log(row.id)
+      console.log(row.userid)
       this.$confirm('确认删除该用户?', '温馨提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
         //
-        deleteUserById(row.userId).then(res => {
+        deleteUserById(row.userid).then(res => {
           if (res.total > 0) {
             console.log(res.data)
-            console.log('删除成功')
+            // console.log('删除成功')
             this.getList()
           }
         })
@@ -511,15 +812,22 @@ export default {
       })
     },
     editUser(index, row) {
-      this.editDialogVisible = true
-      this.userInfo = row
-    },
-    viewUser(index, row) {
-      this.viewDialogVisible = true
-      this.userInfo = row
+      this.userDialogVisible = true
+      this.title = '修改用户信息'
+      this.submitType = 'edit'
+      this.$nextTick(() => {
+        // 赋值
+        this.userInfo = JSON.parse(JSON.stringify(row))
+        // console.log(this.medicine)
+        this.filelist.push({ 'url': this.userInfo.avatar })
+      })
     },
     AddUser(index, row) { // 这里粗心AddUser写成了addUser,所以一直提示handleClick不是一个方法
-      this.addDialogVisible = true
+      this.filelist = []
+      this.userInfo = {}
+      this.userDialogVisible = true
+      this.title = '添加用户'
+      this.submitType = 'add'
 
       // alert(222)
     },
@@ -543,9 +851,9 @@ export default {
         }
       })
     },
-    AllDelete() {
-      console.log(this.selected)
-      const ids = this.selected.map((user) => user.userId)
+    batchDelete() {
+      // console.log(this.selected)
+      const ids = this.selected.map((user) => user.userid)
       this.$confirm('确认删除选中的用户?', '温馨提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
@@ -553,16 +861,122 @@ export default {
       }).then(() => deleteUserByIds(ids).then(res => {
         if (res.total > 0) {
           // console.log(res.data)
-          alert('删除成功')
+          // alert('删除成功')
           this.getList()
         } else {
-          alert('删除失败')
+          // alert('删除失败')
         }
       })
       )
+    },
+    resetForm() {
+      if (this.userDialogVisible === true) {
+        this.$refs.userForm.resetFields()
+      }
 
-      // console.log(ids)
-      // alert(111)
+      this.$refs.pictureUpload.clearFiles()
+      // this.userInfo.userid = ''
+
+      this.filelist = []// 不加这行,在修改时删掉原先图片在上传新的图片,提交成功后,再点击修改进去表单会发现有两张图片
+    },
+
+    submitForm() {
+      this.$refs.userForm.validate(valid => {
+        if (valid) {
+          this.loading = true
+          const user = this.userInfo
+
+          if (this.submitType === 'add') {
+            addUser(user).then(res => {
+            // alert(this.$route.path)
+              if (res.total > 0) {
+                this.userDialogVisible = false
+                this.resetForm()
+                // this.$router.go(0)
+                // this.$router.push({ path: this.$route.path || '/' })
+                this.loading = false
+                this.getList()
+              }
+            }).catch(() => {
+              this.loading = false
+            })
+          } else if (this.submitType === 'edit') {
+            this.loading = true
+
+            updateUserById(user).then(res => {
+            // alert(this.$route.path)
+              if (res.total > 0) {
+                this.userDialogVisible = false
+                this.resetForm()
+                // this.$router.go(0)
+                // this.$router.push({ path: this.$route.path || '/' })
+                this.loading = false
+                this.getList()
+              }
+            }).catch(() => {
+              this.loading = false
+            })
+          }
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    submitEmpForm() {
+
+    },
+    beforeUpload(file) {
+      // this.progressShow = true
+      // this.fake = new FakeProgress({
+      //   timeConstant: 10000,
+      //   autoStart: true
+      // })
+
+      const isJPG = file.type === 'image/jpeg'
+      const isLt2M = file.size / 1024 < 200
+      console.log(file.type)
+      console.log(file.size)
+
+      if (!isLt2M) {
+        this.$message.error('上传头像图片大小不能超过 200k!')
+        return false
+      }
+      if (!isJPG) {
+        this.$message.error('上传头像图片只能是 JPG 格式!')
+        return false
+      }
+      // console.log(isJPG && isLt2M)
+      return isJPG && isLt2M
+    },
+    uploadImg(file) {
+      var form = new FormData()
+      form.append('file', file.file)
+
+      upload(form).then(res => {
+        if (res.total > 0) {
+          // alert(res.message)
+          this.userInfo.avatar = this.baseurl + res.data
+          this.fake.end()
+          // console.log(this.medicine)
+        }
+      })
+    },
+    handlePictureCardPreview(file) {
+      this.dialogImageUrl = this.userInfo.avatar
+      this.dialogVisible = true
+    },
+    handleRemove(file) {
+      console.log('handleRemove')
+      console.log(this.filelist)
+      const uploadFiles = this.$refs.pictureUpload.uploadFiles
+      for (const i in uploadFiles) {
+        if (file.url === uploadFiles[i].url) {
+          uploadFiles.splice(i, 1)
+          this.userInfo.avatar = ''
+        }
+      }
+      console.log('handleRemove')
     },
     handleCheckChange(data, checked) {
       // checked.checkedKeys  选中的节点id数组z
@@ -586,4 +1000,17 @@ export default {
   }
 }
 </script>
+<style  scoped lang='scss'>
+.filter-item{
+  margin-left: 10px;
+  display: inline-block;
+}
+.filter-container .filter-item:nth-of-type(1){
+  margin-left: 0px;
+}
+.filter-btn{
+  display: inline-block;
+  margin-left: 10px;
+}
+</style>
 

@@ -32,6 +32,7 @@
         <el-button type="primary" @click="submit">修改</el-button>
       </div>
     </el-dialog>
+
   </div>
 </template>
 
@@ -49,6 +50,7 @@ export default {
       userId: '',
       roleIds: [],
       roleData: {},
+
       roleDialogVisible: false,
       defaultProps: {
         label: 'description'
@@ -60,13 +62,13 @@ export default {
         tool: [{
           name: '新增员工',
           key: 'addEmployee',
-          permission: 'addEmployee',
+          // permission: 'addEmployee',
           handleClick: this.addEmployee
         },
         {
           name: '批量删除',
           key: 'batchDeleteEmployee',
-          permission: 'batchDeleteEmployee',
+          // permission: 'batchDeleteEmployee',
           handleClick: this.batchDeleteEmployee
         }
         ],
@@ -141,19 +143,19 @@ export default {
             {
               label: '删除', // 操作名称
               type: 'danger',
-              permission: 'deleteRow', // 后期这个操作的权限，用来控制权限
+              // permission: 'deleteRow', // 后期这个操作的权限，用来控制权限
               handleRow: this.deleteRow
             },
             {
               label: '修改', // 操作名称
               type: 'warming',
-              permission: 'editRow', // 后期这个操作的权限，用来控制权限
-              handleRow: this.editRow
+              // permission: 'editRow', // 后期这个操作的权限，用来控制权限
+              handleRow: this.editEmployee
             },
             {
               label: '查看角色', // 操作名称
               type: 'info',
-              permission: 'viewRole', // 后期这个操作的权限，用来控制权限
+              // permission: 'viewRole', // 后期这个操作的权限，用来控制权限
               handleRow: this.viewRole
             }
           ]
@@ -250,6 +252,12 @@ export default {
         }
         // }
       })
+    },
+    addEmployee() {
+
+    },
+    editEmployee() {
+
     },
     // 搜索层事件
 

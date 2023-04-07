@@ -23,6 +23,7 @@
 
                                     <div key="修改">
                                       <el-button
+                                        v-permission="['editItem']"
                                         type="warning"
                                         size="mini"
                                         @click.native.prevent="editItem(scopedata.scope.$index, scopedata.scope.row)"
@@ -212,12 +213,22 @@ export default {
             prop: 'chargingmethod',
             width: 300
           },
-          // {
-          //   label: 'isSpecial',
-          //   prop: 'isSpecial',
-          //   hidden: true
+          {
+            label: '是否特殊处理',
+            prop: 'isSpecial',
+            filter: function(val) {
 
-          // },
+            },
+            isIcon: true,
+            icon: function(val) {
+              if (val === 1) {
+                return 'el-icon-check'
+              } else {
+                return 'el-icon-close'
+              }
+            }
+
+          },
           {
             label: '负责职位',
             prop: 'role.description',

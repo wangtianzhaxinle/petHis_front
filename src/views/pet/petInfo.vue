@@ -20,12 +20,14 @@ export default {
 
       // 表格配置
       dataSource: {
-        tool: [{
-          name: '新增宠物',
-          key: 1,
-          permission: 2010701,
-          handleClick: this.handleAdd
-        }],
+        tool: [
+        //   {
+        //   name: '新增宠物',
+        //   key: 1,
+        //   permission: 2010701,
+        //   handleClick: this.handleAdd
+        // }
+        ],
         data: [], // 表格数据
         cols: [
           {
@@ -95,7 +97,7 @@ export default {
             {
               label: '删除', // 操作名称
               type: 'danger',
-              permission: '2010702', // 后期这个操作的权限，用来控制权限
+              //  permission: '2010702', // 后期这个操作的权限，用来控制权限
               handleRow: this.handleRow
             }
           ]

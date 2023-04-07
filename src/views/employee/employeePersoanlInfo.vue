@@ -4,7 +4,9 @@
     <el-form-item label="姓名">
       <el-input v-model="employeePerosanlInfo.user.name" :disabled="true" />
     </el-form-item>
-
+    <el-form-item label="图片">
+      <el-avatar :src="employeePerosanlInfo.image" shape="square" :size="100" />
+    </el-form-item>
     <el-form-item label="年龄">
       <el-input v-model="employeePerosanlInfo.user.age" :disabled="true" />
     </el-form-item>

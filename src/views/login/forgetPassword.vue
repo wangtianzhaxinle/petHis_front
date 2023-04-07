@@ -2,104 +2,123 @@
 <template>
   <div class="login-container">
     <el-form ref="registerForm" :model="registerForm" :rules="registerRules" class="login-form" auto-complete="on" label-position="left">
+      <template v-if="checkcode===false">
+        <div class="title-container">
+          <h3 class="title">找回密码</h3>
+        </div>
 
-      <div class="title-container">
-        <h3 class="title">找回密码</h3>
-      </div>
+        <el-form-item prop="username">
+          <span class="svg-container">
+            <svg-icon icon-class="user" />
+          </span>
+          <el-input
+            ref="username"
+            v-model="registerForm.username"
+            placeholder="用户名"
+            name="username"
+            type="text"
+            tabindex="1"
+            auto-complete="on"
+          />
+        </el-form-item>
 
-      <el-form-item prop="username">
-        <span class="svg-container">
-          <svg-icon icon-class="user" />
-        </span>
-        <el-input
-          ref="username"
-          v-model="registerForm.username"
-          placeholder="用户名"
-          name="username"
-          type="text"
-          tabindex="1"
-          auto-complete="on"
-        />
-      </el-form-item>
+        <el-form-item prop="phonenumber">
+          <span class="svg-container">
+            <svg-icon icon-class="user" />
+          </span>
+          <el-input
+            ref="phonenumber"
+            v-model.number="registerForm.phonenumber"
+            placeholder="手机"
+            name="phonenumber"
+            type="text"
+            tabindex="1"
+            auto-complete="on"
+          />
+        </el-form-item>
+        <el-form-item
+          prop="VerificationCode"
+        >
+          <span class="svg-container">
+            <svg-icon icon-class="user" />
+          </span>
+          <el-input
+            ref="VerificationCode"
+            v-model="registerForm.VerificationCode"
+            placeholder="验证码"
+            name="VerificationCode"
+            type="text"
+            tabindex="1"
+            auto-complete="on"
+          />
 
-      <!-- <el-form-item prop="password">
-        <span class="svg-container">
-          <svg-icon icon-class="password" />
-        </span>
-        <el-input
-          :key="passwordType"
-          ref="password"
-          v-model="registerForm.password"
-          :type="passwordType"
-          placeholder="密码"
-          name="password"
-          tabindex="2"
-          auto-complete="on"
-          @keyup.enter.native="handleLogin"
-        />
-        <span class="show-pwd" @click="showPwd">
-          <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
-        </span>
-      </el-form-item>
+        </el-form-item>
 
-      <el-form-item prop="confirmPassword">
-        <span class="svg-container">
-          <svg-icon icon-class="password" />
-        </span>
-        <el-input
-          :key="passwordType"
-          ref="confirmPassword"
-          v-model="registerForm.confirmPassword"
-          :type="passwordType"
-          placeholder="确认密码"
-          name="confirmPassword"
-          tabindex="2"
-          auto-complete="on"
-          @keyup.enter.native="handleLogin"
-        />
-        <span class="show-pwd" @click="showPwd">
-          <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
-        </span>
-      </el-form-item> -->
+        <el-button v-if="show" type="primary" style="width:100%;margin-bottom:30px;" @click="getPhoneCode">获取验证码</el-button>
+        <el-button v-if="!show" type="primary" style="width:100%;margin-bottom:30px;" :disabled="true">
+          <span v-if="!show" style="color: #707070;">
+            {{ count }}s后重新获取
+          </span></el-button>
+        <el-row />
+        <!-- 这里一直提示handleRegister不是一个方法,原来我把handleRegister写在methods括号外面了,获取不到 -->
+        <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="submit">提交</el-button>
 
-      <el-form-item prop="phonenumber">
-        <span class="svg-container">
-          <svg-icon icon-class="user" />
-        </span>
-        <el-input
-          ref="phonenumber"
-          v-model.number="registerForm.phonenumber"
-          placeholder="手机"
-          name="phonenumber"
-          type="text"
-          tabindex="1"
-          auto-complete="on"
-        />
-      </el-form-item>
-      <el-form-item
-        prop="VerificationCode"
-      >
-        <span class="svg-container">
-          <svg-icon icon-class="user" />
-        </span>
-        <el-input
-          ref="VerificationCode"
-          v-model="registerForm.VerificationCode"
-          placeholder="验证码"
-          name="VerificationCode"
-          type="text"
-          tabindex="1"
-          auto-complete="on"
-        />
+      </template>
 
-      </el-form-item>
+      <template v-else>
+
+        <div class="title-container">
+          <h3 class="title">重置密码</h3>
+        </div>
+
+        <el-form-item prop="password">
+          <span class="svg-container">
+            <svg-icon icon-class="password" />
+          </span>
+          <el-input
+            :key="passwordType"
+            ref="password"
+            v-model="registerForm.password"
+            :type="passwordType"
+            placeholder="密码"
+            name="password"
+            tabindex="2"
+            auto-complete="on"
+            @keyup.enter.native="handleLogin"
+          />
+          <span class="show-pwd" @click="showPwd">
+            <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+          </span>
+        </el-form-item>
+
+        <el-form-item prop="confirmPassword">
+          <span class="svg-container">
+            <svg-icon icon-class="password" />
+          </span>
+          <el-input
+            :key="passwordType"
+            ref="confirmPassword"
+            v-model="registerForm.confirmPassword"
+            :type="passwordType"
+            placeholder="确认密码"
+            name="confirmPassword"
+            tabindex="2"
+            auto-complete="on"
+            @keyup.enter.native="handleLogin"
+          />
+          <span class="show-pwd" @click="showPwd">
+            <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+          </span>
+        </el-form-item>
+
+        <el-row />
+        <!-- 这里一直提示handleRegister不是一个方法,原来我把handleRegister写在methods括号外面了,获取不到 -->
+        <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="resetPasword">重置密码</el-button>
+
+      </template>
 
       <!-- <el-button v-if="show" type="primary" style="width:100%;margin-bottom:30px;" @click="getPhoneCode">获取验证码</el-button>
          -->
-      <el-button v-if="!show" type="primary" style="width:100%;margin-bottom:30px;" disabled="true"><span v-if="!show" style="color: #707070;">{{ count }}s后重新获取</span></el-button>
-      <el-row />
-      <!-- 这里一直提示handleRegister不是一个方法,原来我把handleRegister写在methods括号外面了,获取不到 -->
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleRegister">注册</el-button>
 
     </el-form>
   </div>
@@ -136,6 +155,7 @@ export default {
       }
     }
     return {
+      checkcode: false,
       show: true,
       count: '',
       timer: null,
@@ -267,6 +287,25 @@ export default {
           return false
         }
       })
+    },
+    getPhoneCode() {
+      const TIME_COUNT = 60
+      if (!this.timer) {
+        this.count = TIME_COUNT
+        this.show = false
+        this.timer = setInterval(() => {
+          if (this.count > 0 && this.count <= TIME_COUNT) {
+            this.count--
+          } else {
+            this.show = true
+            clearInterval(this.timer)
+            this.timer = null
+          }
+        }, 1000)
+      }
+    },
+    submit() {
+      this.checkcode = true
     }
 
   }

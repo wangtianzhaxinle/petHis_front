@@ -35,3 +35,26 @@ export function getPermissionTree() {
 
   })
 }
+
+export function getFatherPermissionList() {
+  return request({
+    url: '/permission/getFatherPermissionList',
+    method: 'get'
+
+  })
+}
+
+export function updatePermissionById(data) {
+  return request({
+    url: '/permission/updatePermissionById',
+    method: 'post',
+    data
+  })
+}
+export function addPermission(data) {
+  return request({
+    url: '/permission/addPermission',
+    method: 'post',
+    data
+  })
+}

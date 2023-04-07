@@ -1,17 +1,67 @@
 <template>
 
   <div class="app-container"> <table-pane
-    :data-source="dataSource"
-    @changeSize="changeSize"
-    @changeNum="changeNum"
-  />
+                                :data-source="dataSource"
+                                @changeSize="changeSize"
+                                @changeNum="changeNum"
+                              />
+    <el-dialog
+      :title="title"
+      :visible.sync="perDialogVisible"
+      width="30%"
+      :before-close="handleClose"
+    >
+      <el-form ref="PermissionForm" :model="permission" :rules="rules" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="permissionId">
+          <el-input v-model="permission.permissionid" />
+        </el-form-item>
+
+        <el-form-item label="权限名" prop="name">
+          <el-input v-model="permission.name" />
+        </el-form-item>
+
+        <el-form-item label="url" prop="url">
+          <el-input v-model="permission.url" />
+
+        </el-form-item>
+
+        <el-form-item label="父权限">
+          <el-select v-model="permission.parentid" placeholder="请选择" @change="$forceUpdate()">
+
+            <el-option
+              v-for=" i in options"
+              :key="i.permissionid"
+              :label="i.name"
+              :value="i.permissionid"
+            />
+
+          </el-select>
+
+        </el-form-item>
+
+        <el-form-item label="权限码" prop="permissioncode">
+          <el-input v-model="permission.permissioncode" />
+        </el-form-item>
+
+        <el-form-item label="类型" prop="type">
+          <el-input v-model="permission.type" />
+
+        </el-form-item>
+        <el-form-item>
+
+          <el-button type="primary" @click="submitForm()">提交</el-button>
+
+        </el-form-item>
+
+      </el-form>
+    </el-dialog>
 
   </div>
 
 </template>
 
 <script>
-import { getPermissionList, deletePermissionById, deletePermissionByIds } from '@/api/permission'
+import { getPermissionList, deletePermissionById, deletePermissionByIds, getFatherPermissionList, updatePermissionById, addPermission } from '@/api/permission'
 
 import tablePane from '@/components/tablePane.vue'
 
@@ -23,6 +73,7 @@ export default {
     return {
 
       /*
+
       rules: {
         name: [
           { required: true, message: '请输入名字', trigger: 'blur' }
@@ -55,18 +106,43 @@ export default {
 
       },
 */
+      title: '',
+      perDialogVisible: false,
+      options: [],
+      permission: {},
+      submitType: '',
+      rules: {
+        name: [
+          { required: true, message: '请输入名字', trigger: 'blur' }
+          // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+        ],
+        url: [
+          { required: true, message: '请输入url', trigger: 'blur' }
+
+        ],
+        parentid: [
+          { }
+          // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+        ],
+        permissioncode: [
+          { required: true, message: '请输入权限码', trigger: 'blur' }
+        ],
+        type: [
+          { required: true, message: '请输入类型', trigger: 'blur' }
+        ]
+      },
       // 表格配置
       dataSource: {
         tool: [{
           name: '新增权限',
           key: 'AddPermission',
-          permission: 'AddPermission',
+          // permission: 'AddPermission',
           handleClick: this.AddPermission
         },
         {
           name: '全部删除',
           key: 'AllDeletePermission',
-          permission: 'AllDeletePermission',
+          // permission: 'AllDeletePermission',
           handleClick: this.AllDeletePermission
         }
         ],
@@ -129,13 +205,13 @@ export default {
             {
               label: '删除', // 操作名称
               type: 'danger',
-              permission: 'deletePermission', // 后期这个操作的权限，用来控制权限
+              //  permission: 'deletePermission', // 后期这个操作的权限，用来控制权限
               handleRow: this.deletePermission
             },
             {
               label: '修改', // 操作名称
               type: 'warning',
-              permission: 'editPermission', // 后期这个操作的权限，用来控制权限
+              //   permission: 'editPermission', // 后期这个操作的权限，用来控制权限
               handleRow: this.editPermission
             }
           ]
@@ -148,9 +224,72 @@ export default {
   },
   created() {
     this.getList()
+    this.getFatherPermissionList()
   },
   methods: {
+    AddPermission() {
+      this.title = '添加权限'
+      this.perDialogVisible = true
+      this.submitType = 'add'
+      this.permission = {}
+      this.permission.parentid = this.options[0].permissionid
+    },
+    editPermission(index, row) {
+      this.title = '修改权限'
+      this.perDialogVisible = true
+      this.submitType = 'edit'
+      this.permission = JSON.parse(JSON.stringify(row))
+    },
+    submitForm() {
+      this.$refs.PermissionForm.validate(valid => {
+        if (valid) {
+          this.loading = true
+          const permissionData = this.permission
 
+          if (this.submitType === 'add') {
+            addPermission(permissionData).then(res => {
+            // alert(this.$route.path)
+              alert(res.message)
+              this.addDialogVisible = false
+              this.resetForm()
+              // this.$router.go(0)
+              // this.$router.push({ path: this.$route.path || '/' })
+              this.loading = false
+              this.getList()
+            }).catch(() => {
+              this.loading = false
+            })
+          } else if (this.submitType === 'edit') {
+            this.loading = true
+            const permissionData = this.permission
+
+            updatePermissionById(permissionData).then(res => {
+            // alert(this.$route.path)
+              alert(res.message)
+              this.perDialogVisible = false
+              // this.resetForm()
+              // this.$router.go(0)
+              // this.$router.push({ path: this.$route.path || '/' })
+              this.loading = false
+              this.getList()
+            }).catch(() => {
+              this.loading = false
+            })
+          }
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    getFatherPermissionList() {
+      getFatherPermissionList().then(res => {
+        if (res.total > 0) {
+          this.options.push({ name: '无父权限', permissionid: null })
+          this.options = this.options.concat(res.data)
+        }
+      })
+    },
     // 获取列表数据
     getList() {
       const data = {
@@ -223,15 +362,6 @@ export default {
         })
         //
       })
-    },
-    editUser(index, row) {
-      this.editDialogVisible = true
-      this.userInfo = row
-    },
-    AddUser(index, row) { // 这里粗心AddUser写成了addUser,所以一直提示handleClick不是一个方法
-      this.addDialogVisible = true
-
-      // alert(222)
     }, AllDeletePermission() {
       // console.log(this.selected)
       const ids = this.selected.map((permission) => permission.permissionid)

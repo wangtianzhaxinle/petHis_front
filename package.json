@@ -18,6 +18,7 @@
     "axios": "0.18.1",
     "core-js": "3.6.5",
     "element-ui": "2.13.2",
+    "fake-progress": "^1.0.4",
     "js-cookie": "2.2.0",
     "locale": "^0.1.0",
     "moment": "^2.29.4",

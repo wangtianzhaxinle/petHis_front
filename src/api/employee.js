@@ -3,11 +3,8 @@ import request from '@/utils/request'
 export function getEmployeeList(data) {
   return request({
     url: '/employee/getEmployeeList',
-    method: 'get',
-    params: {
-      pageSize: data.pageSize,
-      pageNum: data.pageNum
-    }
+    method: 'post',
+    data
 
   })
 }
@@ -21,18 +18,18 @@ export function getEmployeePersonalInfo(userId) {
 
   })
 }
-export function getEmployeeListByRoleId(data) {
-  return request({
-    url: '/employee/getEmployeeListByRoleId',
-    method: 'get',
-    params: {
-      pageNum: data.pageNum,
-      pageSize: data.pageSize,
-      roleId: data.roleId
-    }
+// export function getEmployeeListByRoleId(data) {
+//   return request({
+//     url: '/employee/getEmployeeListByRoleId',
+//     method: 'get',
+//     params: {
+//       pageNum: data.pageNum,
+//       pageSize: data.pageSize,
+//       roleId: data.roleId
+//     }
 
-  })
-}
+//   })
+// }
 
 export function getEmployeeByDate(data) {
   return request({
@@ -44,6 +41,43 @@ export function getEmployeeByDate(data) {
       roleId: data.roleId,
       appointtime: data.appointtime
     }
+
+  })
+}
+
+export function addEmployee(data) {
+  return request({
+    url: '/employee/addEmployee',
+    method: 'post',
+    data
+
+  })
+}
+
+export function updateEmployeeById(data) {
+  return request({
+    url: '/employee/updateEmployeeById',
+    method: 'post',
+    data
+
+  })
+}
+
+export function deleteEmployeeById(id) {
+  return request({
+    url: '/employee/deleteEmployeeById',
+    method: 'delete',
+    params: {
+      id: id
+    }
+
+  })
+}
+export function deleteEmployeeByIds(data) {
+  return request({
+    url: '/employee/deleteEmployeeByIds',
+    method: 'post',
+    data
 
   })
 }

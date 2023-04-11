@@ -24,19 +24,20 @@
 
     </table-pane>
     <el-dialog
-      title="预约"
+      title="预约托管"
       :visible.sync="appointDialogVisible"
       width="30%"
+      :before-close="handleClose"
       append-to-body
     >
       <el-form ref="appointForm" :model="appoint" :rules="rules" label-width="100px" class="demo-ruleForm">
-        <el-form-item label="itemid">
+        <el-form-item label="itemid" hidden>
           <el-input v-model="appoint.itemid" />
         </el-form-item>
-        <el-form-item label="roomid">
+        <el-form-item label="roomid" hidden>
           <el-input v-model="appoint.roomid" />
         </el-form-item>
-        <el-form-item label="appointdate">
+        <el-form-item label="预约时间" prop="appointdate">
 
           <el-select v-model="appoint.appointdate" placeholder="请选择时间">
             <el-option
@@ -48,7 +49,7 @@
           </el-select>
         </el-form-item>
 
-        <el-form-item label="托管时间/天">
+        <el-form-item label="托管时间/天" prop="deposittime">
           <el-input v-model.number="appoint.deposittime" />
         </el-form-item>
 
@@ -64,7 +65,7 @@
         </el-form-item>
 
         <el-form-item>
-          <el-button type="primary" @click="submitForm">立即创建</el-button>
+          <el-button type="primary" @click="submitForm">提交</el-button>
           <!-- <el-button @click="resetForm('ruleForm')">重置</el-button> -->
         </el-form-item>
 
@@ -112,7 +113,15 @@ export default {
       rules: {
         petid: [
           { required: true, message: '请选择宠物', trigger: 'change' }
+        ],
+        appointdate: [
+          { required: true, message: '请选择预约时间', trigger: 'change' }
+        ],
+        deposittime: [
+          { required: true, message: '请输入托管时间', trigger: 'blur' },
+          { type: 'number', message: '请输入数字', trigger: 'change' }
         ]
+
       },
       // 表格配置
       dataSource: {
@@ -148,13 +157,13 @@ export default {
               }
             }
 
-          },
-          {
-            label: '宠物id',
-            prop: 'petid',
-            width: 100
-
           }
+          // {
+          //   label: '宠物id',
+          //   prop: 'petid',
+          //   width: 100
+
+          // }
 
         ], // 表格的列数据
 
@@ -198,6 +207,11 @@ export default {
     this.getList()
   },
   methods: {
+    handleClose(done) {
+      this.resetForm()
+
+      done()
+    },
     getYourPetList() {
       // console.log('getRoleList')
       const data = {
@@ -241,13 +255,24 @@ export default {
       this.appoint.itemid = this.itemid
       this.appoint.roomid = row.roomid
     },
+    resetForm() {
+      this.$refs.appointForm.resetFields()
+      this.appoint.itemid = null
+      this.appoint.roomid = null
+    },
     submitForm() {
-      const data = this.appoint
+      this.$refs.appointForm.validate(valid => {
+        if (valid) {
+          const data = this.appoint
 
-      addDeposit(data).then(res => {
-        if (res.total > 0) {
-          alert(res.message)
-          this.appointDialogVisible = false
+          addDeposit(data).then(res => {
+            if (res.total > 0) {
+              // alert(res.message)
+              this.appointDialogVisible = false
+              this.getList()
+              this.resetForm()
+            }
+          })
         }
       })
     },

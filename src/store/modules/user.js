@@ -15,6 +15,7 @@ const getDefaultState = () => {
     email: '',
     createtime: '',
     phoneNumber: '',
+    isEmployee: '',
     role: [],
     permissions: []
   }
@@ -60,6 +61,9 @@ const mutations = {
   SET_PHONENUMBER: (state, phoneNumber) => {
     state.phoneNumber = phoneNumber
   },
+  SET_ISEMPLOYEE: (state, isEmployee) => {
+    state.isEmployee = isEmployee
+  },
   SET_ROLE: (state, role) => {
     state.role = role
   },
@@ -98,7 +102,7 @@ const actions = {
           return reject('Verification failed, please Login again.')
         }
 
-        const { name, avatar, address, age, sex, phoneNumber, userid, username, createtime, email, role, permissions } = data
+        const { name, avatar, address, age, sex, phoneNumber, userid, username, createtime, email, role, permissions, isEmployee } = data
         if (!permissions || permissions.length <= 0) {
           reject('getInfo:permissions must be a non-null array!')
         }
@@ -112,6 +116,7 @@ const actions = {
         commit('SET_USERNAME', username)
         commit('SET_CREATETIME', createtime)
         commit('SET_EMAIL', email)
+        commit('SET_ISEMPLOYEE', isEmployee)
         commit('SET_ROLE', role)
 
         commit('SET_PERMISSIONS', permissions)

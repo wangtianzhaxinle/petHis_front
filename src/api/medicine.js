@@ -1,14 +1,10 @@
 import request from '@/utils/request'
 
-export function getMedicineList(data) {
+export function getMedicineList(params) {
   return request({
     url: '/medicine/getMedicineList',
     method: 'get',
-    params: {
-      pageSize: data.pageSize,
-      pageNum: data.pageNum
-    }
-
+    params
   })
 }
 export function getMedicineInfoById(medicineId) {

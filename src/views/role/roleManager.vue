@@ -60,7 +60,7 @@
 </template>
 
 <script>
-import { getRoleList, deleteRoleById, getPermissionByRoleId, updatePermissionByRoleId, addRole, updateRoleByRoleId } from '@/api/role'
+import { getRoleList, deleteRoleById, getPermissionByRoleId, updatePermissionByRoleId, addRole, updateRoleByRoleId, deleteRoleByIds } from '@/api/role'
 import { getPermissionTree } from '@/api/permission'
 
 import tablePane from '@/components/tablePane.vue'
@@ -110,9 +110,9 @@ export default {
         },
         {
           name: '全部删除',
-          key: 'AllDeleteRole',
+          key: 'bitchDelete',
           // permission: 'AllDeleteRole',
-          handleClick: this.AllDeleteRole
+          handleClick: this.deleteRoleByIds
         }
         ],
         data: [], // 表格数据
@@ -251,7 +251,7 @@ export default {
           const data = this.role
           if (this.submitType === 'add') {
             addRole(data).then(res => {
-              alert(res.message)
+              // alert(res.message)
               if (res.total > 0) {
                 this.roleDialogVisible = false
                 this.getList()
@@ -259,7 +259,7 @@ export default {
             })
           } else if (this.submitType === 'edit') {
             updateRoleByRoleId(data).then(res => {
-              alert(res.message)
+              // alert(res.message)
               if (res.total > 0) {
                 this.roleDialogVisible = false
                 this.getList()
@@ -323,6 +323,14 @@ export default {
         //
       })
     },
+    deleteRoleByIds() {
+      const ids = this.selected.map((role) => role.roleid)
+      deleteRoleByIds(ids).then(res => {
+        if (res.total > 0) {
+          this.getList()
+        }
+      })
+    },
     viewPermission(index, row) {
       this.perDialogVisible = true
       // this.$refs.permissionTree.setCheckedKeys([])
@@ -358,7 +366,8 @@ export default {
       this.addDialogVisible = true
 
       // alert(222)
-    }, /*
+    },
+    /*
     AllDeletePermission() {
       // console.log(this.selected)
       const ids = this.selected.map((permission) => permission.permissionid)

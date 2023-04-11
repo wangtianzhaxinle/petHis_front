@@ -1,5 +1,28 @@
 <template>
-  <div>
+  <div class="app-container">
+    <div>
+      <div class="filter-container">
+        <el-input v-model="searchEmployee.user.name" style="width:200px" class="filter-item" placeholder="请输入名字" />
+        <el-input v-model="searchEmployee.nativeplace" style="width:200px" class="filter-item" placeholder="请输入籍贯" />
+        <el-input v-model="searchEmployee.user.address" style="width:200px" class="filter-item" placeholder="请输入地址" />
+
+        <el-select v-model="searchEmployee.user.sex" style="width:200px" class="filter-item" placeholder="性别">
+
+          <el-option label="女" value="0" />
+          <el-option label="男" value="1" />
+
+        </el-select>
+        <div class="filter-btn">
+          <el-button class="filter-item" type="primary" @click="search">
+            搜索
+          </el-button>
+          <el-button class="filter-item" type="warning" @click="resetFilter">
+            重置
+          </el-button>
+        </div>
+      </div>
+
+    </div>
     <table-pane
       :data-source="dataSource"
       @changeSize="changeSize"
@@ -29,18 +52,123 @@
         @check="handleCheckChange"
       />
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submit">修改</el-button>
+        <el-button type="primary" @click="submitRoleList">修改</el-button>
       </div>
     </el-dialog>
+    <el-dialog
+      :title="title"
+      :visible.sync="empDialogVisible"
+      width="30%"
+      :before-close="handleClose"
+    >
+      <el-form ref="empForm" :model="employee" :rules="empRules" label-width="100px" class="demo-ruleForm">
+        <el-form-item v-if="submitType==='edit'" label="用户id" prop="userid">
+          <el-input v-model="employee.userid" />
+        </el-form-item>
+        <el-form-item v-if="submitType==='add'" label="用户id" prop="userid">
+          <el-select
+            v-model="employee.userid"
+            filterable
+            remote
+            reserve-keyword
+            placeholder="请输入用户名"
+            :remote-method="remoteMethod"
+            :loading="userlodading"
+          >
+            <el-option
+              v-for="item in options"
+              :key="item.userid"
+              :label="item.name"
+              :value="item.userid"
+            />
+          </el-select>
 
+        </el-form-item>
+        <el-form-item label="入职日期" required>
+          <el-col :span="11">
+            <el-form-item prop="hiredate">
+              <el-date-picker v-model="employee.hiredate" placeholder="选择日期" style="width: 100%;" />
+            </el-form-item>
+          </el-col>
+        </el-form-item>
+
+        <el-form-item label="照片" prop="image">
+
+          <el-upload
+            ref="pictureUpload"
+            class="avatar-uploader"
+            action="#"
+            list-type="picture-card"
+            :limit="1"
+            :http-request="uploadImg"
+            :file-list="filelist"
+          >
+
+            <i slot="default" class="el-icon-plus" />
+            <div slot="file" slot-scope="{file}">
+              <img
+                class="el-upload-list__item-thumbnail"
+                :src="file.url"
+                alt=""
+              >
+              <span class="el-upload-list__item-actions">
+                <span
+                  class="el-upload-list__item-preview"
+                  @click="handlePictureCardPreview(file)"
+                >
+                  <i class="el-icon-zoom-in" />
+                </span>
+                <span
+                  class="el-upload-list__item-delete"
+                  @click="handleRemove(file)"
+                >
+                  <i class="el-icon-delete" />
+                </span>
+
+              </span>
+            </div>
+          </el-upload>
+
+        </el-form-item>
+
+        <el-form-item label="薪水" prop="salary">
+          <el-input v-model.number="employee.salary" />
+        </el-form-item>
+        <el-form-item label="银行卡" prop="bankcard">
+          <el-input v-model="employee.bankcard" />
+        </el-form-item>
+
+        <el-form-item label="最大容量" prop="maxAppoint">
+          <el-input v-model.number="employee.maxAppoint" />
+        </el-form-item>
+        <el-form-item label="身份证" prop="card">
+          <el-input v-model="employee.card" />
+        </el-form-item>
+        <el-form-item label="籍贯" prop="nativePlace">
+          <el-input v-model="employee.nativePlace" />
+        </el-form-item>
+        <el-form-item label="学历" prop="educationBackground">
+          <el-input v-model="employee.educationBackground" />
+        </el-form-item>
+
+        <el-form-item>
+          <el-button type="primary" @click="submitEmpForm">提交</el-button>
+          <!-- <el-button @click="resetForm('ruleForm')">重置</el-button> -->
+        </el-form-item>
+
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 
 <script>
 
-import { getEmployeeList } from '@/api/employee.js'
+import { getEmployeeList, addEmployee, updateEmployeeById, deleteEmployeeById, deleteEmployeeByIds } from '@/api/employee.js'
+import { getUserInfoList } from '@/api/user'
+
 import tablePane from '@/components/tablePane.vue'
 import { getAllRoleList, getRoleByUserId, updateRoleByUserId } from '@/api/role'
+import { upload } from '@/api/upload'
 
 export default {
   name: 'EmployeeInfo',
@@ -50,10 +178,60 @@ export default {
       userId: '',
       roleIds: [],
       roleData: {},
-
+      filelist: [],
+      options: [],
       roleDialogVisible: false,
+      title: '',
+      empDialogVisible: false,
+      submitType: '',
+      userlodading: '',
+      employee: {},
       defaultProps: {
         label: 'description'
+      },
+      searchEmployee: {
+        user: {
+          name: null,
+          address: null,
+          sex: null
+        },
+        nativeplace: null
+
+      },
+      empRules: {
+        image: [
+          { required: true, message: '请选择图片', trigger: 'blur' }
+        ],
+        userid: [
+          { required: true, message: '请选择用户', trigger: 'blur' }
+        ],
+        hiredate: [
+          { required: true, message: '请选择入职日期', trigger: 'blur' }
+
+        ],
+        salary: [
+          { required: true, message: '请输入薪水', trigger: 'blur' },
+          { type: 'number', message: '请输入数字', trigger: 'blur' }
+        ],
+        bankcard: [
+          { required: true, trigger: 'blur', message: '请输入银行卡' }
+
+        ],
+        maxAppoint: [
+          { required: true, trigger: 'blur', message: '请输入最大预约人数' },
+
+          { type: 'number', message: '请输入数字', trigger: 'blur' }
+        ],
+        card: [
+
+          { required: true, message: '请输入身份证', trigger: 'blur' }
+        ],
+        nativePlace: [
+          { required: true, message: '请输入籍贯', trigger: 'blur' }
+        ],
+        educationBackground: [
+          { required: true, message: '请输入学历', trigger: 'blur' }
+        ]
       },
       // 搜索栏配置
 
@@ -67,9 +245,9 @@ export default {
         },
         {
           name: '批量删除',
-          key: 'batchDeleteEmployee',
+          key: 'batchDelete',
           // permission: 'batchDeleteEmployee',
-          handleClick: this.batchDeleteEmployee
+          handleClick: this.batchDelete
         }
         ],
         data: [], // 表格数据
@@ -90,18 +268,42 @@ export default {
             width: 100,
             isTemplate: true
           },
+          {
+            label: '身份证',
+            prop: 'card',
+            width: 150
 
+          },
+          {
+            label: '籍贯',
+            prop: 'nativeplace',
+            width: 170
+
+          },
+          {
+            label: '学历',
+            prop: 'educationbackground',
+            width: 100
+
+          },
           {
             label: '性别',
             prop: 'user.sex',
-            width: 100
+            width: 60,
+            isCodeTableFormatter: function(val) { // 过滤器
+              if (val.sex === 1) {
+                return '男'
+              } else {
+                return '女'
+              }
+            }
 
           },
 
           {
             label: '手机号',
             prop: 'user.phonenumber',
-            width: 300
+            width: 130
           },
           {
             label: '地址',
@@ -120,7 +322,8 @@ export default {
 
           {
             label: '银行卡',
-            prop: 'bankcard'
+            prop: 'bankcard',
+            width: 150
           }
 
         ], // 表格的列数据
@@ -144,11 +347,11 @@ export default {
               label: '删除', // 操作名称
               type: 'danger',
               // permission: 'deleteRow', // 后期这个操作的权限，用来控制权限
-              handleRow: this.deleteRow
+              handleRow: this.deleteEmployee
             },
             {
               label: '修改', // 操作名称
-              type: 'warming',
+              type: 'warning',
               // permission: 'editRow', // 后期这个操作的权限，用来控制权限
               handleRow: this.editEmployee
             },
@@ -168,19 +371,62 @@ export default {
   },
   created() {
     this.getList()
-    this.getRoleList()
   },
   methods: {
-    submit() {
-      const data = {
-        roleIds: this.roleIds,
-        userId: this.userId
+    resetFilter() {
+      this.searchEmployee.user.name = null
+      this.searchEmployee.user.address = null
+      this.searchEmployee.user.sex = null
+      this.searchEmployee.nativeplace = null
+    },
+    search() {
+      this.getList()
+    },
+    handleClose(done) {
+      // this.userInfo = {}
+      this.resetForm()
+      done()
+    },
+    resetForm() {
+      if (this.roleDialogVisible) {
+
+      } if (this.empDialogVisible) {
+        this.$refs.empForm.resetFields()
+        // 这里userid未绑定rules的prop无法用resetField重置
+        this.employee = {}
+        this.$refs.pictureUpload.clearFiles()
+        // this.userInfo.userid = ''
+        this.filelist = []
       }
-      updateRoleByUserId(data).then(res => {
-        alert(res.message)
+    },
+
+    // 获取列表数据
+    getList() {
+      const data = {
+        pageSize: this.dataSource.pageData.pageSize,
+        pageNum: this.dataSource.pageData.pageNum,
+        user: {
+          name: this.searchEmployee.user.name,
+          address: this.searchEmployee.user.address,
+          sex: this.searchEmployee.user.sex
+        },
+        nativeplace: this.searchEmployee.nativeplace
+      }
+      this.dataSource.loading = true
+      // console.log('getAllPetInfoList')
+      getEmployeeList(data).then(res => {
+        this.dataSource.loading = false
+        // if (res.succeed) {
         if (res.total > 0) {
-          this.roleDialogVisible = false
+          this.dataSource.pageData.total = res.total
+          this.dataSource.data = res.data
+          this.getRoleList()
+          // console.log(res.data)
+        } else {
+          this.dataSource.data = []
+          this.dataSource.pageData.total = 0
         }
+        // }
       })
     },
     getRoleList() {
@@ -188,9 +434,89 @@ export default {
         this.roleData = res.data
       })
     },
-    handleClose(done) {
-      // this.userInfo = {}
-      done()
+    remoteMethod(query) {
+      if (query !== '') {
+        this.loading = true
+        setTimeout(() => {
+          this.userlodading = false
+          const data = { name: query }
+          getUserInfoList(data).then(res => {
+            if (res.total > 0) {
+              this.options = res.data.records
+            }
+          })
+        }, 200)
+      } else {
+        this.options = []
+      }
+    },
+    submitEmpForm() {
+      this.$refs.empForm.validate(valid => {
+        if (valid) {
+          this.loading = true
+          const employee = this.employee
+          if (this.submitType === 'add') {
+            addEmployee(employee).then(res => {
+              if (res.total > 0) {
+                this.resetForm()
+                this.petDialogVisible = false
+                this.loading = false
+                this.getList()
+              }
+            }).catch(() => {
+              this.loading = false
+            })
+          } else if (this.submitType === 'edit') {
+            this.loading = true
+            updateEmployeeById(employee).then(res => {
+              if (res.total > 0) {
+                this.resetForm()
+                this.petDialogVisible = false
+                this.loading = false
+                this.getList()
+              }
+            }).catch(() => {
+              this.loading = false
+            })
+          }
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+    addEmployee() {
+      this.title = '添加员工'
+      this.empDialogVisible = true
+      this.submitType = 'add'
+      this.filelist = []
+      this.employee = {}
+    },
+    editEmployee(index, row) {
+      this.title = '修改员工'
+      this.empDialogVisible = true
+      this.submitType = 'edit'
+
+      this.$nextTick(() => {
+        // 赋值
+        this.employee = JSON.parse(JSON.stringify(row))
+        this.filelist.push({ 'url': this.employee.image })
+      })
+    },
+    batchDelete() {
+      const ids = this.selected.map((employee) => employee.employeeid)
+      deleteEmployeeByIds(ids).then(res => {
+        if (res.total > 0) {
+          this.getList()
+        }
+      })
+    },
+    deleteEmployee(index, row) {
+      deleteEmployeeById(row.employeeid).then(res => {
+        if (res.total > 0) {
+          this.getList()
+        }
+      })
     },
     viewRole(index, row) {
       this.roleDialogVisible = true
@@ -198,7 +524,6 @@ export default {
       this.userId = row.userid
       getRoleByUserId(this.userId).then(res => {
         this.roleIds = this.getIdsFromJson(res.data)
-
         // console.log(this.permissionids)
         if (this.roleIds) {
           this.$nextTick(() => {
@@ -230,34 +555,70 @@ export default {
         return ids
       }
     },
-    // 获取列表数据
-    getList() {
+    submitRoleList() {
       const data = {
-        pageSize: this.dataSource.pageData.pageSize,
-        pageNum: this.dataSource.pageData.pageNum
+        roleIds: this.roleIds,
+        userId: this.userId
       }
-
-      this.dataSource.loading = true
-      console.log('getAllPetInfoList')
-      getEmployeeList(data).then(res => {
-        this.dataSource.loading = false
-        // if (res.succeed) {
+      updateRoleByUserId(data).then(res => {
+        alert(res.message)
         if (res.total > 0) {
-          this.dataSource.pageData.total = res.total
-          this.dataSource.data = res.data
-          console.log(res.data)
-        } else {
-          this.dataSource.data = []
-          this.dataSource.pageData.total = 0
+          this.roleDialogVisible = false
         }
-        // }
       })
     },
-    addEmployee() {
+    // 图片上传
+    beforeUpload(file) {
+      // this.progressShow = true
+      // this.fake = new FakeProgress({
+      //   timeConstant: 10000,
+      //   autoStart: true
+      // })
+      const isJPG = file.type === 'image/jpeg'
+      const isLt2M = file.size / 1024 < 200
+      console.log(file.type)
+      console.log(file.size)
 
+      if (!isLt2M) {
+        this.$message.error('上传头像图片大小不能超过 200k!')
+        return false
+      }
+      if (!isJPG) {
+        this.$message.error('上传头像图片只能是 JPG 格式!')
+        return false
+      }
+      // console.log(isJPG && isLt2M)
+      return isJPG && isLt2M
     },
-    editEmployee() {
+    uploadImg(file) {
+      var form = new FormData()
+      form.append('file', file.file)
 
+      upload(form).then(res => {
+        if (res.total > 0) {
+          // alert(res.message)
+          if (this.userDialogVisible) { this.userInfo.avatar = this.baseurl + res.data }
+          if (this.empDialogVisible) { this.employee.image = this.baseurl + res.data }
+          this.fake.end()
+          // console.log(this.medicine)
+        }
+      })
+    },
+    handlePictureCardPreview(file) {
+      this.dialogImageUrl = this.userInfo.avatar
+      this.dialogVisible = true
+    },
+    handleRemove(file) {
+      console.log('handleRemove')
+      console.log(this.filelist)
+      const uploadFiles = this.$refs.pictureUpload.uploadFiles
+      for (const i in uploadFiles) {
+        if (file.url === uploadFiles[i].url) {
+          uploadFiles.splice(i, 1)
+          this.employee.image = ''
+        }
+      }
+      console.log('handleRemove')
     },
     // 搜索层事件
 
@@ -314,4 +675,17 @@ export default {
   }
 }
 </script>
+<style  scoped lang='scss'>
+.filter-item{
+  margin-left: 10px;
+  display: inline-block;
+}
+.filter-container .filter-item:nth-of-type(1){
+  margin-left: 0px;
+}
+.filter-btn{
+  display: inline-block;
+  margin-left: 10px;
+}
+</style>
 

@@ -6,7 +6,12 @@ export function getPermissionList(data) {
     method: 'get',
     params: {
       pageSize: data.pageSize,
-      pageNum: data.pageNum
+      pageNum: data.pageNum,
+      name: data.name,
+      url: data.url,
+      permissioncode: data.permissionCode,
+      type: data.type,
+      parentid: data.parentid
     }
 
   })

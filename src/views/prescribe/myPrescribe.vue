@@ -14,7 +14,7 @@
             @click.native.prevent="editRoom(scopedata.scope.$index, scopedata.scope.row)"
           >
 
-            办理
+            完成配药
           </el-button>
 
         </div>

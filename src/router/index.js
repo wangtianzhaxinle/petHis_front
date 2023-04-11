@@ -189,13 +189,13 @@ export const asyncRoutes = [
         path: 'userInfo',
         name: 'userInfo',
         component: () => import('@/views/user/userInfo'),
-        meta: { title: '用户信息', icon: 'form', permission: ['allUserInfo'] }
+        meta: { title: '用户信息管理', icon: 'form', permission: ['allUserInfo'] }
       },
       {
         path: 'personalInfo',
         name: 'personalInfo',
         component: () => import('@/views/user/personalInfo'),
-        meta: { title: '个人信息', icon: 'form', permission: ['myUserInfo'] }
+        meta: { title: '个人信息管理', icon: 'form', permission: ['myUserInfo'] }
 
       }
     ]
@@ -210,13 +210,13 @@ export const asyncRoutes = [
         path: 'allPetInfo',
         name: 'allPetInfo',
         component: () => import('@/views/pet/petInfo'),
-        meta: { title: '全部宠物信息', icon: 'form', permission: ['allPetInfo'] }
+        meta: { title: '宠物信息管理', icon: 'form', permission: ['allPetInfo'] }
       },
       {
         path: 'personalPetInfo',
         name: 'personalPetInfo',
         component: () => import('@/views/pet/personalPetInfo'),
-        meta: { title: '个人宠物信息', icon: 'form', permission: ['myPetInfo'] }
+        meta: { title: '个人宠物管理', icon: 'form', permission: ['myPetInfo'] }
       }
     ]
   },
@@ -230,13 +230,13 @@ export const asyncRoutes = [
         path: 'employeeInfo',
         name: 'EmployeeInfo',
         component: () => import('@/views/employee/employeeInfo'),
-        meta: { title: '员工信息', icon: 'form', permission: ['allEmployeeInfo'] }
+        meta: { title: '员工信息管理', icon: 'form', permission: ['allEmployeeInfo'] }
       },
       {
         path: 'employeePersoanlInfo',
         name: 'employeePersoanlInfo',
         component: () => import('@/views/employee/employeePersoanlInfo'),
-        meta: { title: '员工个人信息', icon: 'form', permission: ['myEmployeeInfo'] }
+        meta: { title: '员工个人信息管理', icon: 'form', permission: ['myEmployeeInfo'] }
       }
     ]
   },
@@ -253,7 +253,7 @@ export const asyncRoutes = [
         path: '/itemInfo',
         name: 'itemInfo',
         component: () => import('@/views/item/item'),
-        meta: { title: '项目信息', icon: 'form', permission: ['itemInfo'] }
+        meta: { title: '项目信息管理', icon: 'form', permission: ['itemInfo'] }
 
       },
       {
@@ -361,7 +361,7 @@ export const asyncRoutes = [
         path: '/appointInfo',
         name: 'appointInfo',
         component: () => import('@/views/apponit/appointInfo'),
-        meta: { title: '全部预约列表', icon: 'form', permission: ['allAppointList'] }
+        meta: { title: '预约信息管理', icon: 'form', permission: ['allAppointList'] }
 
       }
     ]
@@ -395,7 +395,7 @@ export const asyncRoutes = [
         path: '/medicalRecordInfo',
         name: 'medicalRecordInfo',
         component: () => import('@/views/medicalRecord/medicalRecordInfo'),
-        meta: { title: '宠物病历信息列表', icon: 'form', permission: ['medicalRecordList'] }
+        meta: { title: '宠物病历信息管理', icon: 'form', permission: ['medicalRecordList'] }
 
       }
     ]
@@ -411,7 +411,7 @@ export const asyncRoutes = [
         path: '/roomlist',
         name: 'roomlist',
         component: () => import('@/views/room/roomlist'),
-        meta: { title: '宠物房间列表', icon: 'form', permission: ['roomList'] }
+        meta: { title: '宠物房间信息管理', icon: 'form', permission: ['roomList'] }
 
       }
     ]
@@ -427,7 +427,7 @@ export const asyncRoutes = [
         path: '/allPrescribeList',
         name: 'allPrescribeList',
         component: () => import('@/views/prescribe/allPrescribeList'),
-        meta: { title: '配药列表', icon: 'form', permission: ['prescribeList'] }
+        meta: { title: '配药信息管理', icon: 'form', permission: ['prescribeList'] }
 
       },
       {
@@ -475,7 +475,7 @@ export const asyncRoutes = [
         path: '/medicineInfo',
         name: 'medicineInfo',
         component: () => import('@/views/medicine/medicineInfo'),
-        meta: { title: '药品信息', icon: 'form', permission: ['medicineInfo'] }
+        meta: { title: '药品信息管理', icon: 'form', permission: ['medicineInfo'] }
 
       }
     ]
@@ -491,7 +491,7 @@ export const asyncRoutes = [
         path: '/dutyInfo',
         name: 'dutyInfo',
         component: () => import('@/views/duty/dutyInfo'),
-        meta: { title: '值班信息', icon: 'form', permission: ['dutyInfo'] }
+        meta: { title: '值班信息管理', icon: 'form', permission: ['dutyInfo'] }
 
       }
     ]

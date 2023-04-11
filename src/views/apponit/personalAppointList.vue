@@ -1,32 +1,78 @@
 <template>
-  <div>  <table-pane
-    :data-source="dataSource"
-    @changeSize="changeSize"
-    @changeNum="changeNum"
-  >
-    <template v-slot:operator="scopedata">
+  <div>
+    <div>
+      <div class="filter-container">
+        <el-input v-model="searchAppoint.apponitid" style="width:200px" class="filter-item" placeholder="预约id" />
 
-      <div class="btn">
-        <el-button
-          v-if="scopedata.scope.row.status===0"
-          type="info"
-          size="mini"
-          @click.native.prevent="confirm(scopedata.scope.$index, scopedata.scope.row)"
-        >
+        <el-input v-model="searchAppoint.pet.name" style="width:200px" class="filter-item" placeholder="宠物名" />
+        <el-date-picker v-model="searchAppoint.appointdate" style="width:200px" class="filter-item" placeholder="预约时间" />
+        <el-select v-model="searchAppoint.status" style="width:200px" class="filter-item" placeholder="预约状态">
+          <el-option label="未确定" value="0" />
+          <el-option label="已确定" value="1" />
+          <el-option label="爽约" value="2" />
+          <el-option label="已完成" value="3" />
+          <el-option label="已取消" value="4" />
+          <el-option label="进行中" value="5" />
 
-          确认预约
-        </el-button>
+        </el-select>
+        <div class="filter-btn">
+          <el-button class="filter-item" type="primary" @click="search">
+            搜索
+          </el-button>
+          <el-button class="filter-item" type="warning" @click="resetFilter">
+            重置
+          </el-button>
+        </div>
       </div>
 
-    </template>
-  </table-pane>
+    </div>
+
+    <table-pane
+      :data-source="dataSource"
+      @changeSize="changeSize"
+      @changeNum="changeNum"
+    >
+      <template v-slot:operator="scopedata">
+
+        <div class="btn">
+          <el-button
+            v-if="scopedata.scope.row.status===0"
+            type="success"
+            size="mini"
+            @click.native.prevent="confirm(scopedata.scope.$index, scopedata.scope.row)"
+          >
+
+            确认预约
+          </el-button>
+          <el-button
+            v-if="scopedata.scope.row.status===0"
+            type="warning"
+            size="mini"
+            @click.native.prevent="cnacel(scopedata.scope.$index, scopedata.scope.row)"
+          >
+
+            取消预约
+          </el-button>
+          <el-button
+            v-if="scopedata.scope.row.status===3"
+            type="warning"
+            size="mini"
+            @click.native.prevent="downloadMedicalRecord(scopedata.scope.$index, scopedata.scope.row)"
+          >
+
+            下载病历
+          </el-button>
+        </div>
+
+      </template>
+    </table-pane>
   </div>
 
 </template>
 
 <script>
 
-import { getUserAppointList, confirmAppoint } from '@/api/appoint'
+import { getUserAppointList, confirmAppoint, cancelAppoint } from '@/api/appoint'
 import tablePane from '@/components/tablePane2.vue'
 import store from '@/store'
 
@@ -36,6 +82,15 @@ export default {
   data() {
     return {
       userId: store.getters.userId,
+      searchAppoint: {
+        appointid: null,
+        pet: {
+          name: null
+        },
+        appointdate: null,
+        status: null
+
+      },
       // 搜索栏配置
       // 表格配置
       dataSource: {
@@ -78,7 +133,22 @@ export default {
           },
           {
             label: 'status',
-            prop: 'status'
+            prop: 'status',
+            isCodeTableFormatter: function(val) { // 过滤器
+              if (val.status === 0) {
+                return '未确定'
+              } else if (val.status === 1) {
+                return '已确定'
+              } else if (val.status === 2) {
+                return '爽约'
+              } else if (val.status === 3) {
+                return '已完成'
+              } else if (val.status === 4) {
+                return '已取消'
+              } else if (val.status === 5) {
+                return '进行中'
+              }
+            }
           },
 
           {
@@ -120,7 +190,15 @@ export default {
     this.getList()
   },
   methods: {
-
+    resetFilter() {
+      this.searchAppoint.appointid = null
+      this.searchAppoint.pet.name = null
+      this.searchAppoint.appointdate = null
+      this.searchAppoint.status = null
+    },
+    search() {
+      this.getList()
+    },
     // 获取列表数据
     getList() {
       this.dataSource.loading = true
@@ -154,6 +232,17 @@ export default {
           this.getList()
         }
       })
+    },
+    cnacel(index, row) {
+      const appointid = row.appointid
+      cancelAppoint(appointid).then(res => {
+        if (res.total > 0) {
+          this.getList()
+        }
+      })
+    },
+    downloadMedicalRecord() {
+
     },
 
     // 搜索层事件
@@ -191,4 +280,17 @@ export default {
   }
 }
 </script>
+<style  scoped lang='scss'>
+.filter-item{
+  margin-left: 10px;
+  display: inline-block;
+}
+.filter-container .filter-item:nth-of-type(1){
+  margin-left: 0px;
+}
+.filter-btn{
+  display: inline-block;
+  margin-left: 10px;
+}
+</style>
 

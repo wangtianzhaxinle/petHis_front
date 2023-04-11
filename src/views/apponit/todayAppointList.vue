@@ -1,25 +1,64 @@
 <template>
-  <div>  <table-pane
-    :data-source="dataSource"
-    @changeSize="changeSize"
-    @changeNum="changeNum"
-  >
-    <template v-slot:operator="scopedata">
-      <div class="btn">
-        <el-button
-          v-if="scopedata.scope.row.itemid===1"
-          type="info"
-          size="mini"
-          @click.native.prevent="editRoom(scopedata.scope.$index, scopedata.scope.row)"
-        >
+  <div>
+    <div>
+      <div class="filter-container">
+        <el-input v-model="searchAppoint.apponitid" style="width:200px" class="filter-item" placeholder="预约id" />
 
-          办理
-        </el-button>
+        <el-input v-model="searchAppoint.pet.name" style="width:200px" class="filter-item" placeholder="宠物名" />
+        <el-input v-model="searchAppoint.employee.name" style="width:200px" class="filter-item" placeholder="员工名" />
+        <el-date-picker v-model="searchAppoint.appointdate" style="width:200px" class="filter-item" placeholder="预约时间" />
+        <el-select v-model="searchAppoint.status" style="width:200px" class="filter-item" placeholder="预约状态">
 
+          <el-option label="未确定" value="0" />
+          <el-option label="已确定" value="1" />
+          <el-option label="爽约" value="2" />
+          <el-option label="已完成" value="3" />
+          <el-option label="已取消" value="4" />
+          <el-option label="进行中" value="5" />
+
+        </el-select>
+        <div class="filter-btn">
+          <el-button class="filter-item" type="primary" @click="search">
+            搜索
+          </el-button>
+          <el-button class="filter-item" type="warning" @click="resetFilter">
+            重置
+          </el-button>
+        </div>
       </div>
 
-    </template>
-  </table-pane>
+    </div>
+    <table-pane
+      :data-source="dataSource"
+      @changeSize="changeSize"
+      @changeNum="changeNum"
+    >
+      <template v-slot:operator="scopedata">
+        <div class="btn">
+          <el-button
+            v-if="scopedata.scope.row.itemid===1"
+            type="info"
+            size="mini"
+            @click.native.prevent="editRoom(scopedata.scope.$index, scopedata.scope.row)"
+          >
+
+            办理托管
+          </el-button>
+
+          <el-button
+            v-if="scopedata.scope.row.itemid===1"
+            type="success"
+            size="mini"
+            @click.native.prevent="editRoom(scopedata.scope.$index, scopedata.scope.row)"
+          >
+
+            提醒
+          </el-button>
+
+        </div>
+
+      </template>
+    </table-pane>
   </div>
 
 </template>
@@ -37,6 +76,18 @@ export default {
     return {
       userId: store.getters.userId,
       // 搜索栏配置
+      searchAppoint: {
+        appointid: null,
+        pet: {
+          name: null
+        },
+        appointdate: null,
+        status: null,
+        employee: {
+          name: null
+        }
+
+      },
       // 表格配置
       dataSource: {
         tool: [
@@ -175,3 +226,16 @@ export default {
 }
 </script>
 
+<style  scoped lang='scss'>
+.filter-item{
+  margin-left: 10px;
+  display: inline-block;
+}
+.filter-container .filter-item:nth-of-type(1){
+  margin-left: 0px;
+}
+.filter-btn{
+  display: inline-block;
+  margin-left: 10px;
+}
+</style>

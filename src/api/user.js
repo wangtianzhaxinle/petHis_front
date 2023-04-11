@@ -70,4 +70,10 @@ export async function isRepeatUsername(username) {
     data: { username }
   })
 }
-
+export async function updatePassword(data) {
+  return request({
+    url: '/user/updatePassword',
+    method: 'post',
+    data
+  })
+}

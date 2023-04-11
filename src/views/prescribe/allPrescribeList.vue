@@ -1,37 +1,96 @@
 <template>
 
   <div class="app-container">
+    <div>
+      <div class="filter-container">
+        <el-input v-model="serchPrescribe.appointId" style="width:200px" class="filter-item" placeholder="预约id" />
+        <el-input v-model="serchPrescribe.pet.name" style="width:200px" class="filter-item" placeholder="宠物名" />
+        <el-input v-model="serchPrescribe.medicine.name" style="width:200px" class="filter-item" placeholder="药名" />
+        <el-input v-model="serchPrescribe.employee.name" style="width:200px" class="filter-item" placeholder="药师" />
+        <el-select v-model="serchPrescribe.status" style="width:200px" class="filter-item" placeholder="状态">
+          <el-option label="待配药" value="0" />
+          <el-option label="已完成" value="1" />
+
+        </el-select>
+
+        <div class="filter-btn">
+          <el-button class="filter-item" type="primary" @click="search">
+            搜索
+          </el-button>
+          <el-button class="filter-item" type="warning" @click="resetFilter">
+            重置
+          </el-button>
+        </div>
+      </div>
+
+    </div>
     <table-pane
       :data-source="dataSource"
       @changeSize="changeSize"
       @changeNum="changeNum"
     >
-      <!-- <template v-slot:operator="scopedata">
-          <div class="btn">
-            <el-button
+      <template v-slot:operator="scopedata">
+        <div class="btn">
+          <el-button
 
-              type="info"
-              size="mini"
-              @click.native.prevent="editRoom(scopedata.scope.$index, scopedata.scope.row)"
-            >
+            type="warning"
+            size="mini"
+            @click.native.prevent="editPrescribe(scopedata.scope.$index, scopedata.scope.row)"
+          >
 
-              修改
-            </el-button>
-            <el-button
+            修改
+          </el-button>
+          <el-button
 
-              type="info"
-              size="mini"
-              @click.native.prevent="deleteRoom(scopedata.scope.$index, scopedata.scope.row)"
-            >
+            type="danger"
+            size="mini"
+            @click.native.prevent="deletePrescribe(scopedata.scope.$index, scopedata.scope.row)"
+          >
 
-              删除
-            </el-button>
-          </div>
+            删除
+          </el-button>
+        </div>
 
-        </template> -->
+      </template>
 
     </table-pane>
+    <el-dialog
+      :title="title"
+      :visible.sync="prescribeDialogVisible"
+      width="30%"
+      :before-close="handleClose"
+    >
+      <el-form ref="prescribeForm" :model="prescribe" :rules="rules" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="prescribeId">
+          <el-input v-model="prescribe.prescribeid" />
+        </el-form-item>
+        <el-form-item label="appointid">
+          <el-input v-model="prescribe.appointid" />
+        </el-form-item>
 
+        <el-form-item label="药品" prop="medicineid">
+          <el-select />
+        </el-form-item>
+        <el-form-item label="药师" prop="employeeid">
+          <el-select />
+        </el-form-item>
+        <el-form-item label="数量" prop="count">
+          <el-input v-model="prescribe.breed" />
+        </el-form-item>
+        <el-form-item label="状态" prop="status">
+          <el-radio-group v-model="prescribe.status">
+            <el-radio :label="1">已完成</el-radio>
+            <el-radio :label="0">待配药</el-radio>
+          </el-radio-group>
+        </el-form-item>
+
+        <el-form-item>
+          <el-button type="primary" @click="submitForm">提交</el-button>
+          <!-- <el-button @click="resetForm('ruleForm')">重置</el-button> -->
+        </el-form-item>
+
+      </el-form>
+    </el-dialog>
   </div>
 
 </template>
@@ -42,7 +101,7 @@ import tablePane from '@/components/tablePane2.vue'
 // import moment from 'moment'
 import 'moment/locale/zh-cn'
 import store from '@/store'
-import { getPrescribeList } from '@/api/prescribe'
+import { getPrescribeList, deletePrescribeById, deletePrescribeByIds, updatePrescribeById } from '@/api/prescribe'
 export default {
   name: 'AllPerscribeList',
   components: { tablePane },
@@ -51,11 +110,28 @@ export default {
     return {
       userId: store.getters.userId,
       appointDialogVisible: false,
-
+      serchPrescribe: {
+        appointId: null,
+        pet: {
+          name: null
+        },
+        medicine: {
+          name: null
+        },
+        status: null,
+        employee: {
+          name: null
+        }
+      },
       // 表格配置
       dataSource: {
         tool: [
-
+          {
+            name: '批量删除',
+            key: 'batchDelete',
+            // permission: 'AddPrescribe',
+            handleClick: this.batchDelete
+          }
         ],
         data: [], // 表格数据
         cols: [
@@ -103,7 +179,7 @@ export default {
               if (val === 1) {
                 return '已完成'
               } else {
-                return '待完成'
+                return '待配药'
               }
             },
             isIcon: true,
@@ -120,7 +196,7 @@ export default {
 
         handleSelectionChange: this.handleSelectionChange,
         isSelection: true, // 表格有多选时设置
-        isOperation: false, // 表格有操作列时设置
+        isOperation: true, // 表格有操作列时设置
         isIndex: true, // 列表序号
         loading: true, // loading
         pageData: {
@@ -158,12 +234,32 @@ export default {
     this.getList()
   },
   methods: {
-
+    resetFilter() {
+      this.serchPrescribe.appointId = null
+      this.serchPrescribe.pet.name = null
+      this.serchPrescribe.medicine.name = null
+      this.serchPrescribe.employee.name = null
+      this.serchPrescribe.status = null
+    },
+    search() {
+      this.getList()
+    },
     // 获取列表数据
     getList() {
       const data = {
         pageSize: this.dataSource.pageData.pageSize,
-        pageNum: this.dataSource.pageData.pageNum
+        pageNum: this.dataSource.pageData.pageNum,
+        appointId: this.serchPrescribe.appointId,
+        pet: {
+          name: this.serchPrescribe.pet.name
+        },
+        medicine: {
+          name: this.serchPrescribe.medicine.name
+        },
+        employee: {
+          name: this.serchPrescribe.employee.name
+        },
+        status: this.serchPrescribe.status
 
       }
       this.dataSource.loading = true
@@ -181,6 +277,24 @@ export default {
         }
         // }
       })
+    },
+    deletePrescribe(index, row) {
+      deletePrescribeById(row.prescribeid).then(res => {
+        if (res.total > 0) {
+          this.getList()
+        }
+      })
+    },
+    batchDelete() {
+      const ids = this.selected.map((prescribe) => prescribe.prescribeid)
+      deletePrescribeByIds(ids).then(res => {
+        if (res.total > 0) {
+          this.getList()
+        }
+      })
+    },
+    editPrescribe(index, row) {
+
     },
 
     // 搜索层事件
@@ -216,3 +330,16 @@ export default {
 
 </script>
 
+<style  scoped lang='scss'>
+.filter-item{
+  margin-left: 10px;
+  display: inline-block;
+}
+.filter-container .filter-item:nth-of-type(1){
+  margin-left: 0px;
+}
+.filter-btn{
+  display: inline-block;
+  margin-left: 10px;
+}
+</style>

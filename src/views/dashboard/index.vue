@@ -1,14 +1,17 @@
 <template>
   <div class="dashboard-container">
-    <div class="dashboard-text">name: {{ name }}</div>
-    <div class="dashboard-text">email: {{ email }}</div>
-    <div class="dashboard-text">userid: {{ userId }}</div>
-    <div class="dashboard-text">username: {{ username }}</div>
-    <div class="dashboard-text">sex: {{ sex }}</div>
-    <div class="dashboard-text">age: {{ age }}</div>
-    <div class="dashboard-text">address: {{ address }}</div>
-    <div class="dashboard-text">createtime: {{ createtime }}</div>
-    <div class="dashboard-text">phoneNumber: {{ phoneNumber }}</div>
+    <div>
+      <div class="dashboard-text">欢迎登录,{{ name }}</div>
+      <!-- <div class="dashboard-text">email: {{ email }}</div>
+      <div class="dashboard-text">userid: {{ userId }}</div>
+      <div class="dashboard-text">username: {{ username }}</div>
+      <div class="dashboard-text">sex: {{ sex }}</div>
+      <div class="dashboard-text">age: {{ age }}</div>
+      <div class="dashboard-text">address: {{ address }}</div>
+      <div class="dashboard-text">createtime: {{ createtime }}</div>
+      <div class="dashboard-text">phoneNumber: {{ phoneNumber }}</div> -->
+
+    </div>
 
   </div>
 </template>
@@ -38,6 +41,12 @@ export default {
 <style lang="scss" scoped>
 .dashboard {
   &-container {
+  //   background:url("../../assets/welcome.jpeg");
+  // width:100%;
+  // height:100%;
+  // position:fixed;
+  // background-size:100% 100%;
+
     margin: 30px;
   }
   &-text {
@@ -45,4 +54,7 @@ export default {
     line-height: 46px;
   }
 }
+// .black{
+//   background:url("../../assets/welcome.jpeg");
+// }
 </style>

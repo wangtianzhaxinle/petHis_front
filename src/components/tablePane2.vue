@@ -1,18 +1,21 @@
 <template>
   <div>
     <div v-if="dataSource.tool" class="tool">
-      <!-- 下面buttopn标签应该有个v-permission="item.permission" -->
-      <el-button
-        v-for="(item) in dataSource.tool"
-        :key="item.key"
+      <el-row :gutter="0" class="el-row">
+        <!-- 下面buttopn标签应该有个v-permission="item.permission" -->
+        <el-button
+          v-for="(item) in dataSource.tool"
+          :key="item.key"
 
-        class="filter-item"
-        :style="{'background':item.bgColor,borderColor:item.bgColor}"
-        :type="item.type || 'primary'"
-        @click="item.handleClick(item.name,$event)"
-      >
-        {{ item.name }}
-      </el-button>
+          class="filter-item"
+          :style="{'background':item.bgColor,borderColor:item.bgColor}"
+          :type="item.type || 'primary'"
+          @click="item.handleClick(item.name,$event)"
+        >
+          {{ item.name }}
+        </el-button>
+      </el-row>
+
     </div>
     <!-- 下面本来有个 @row-click="getRowData",可以点击行就选中,当时单击操作按钮时也会选中不太方便就去掉了 -->
     <el-table
@@ -190,6 +193,10 @@ export default {
 }
 </script>
      <style lang="scss" scoped>
+     .el-row{
+      margin-bottom: 15px;
+      margin-top: 15px;
+     }
      .page{
       margin-top: 20px;
      }

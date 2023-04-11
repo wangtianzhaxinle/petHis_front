@@ -79,7 +79,7 @@
             v-if="scopedata.scope.row.isEmployee===0"
             type="info"
             size="mini"
-            @click.native.prevent="viewRole(scopedata.scope.$index, scopedata.scope.row)"
+            @click.native.prevent="addEmploye(scopedata.scope.$index, scopedata.scope.row)"
           >
             添加为员工
           </el-button>
@@ -317,13 +317,13 @@
       :before-close="handleClose"
     >
       <el-form ref="empForm" :model="employee" :rules="empRules" label-width="100px" class="demo-ruleForm">
-        <el-form-item label="用户id">
+        <el-form-item label="用户id" hidden>
           <el-input v-model="employee.userid" />
         </el-form-item>
         <el-form-item label="入职日期" required>
           <el-col :span="11">
             <el-form-item prop="hiredate">
-              <el-date-picker v-model="userInfo.createtime" placeholder="选择日期" style="width: 100%;" />
+              <el-date-picker v-model="employee.hiredate" placeholder="选择日期" style="width: 100%;" />
             </el-form-item>
           </el-col>
         </el-form-item>
@@ -403,8 +403,10 @@
 import { getUserInfoList, deleteUserById, deleteUserByIds, addUser, updateUserById } from '@/api/user'
 import { getAllRoleList, getRoleByUserId, updateRoleByUserId } from '@/api/role'
 import { upload } from '@/api/upload'
+import { checkUsername } from '@/utils/validate'
+import { addEmployee } from '@/api/employee'
 import tablePane from '@/components/tablePane2.vue'
-import FakeProgress from 'fake-progress'
+// import FakeProgress from 'fake-progress'
 
 export default {
   name: 'UserInfo',
@@ -436,7 +438,7 @@ export default {
       baseurl: 'http://localhost:8080/petHis',
       filelist: [],
       progressShow: false,
-      fake: '',
+      // fake: '',
       userInfo: {
         userid: '',
         name: '',
@@ -452,6 +454,15 @@ export default {
 
       },
       employee: {
+        hiredate: '',
+        salary: '',
+        bankcard: '',
+        maxAppoint: '',
+        card: '',
+        nativePlace: '',
+        educationBackground: '',
+        image: '',
+        userid: ''
 
       },
       searchUser: {
@@ -472,7 +483,7 @@ export default {
       userRules: {
         name: [
           { required: true, message: '请输入名字', trigger: 'blur' },
-          { min: 3, max: 5, message: '长度至少有三个字符', trigger: 'blur' }
+          { min: 3, message: '长度至少有三个字符', trigger: 'blur' }
         ],
         age: [
           { required: true, trigger: 'blur', message: '请输入年龄' },
@@ -490,7 +501,7 @@ export default {
         ],
         sex: [
 
-          { type: 'array', message: '请选择性别', trigger: 'blur' }
+          { required: true, message: '请选择性别', trigger: 'blur' }
         ],
         phonenumber: [
           { required: true, trigger: 'blur', message: '请输入手机号码' },
@@ -504,7 +515,23 @@ export default {
           { required: true, message: '请输入邮箱地址', trigger: 'blur' },
           { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
         ], username: [
-          { required: true, message: '请输入用户名', trigger: 'blur' }
+          { required: true, message: '请输入用户名', trigger: 'blur' },
+          {
+            async validator(rule, value, callback) {
+              // console.log(value)
+              var flag = await checkUsername(value)
+              // console.log('flag' + flag)
+              if (!flag) {
+                // console.log(11)
+                console.log('用户名可用')
+                callback()
+              } else {
+                // console.log(22)
+                callback(new Error('用户名已经存在'))
+              }
+            },
+            trigger: 'blur'
+          }
 
         ], createtime: [
           { required: true, message: '请选择日期', trigger: 'blur' }
@@ -517,7 +544,36 @@ export default {
 
       },
       empRules: {
+        image: [
+          { required: true, message: '请选择图片', trigger: 'blur' }
+        ],
+        hiredate: [
+          { required: true, message: '请选择入职日期', trigger: 'blur' }
 
+        ],
+        salary: [
+          { required: true, message: '请输入薪水', trigger: 'blur' },
+          { type: 'number', message: '请输入数字', trigger: 'blur' }
+        ],
+        bankcard: [
+          { required: true, trigger: 'blur', message: '请输入银行卡' }
+
+        ],
+        maxAppoint: [
+          { required: true, trigger: 'blur', message: '请输入最大预约人数' },
+
+          { type: 'number', message: '请输入数字', trigger: 'blur' }
+        ],
+        card: [
+
+          { required: true, message: '请输入身份证', trigger: 'blur' }
+        ],
+        nativePlace: [
+          { required: true, message: '请输入籍贯', trigger: 'blur' }
+        ],
+        educationBackground: [
+          { required: true, message: '请输入学历', trigger: 'blur' }
+        ]
       },
 
       // 表格配置
@@ -681,11 +737,6 @@ export default {
     this.getList()
   },
   methods: {
-    handleClose(done) {
-      this.resetForm()
-      this.userInfo = {}
-      done()
-    },
     resetFilter() {
       this.searchUser.name = null
       this.searchUser.username = null
@@ -697,6 +748,7 @@ export default {
     search() {
       this.getList()
     },
+
     // 获取列表数据
     getList() {
       const data = {
@@ -744,7 +796,11 @@ export default {
         this.roleData = res.data
       })
     },
-    // 搜索层事件
+    handleCheckChange(data, checked) {
+      // checked.checkedKeys  选中的节点id数组z
+      // checked.halfCheckedKeys 半选中节点id数组
+      this.roleIds = checked.halfCheckedKeys.concat(checked.checkedKeys) // 选中节点和半选中节点所有的id
+    },
 
     // 子组件通信
     childMsg(msg) {
@@ -869,9 +925,25 @@ export default {
       })
       )
     },
+    addEmploye(index, row) {
+      this.empDialogVisible = true
+      this.$nextTick(() => { this.employee.userid = row.userid })
+    },
+    handleClose(done) {
+      this.resetForm()
+      // 这里userid未绑定rules的prop无法用resetField重置
+
+      done()
+    },
     resetForm() {
       if (this.userDialogVisible === true) {
         this.$refs.userForm.resetFields()
+        this.userInfo = {}
+      }
+      if (this.empDialogVisible === true) {
+        // alert(666)
+        this.$refs.empForm.resetFields()
+        this.employee.userid = ''
       }
 
       this.$refs.pictureUpload.clearFiles()
@@ -924,7 +996,36 @@ export default {
       })
     },
     submitEmpForm() {
-
+      this.$refs.empForm.validate(valid => {
+        if (valid) {
+          this.loading = true
+          const data = {
+            hiredate: this.employee.hiredate,
+            salary: this.employee.salary,
+            bankcard: this.employee.bankcard,
+            maxappoint: this.employee.maxAppoint,
+            card: this.employee.card,
+            nativeplace: this.employee.nativePlace,
+            educationbackground: this.employee.educationBackground,
+            userid: this.employee.userid,
+            image: this.employee.image
+          }
+          addEmployee(data).then(res => {
+            if (res.total > 0) {
+              this.empDialogVisible = false
+              this.resetForm()
+              this.loading = false
+              this.getList()
+            }
+          }).catch(() => {
+            this.loading = false
+          })
+        } else {
+          console.log('error submit!!')
+          this.$message.error('表单验证不通过')
+          return false
+        }
+      })
     },
     beforeUpload(file) {
       // this.progressShow = true
@@ -932,7 +1033,6 @@ export default {
       //   timeConstant: 10000,
       //   autoStart: true
       // })
-
       const isJPG = file.type === 'image/jpeg'
       const isLt2M = file.size / 1024 < 200
       console.log(file.type)
@@ -956,7 +1056,8 @@ export default {
       upload(form).then(res => {
         if (res.total > 0) {
           // alert(res.message)
-          this.userInfo.avatar = this.baseurl + res.data
+          if (this.userDialogVisible) { this.userInfo.avatar = this.baseurl + res.data }
+          if (this.empDialogVisible) { this.employee.image = this.baseurl + res.data }
           this.fake.end()
           // console.log(this.medicine)
         }
@@ -974,15 +1075,12 @@ export default {
         if (file.url === uploadFiles[i].url) {
           uploadFiles.splice(i, 1)
           this.userInfo.avatar = ''
+          this.employee.image = ''
         }
       }
       console.log('handleRemove')
     },
-    handleCheckChange(data, checked) {
-      // checked.checkedKeys  选中的节点id数组z
-      // checked.halfCheckedKeys 半选中节点id数组
-      this.roleIds = checked.halfCheckedKeys.concat(checked.checkedKeys) // 选中节点和半选中节点所有的id
-    },
+
     getIdsFromJson(json) {
       // console.log(json)
       const ids = []

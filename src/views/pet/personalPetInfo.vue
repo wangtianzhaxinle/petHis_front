@@ -5,7 +5,7 @@
           @changeNum="changeNum"
         />
     <el-dialog
-      title="提示"
+      :title="title"
       :visible.sync="petDialogVisible"
       width="30%"
       :before-close="handleClose"
@@ -21,7 +21,7 @@
         <el-form-item label="品种" prop="breed">
           <el-input v-model="petInfo.breed" />
         </el-form-item>
-        <el-form-item label="是否健康" required>
+        <el-form-item label="是否健康" prop="ishealth">
           <el-radio-group v-model="petInfo.ishealth">
             <el-radio :label="1">健康</el-radio>
             <el-radio :label="0">生病</el-radio>
@@ -43,12 +43,13 @@
         </el-form-item>
 
       </el-form>
-    </el-dialog></div>
+    </el-dialog>
+  </div>
 
 </template>
 
 <script>
-import { getPetListByUserId } from '@/api/pet'
+import { getPetListByUserId, addPet, updatePetById, deletePetById, deletePetByIds } from '@/api/pet'
 import tablePane from '@/components/tablePane.vue'
 import store from '@/store'
 export default {
@@ -59,7 +60,39 @@ export default {
       // 搜索栏配置
       userId: store.getters.userId,
       petInfo: {},
+      title: '',
       petDialogVisible: false,
+      submitType: '',
+      rules: {
+        name: [
+          { required: true, message: '请输入名字', trigger: 'blur' }
+        ],
+
+        sex: [
+          { required: true, message: '请选择性别', trigger: 'blur' }
+
+        ],
+        breed: [
+          { required: true, message: '请输入品种', trigger: 'blur' }
+        ],
+        ishealth: [
+          { required: true, message: '请选择一项', trigger: 'blur' }
+        ],
+        age: [
+          { required: true, message: '请输入年龄', trigger: 'change' },
+          { type: 'number', required: true, trigger: 'blur', message: '请输入数字' },
+          {
+            validator(rule, value, callback) {
+              if (value > 0) {
+                callback()
+              } else {
+                callback(new Error('年龄范围不正确'))
+              }
+            },
+            trigger: 'blur'
+          }
+        ]
+      },
       // 表格配置
       dataSource: {
         tool: [{
@@ -146,13 +179,13 @@ export default {
               label: '修改', // 操作名称
               type: 'warning',
               // permission: '2010702', // 后期这个操作的权限，用来控制权限
-              handleRow: this.handleRow
+              handleRow: this.editPet
             },
             {
               label: '删除', // 操作名称
               type: 'danger',
               // permission: '2010702', // 后期这个操作的权限，用来控制权限
-              handleRow: this.handleRow
+              handleRow: this.deletePet
             }
           ]
         }
@@ -190,9 +223,82 @@ export default {
         // }
       })
     },
-    addPet() {
-      this.petDialogVisible = true
+    handleClose(done) {
+      this.resetForm()
+      done()
     },
+    resetForm() {
+      this.$refs.petForm.resetFields()
+      // 这里userid未绑定rules的prop无法用resetField重置
+      this.petInfo = {}
+    },
+    addPet() {
+      this.title = '添加宠物'
+      this.petDialogVisible = true
+      this.submitType = 'add'
+      this.petInfo = {}
+    },
+    editPet(index, row) {
+      this.title = '修改宠物'
+      this.petDialogVisible = true
+      this.submitType = 'edit'
+
+      this.$nextTick(() => {
+        // 赋值
+        this.petInfo = JSON.parse(JSON.stringify(row))
+      })
+    },
+    deletePet(index, row) {
+      deletePetById(row.petid).then(res => {
+        if (res.total > 0) {
+          this.getList()
+        }
+      })
+    },
+    batchDelete() {
+      const ids = this.selected.map((pet) => pet.petid)
+      deletePetByIds(ids).then(res => {
+        if (res.total > 0) {
+          this.getList()
+        }
+      })
+    },
+    submitForm() {
+      this.$refs.petForm.validate(valid => {
+        if (valid) {
+          this.loading = true
+          const pet = this.petInfo
+          if (this.submitType === 'add') {
+            addPet(pet).then(res => {
+              if (res.total > 0) {
+                this.resetForm()
+                this.petDialogVisible = false
+                this.loading = false
+                this.getList()
+              }
+            }).catch(() => {
+              this.loading = false
+            })
+          } else if (this.submitType === 'edit') {
+            this.loading = true
+            updatePetById(pet).then(res => {
+              if (res.total > 0) {
+                this.resetForm()
+                this.petDialogVisible = false
+                this.loading = false
+                this.getList()
+              }
+            }).catch(() => {
+              this.loading = false
+            })
+          }
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
+    },
+
     // 搜索层事件
 
     // 子组件通信

@@ -1,5 +1,25 @@
 <template>
   <div class="app-container">
+    <div>
+      <div class="filter-container">
+        <el-input v-model="searchMedicine.name" style="width:200px" class="filter-item" placeholder="药名" />
+        <el-input v-model="searchMedicine.company" style="width:200px" class="filter-item" placeholder="公司" />
+        <el-input v-model="searchMedicine.authenticationcode" style="width:200px" class="filter-item" placeholder="批准文号" />
+        <el-select v-model="searchMedicine.isprescription" style="width:200px" class="filter-item" placeholder="是否处方药">
+          <el-option label="是" value="1" />
+          <el-option label="否" value="0" />
+        </el-select>
+        <div class="filter-btn">
+          <el-button class="filter-item" type="primary" @click="search">
+            搜索
+          </el-button>
+          <el-button class="filter-item" type="warning" @click="resetFilter">
+            重置
+          </el-button>
+        </div>
+      </div>
+
+    </div>
     <table-pane
       :data-source="dataSource"
       @changeSize="changeSize"
@@ -17,7 +37,7 @@
       width="30%"
       :before-close="handleClose"
     >
-      <el-form ref="addMedicineForm" :model="medicine" :rules="rules" label-width="100px" class="demo-ruleForm">
+      <el-form ref="MedicineForm" :model="medicine" :rules="rules" label-width="100px" class="demo-ruleForm">
 
         <el-form-item label="名字" prop="name">
           <el-input v-model="medicine.name" />
@@ -101,6 +121,9 @@ https://blog.csdn.net/weixin_44345975/article/details/123697991
         <el-form-item label="数量" prop="amount">
           <el-input v-model.number="medicine.amount" />
         </el-form-item>
+        <el-form-item label="单位" prop="unit">
+          <el-input v-model="medicine.unit" />
+        </el-form-item>
         <el-form-item label="描述" prop="description">
           <el-input v-model="medicine.description" />
         </el-form-item>
@@ -121,7 +144,7 @@ https://blog.csdn.net/weixin_44345975/article/details/123697991
 
         <el-form-item>
           <el-button type="primary" @click="submitForm">添加</el-button>
-          <el-button @click="resetForm('addMedicineForm')">重置</el-button>
+          <el-button @click="resetForm('MedicineForm')">重置</el-button>
         </el-form-item>
 
       </el-form>
@@ -157,6 +180,12 @@ export default {
       baseurl: 'http://localhost:8080/petHis',
 
       filelist: [],
+      searchMedicine: {
+        name: null,
+        company: null,
+        authenticationcode: null,
+        isprescription: null
+      },
       rules: {
 
         name: [
@@ -167,15 +196,38 @@ export default {
           { required: true, message: '请输入公司', trigger: 'blur' }
 
         ],
+        image: [
+          { required: true, message: '请选择图片', trigger: 'change' }
+        ],
         price: [
 
           { required: true, message: '请输入价格', trigger: 'blur' },
-          { type: 'number', message: '请输入正确的价格', trigger: ['blur', 'change'] }
+          { type: 'number', message: '请输入数字', trigger: ['blur', 'change'] },
+          {
+            validator(rule, value, callback) {
+              if (value > 0) {
+                callback()
+              } else {
+                callback(new Error('请输入正确的价格'))
+              }
+            },
+            trigger: ['blur', 'change']
+          }
 
         ],
         amount: [
           { required: true, message: '请输入数量', trigger: 'blur' },
-          { type: 'number', message: '请输入正确的数量', trigger: 'blur' }
+          { type: 'number', message: '请输入数字', trigger: 'blur' },
+          {
+            validator(rule, value, callback) {
+              if (value > 0) {
+                callback()
+              } else {
+                callback(new Error('请输入正确的数量'))
+              }
+            },
+            trigger: ['blur', 'change']
+          }
         ],
         description: [
           { message: '请输入描述', trigger: 'blur' }
@@ -191,6 +243,10 @@ export default {
         isprescription: [
           { required: true, message: '请设置药品是否是处方药', trigger: 'change' }
 
+        ],
+        unit: [
+          { required: true, message: '请输入单位', trigger: 'blur' }
+
         ]
 
       },
@@ -204,7 +260,8 @@ export default {
         exp: '',
         authenticationcode: '',
         image: '',
-        isprescription: ''
+        isprescription: '',
+        unit: ''
       },
       /*
       editMedicineInfo: {
@@ -226,7 +283,15 @@ export default {
           key: 'addMedicine',
           // permission: 'addMedicine',
           handleClick: this.addMedicine
-        }],
+        },
+        {
+          name: '批量删除',
+          key: 'batchDelete',
+          // permission: 'addMedicine',
+          handleClick: this.batchDelete
+        }
+
+        ],
         data: [], // 表格数据
         cols: [
           {
@@ -253,8 +318,18 @@ export default {
 
           },
           {
-            label: '库存',
+            label: '实际库存',
             prop: 'amount'
+
+          },
+          {
+            label: '单位',
+            prop: 'unit'
+
+          },
+          {
+            label: '当前库存',
+            prop: 'nowAmount'
 
           },
           {
@@ -278,14 +353,17 @@ export default {
           {
             label: '是否处方药别',
             prop: 'isprescription',
-            isCodeTableFormatter: function(val) { // 过滤器
-              if (val.isprescription === 1) {
-                return '是'
+            filter: function(val) {
+
+            },
+            isIcon: true,
+            icon: function(val) {
+              if (val === 1) {
+                return 'el-icon-check'
               } else {
-                return '否'
+                return 'el-icon-close'
               }
             }
-
           }
 
         ], // 表格的列数据
@@ -307,13 +385,13 @@ export default {
           data: [
             {
               label: '删除', // 操作名称
-              type: 'deleteMedicine',
+              type: 'danger',
               // permission: 'deleteMedicine', // 后期这个操作的权限，用来控制权限
               handleRow: this.deleteMedicine
             },
             {
               label: '修改', // 操作名称
-              type: 'editMedicine',
+              type: 'warning',
               //  permission: 'editMedicine', // 后期这个操作的权限，用来控制权限
               handleRow: this.editMedicine
             }
@@ -329,6 +407,15 @@ export default {
     this.getList()
   },
   methods: {
+    resetFilter() {
+      this.searchMedicine.name = null
+      this.searchMedicine.company = null
+      this.searchMedicine.authenticationcode = null
+      this.searchMedicine.isprescription = null
+    },
+    search() {
+      this.getList()
+    },
     handleClose(done) {
       this.$confirm('确认关闭？')
         .then(_ => {
@@ -382,7 +469,7 @@ export default {
       console.log('handleRemove')
     },
     submitForm() {
-      this.$refs.addMedicineForm.validate(valid => {
+      this.$refs.MedicineForm.validate(valid => {
         if (valid) {
           this.loading = true
           const MedicineInfo = this.medicine
@@ -515,11 +602,14 @@ export default {
       const data = {
         pageSize: this.dataSource.pageData.pageSize,
         pageNum: this.dataSource.pageData.pageNum,
-        userId: this.userId
+        name: this.searchMedicine.name,
+        company: this.searchMedicine.company,
+        authenticationcode: this.searchMedicine.authenticationcode,
+        isprescription: this.searchMedicine.isprescription
       }
 
       this.dataSource.loading = true
-      console.log('getAllPetInfoList')
+      //  console.log('getAllPetInfoList')
       getMedicineList(data).then(res => {
         this.dataSource.loading = false
         // if (res.succeed) {
@@ -539,7 +629,7 @@ export default {
       // 当加入修改药品信息的对话框后,如果先打开添加药品对话框,再打开修改对话框,可以关闭,但是对应的药品信息的行会内容变空
       // 如果先打开修改对话框则无法退出对话框挑时候发现问题在 this.$refs.addMedicineForm.resetFields()
       // console.log(55555)
-      this.$refs.addMedicineForm.resetFields()
+      this.$refs.MedicineForm.resetFields()
       // console.log(6666)
       this.$refs.pictureUpload.clearFiles()
 
@@ -602,3 +692,16 @@ export default {
 }
 </script>
 
+<style  scoped lang='scss'>
+.filter-item{
+  margin-left: 10px;
+  display: inline-block;
+}
+.filter-container .filter-item:nth-of-type(1){
+  margin-left: 0px;
+}
+.filter-btn{
+  display: inline-block;
+  margin-left: 10px;
+}
+</style>

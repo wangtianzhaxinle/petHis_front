@@ -13,6 +13,7 @@ const getters = {
   email: state => state.user.email,
   createtime: state => state.user.createtime,
   phoneNumber: state => state.user.phoneNumber,
+  isEmployee: state => state.user.isEmployee,
   role: state => state.user.role,
   permissions: state => state.user.permissions,
   permission_routes: state => state.permission.routes

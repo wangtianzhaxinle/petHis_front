@@ -1,15 +1,43 @@
 <template>
-  <table-pane
-    :data-source="dataSource"
-    @changeSize="changeSize"
-    @changeNum="changeNum"
-  />
+  <div>
+    <div>
+      <div class="filter-container">
+        <el-input v-model="searchAppoint.apponitid" style="width:200px" class="filter-item" placeholder="预约id" />
 
+        <el-input v-model="searchAppoint.pet.name" style="width:200px" class="filter-item" placeholder="宠物名" />
+        <el-input v-model="searchAppoint.employee.name" style="width:200px" class="filter-item" placeholder="员工名" />
+        <el-date-picker v-model="searchAppoint.appointdate" style="width:200px" class="filter-item" placeholder="预约时间" />
+        <el-select v-model="searchAppoint.status" style="width:200px" class="filter-item" placeholder="预约状态">
+
+          <el-option label="未确定" value="0" />
+          <el-option label="已确定" value="1" />
+          <el-option label="爽约" value="2" />
+          <el-option label="已完成" value="3" />
+          <el-option label="已取消" value="4" />
+          <el-option label="进行中" value="5" />
+        </el-select>
+        <div class="filter-btn">
+          <el-button class="filter-item" type="primary" @click="search">
+            搜索
+          </el-button>
+          <el-button class="filter-item" type="warning" @click="resetFilter">
+            重置
+          </el-button>
+        </div>
+      </div>
+
+    </div>
+    <table-pane
+      :data-source="dataSource"
+      @changeSize="changeSize"
+      @changeNum="changeNum"
+    />
+  </div>
 </template>
 
 <script>
 
-import { getAppointList, getAppointPersonalInfo } from '@/api/appoint'
+import { getAppointList } from '@/api/appoint'
 import tablePane from '@/components/tablePane.vue'
 import store from '@/store'
 
@@ -20,7 +48,18 @@ export default {
     return {
       userId: store.getters.userId,
       // 搜索栏配置
+      searchAppoint: {
+        appointid: null,
+        pet: {
+          name: null
+        },
+        appointdate: null,
+        status: null,
+        employee: {
+          name: null
+        }
 
+      },
       // 表格配置
       dataSource: {
         tool: [
@@ -63,7 +102,22 @@ export default {
           },
           {
             label: 'status',
-            prop: 'status'
+            prop: 'status',
+            isCodeTableFormatter: function(val) { // 过滤器
+              if (val.status === 0) {
+                return '未确定'
+              } else if (val.status === 1) {
+                return '已确定'
+              } else if (val.status === 2) {
+                return '爽约'
+              } else if (val.status === 3) {
+                return '已完成'
+              } else if (val.status === 4) {
+                return '已取消'
+              } else if (val.status === 5) {
+                return '进行中'
+              }
+            }
           },
 
           {
@@ -116,11 +170,31 @@ export default {
     this.getList()
   },
   methods: {
+    resetFilter() {
+      this.searchAppoint.appointid = null
+      this.searchAppoint.pet.name = null
+      this.searchAppoint.employee.name = null
+      this.searchAppoint.appointdate = null
+      this.searchAppoint.status = null
+    },
+    search() {
+      this.getList()
+    },
     // 获取列表数据
     getList() {
       const data = {
         pageSize: this.dataSource.pageData.pageSize,
-        pageNum: this.dataSource.pageData.pageNum
+        pageNum: this.dataSource.pageData.pageNum,
+        appointid: this.searchAppoint.appointid,
+        appointdate: this.searchAppoint.appointdate,
+        status: this.searchAppoint.status,
+        pet: {
+          name: this.searchAppoint.pet.name
+        },
+        employee: {
+          name: this.searchAppoint.employee.name
+        }
+
       }
 
       this.dataSource.loading = true
@@ -139,11 +213,7 @@ export default {
         // }
       })
     },
-    getAppointPersonalInfo() {
-      getAppointPersonalInfo(this.userId).then(res => {
 
-      })
-    },
     // 搜索层事件
 
     // 子组件通信
@@ -179,4 +249,16 @@ export default {
   }
 }
 </script>
-
+<style  scoped lang='scss'>
+.filter-item{
+  margin-left: 10px;
+  display: inline-block;
+}
+.filter-container .filter-item:nth-of-type(1){
+  margin-left: 0px;
+}
+.filter-btn{
+  display: inline-block;
+  margin-left: 10px;
+}
+</style>

@@ -3,10 +3,13 @@ import request from '@/utils/request'
 export function getDutyList(data) {
   return request({
     url: '/duty/getDutyList',
-    method: 'get',
-    params: {
+    method: 'post',
+    data: {
       pageNum: data.pageNum,
-      pageSize: data.pageSize
+      pageSize: data.pageSize,
+      user: {
+        name: data.name
+      }
     }
 
   })

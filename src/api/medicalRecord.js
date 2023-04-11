@@ -10,3 +10,10 @@ export function getMedicalRecordList(data) {
     }
   })
 }
+export function updateMedicalRecordById(data) {
+  return request({
+    url: '/MedicalRecord/updateMedicalRecordById',
+    method: 'post',
+    data
+  })
+}

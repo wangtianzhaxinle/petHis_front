@@ -33,3 +33,10 @@ export function updateItemById(data) {
     data
   })
 }
+export function deleteItemByIds(data) {
+  return request({
+    url: '/item/deleteItemByIds',
+    method: 'post',
+    data
+  })
+}

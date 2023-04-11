@@ -1,10 +1,39 @@
 <template>
 
-  <div class="app-container"> <table-pane
-                                :data-source="dataSource"
-                                @changeSize="changeSize"
-                                @changeNum="changeNum"
-                              />
+  <div class="app-container">
+    <div>
+      <div class="filter-container">
+        <el-input v-model="searchPermission.name" style="width:200px" class="filter-item" placeholder="请输入权限名" />
+        <el-input v-model="searchPermission.url" style="width:200px" class="filter-item" placeholder="请输入url" />
+        <el-input v-model="searchPermission.permissionCode" style="width:200px" class="filter-item" placeholder="请输入权限码" />
+        <el-input v-model="searchPermission.type" style="width:200px" class="filter-item" placeholder="请输入类型" />
+        <el-select v-model="searchPermission.parentid" style="width:200px" class="filter-item" placeholder="请选择父权限">
+          <el-option label="全部" :value="-1" />
+          <el-option
+            v-for=" i in options"
+            :key="i.permissionid"
+            :label="i.name"
+            :value="i.permissionid"
+          />
+
+        </el-select>
+
+        <div class="filter-btn">
+          <el-button class="filter-item" type="primary" @click="search">
+            搜索
+          </el-button>
+          <el-button class="filter-item" type="warning" @click="resetFilter">
+            重置
+          </el-button>
+        </div>
+      </div>
+
+    </div>
+    <table-pane
+      :data-source="dataSource"
+      @changeSize="changeSize"
+      @changeNum="changeNum"
+    />
     <el-dialog
       :title="title"
       :visible.sync="perDialogVisible"
@@ -12,7 +41,7 @@
       :before-close="handleClose"
     >
       <el-form ref="PermissionForm" :model="permission" :rules="rules" label-width="100px" class="demo-ruleForm">
-        <el-form-item label="permissionId">
+        <el-form-item label="permissionId" hidden>
           <el-input v-model="permission.permissionid" />
         </el-form-item>
 
@@ -111,6 +140,13 @@ export default {
       options: [],
       permission: {},
       submitType: '',
+      searchPermission: {
+        name: null,
+        url: null,
+        permissionCode: null,
+        type: null,
+        parentid: -1
+      },
       rules: {
         name: [
           { required: true, message: '请输入名字', trigger: 'blur' }
@@ -156,8 +192,8 @@ export default {
           },
           {
             label: '名字',
-            prop: 'name'
-
+            prop: 'name',
+            width: 200
           },
 
           {
@@ -167,10 +203,23 @@ export default {
             width: 150
 
           },
+          // {
+          //   label: 'parentid',
+          //   prop: 'parentid',
+          //   width: 100
+
+          // },
           {
-            label: 'parentid',
-            prop: 'parentid',
-            width: 100
+            label: '父权限',
+            prop: 'parentPermission.name',
+            width: 150,
+            isCodeTableFormatter: function(val) { // 过滤器
+              if (val.parentPermission === null) {
+                return '无父权限'
+              } else {
+                return val.parentPermission.name
+              }
+            }
 
           },
           {
@@ -224,9 +273,18 @@ export default {
   },
   created() {
     this.getList()
-    this.getFatherPermissionList()
   },
   methods: {
+    resetFilter() {
+      this.searchPermission.name = null
+      this.searchPermission.url = null
+      this.searchPermission.permissionCode = null
+      this.searchPermission.type = null
+      this.searchPermission.parentid = -1
+    },
+    search() {
+      this.getList()
+    },
     AddPermission() {
       this.title = '添加权限'
       this.perDialogVisible = true
@@ -249,11 +307,10 @@ export default {
           if (this.submitType === 'add') {
             addPermission(permissionData).then(res => {
             // alert(this.$route.path)
-              alert(res.message)
-              this.addDialogVisible = false
+              // alert(res.message)
+              this.perDialogVisible = false
               this.resetForm()
-              // this.$router.go(0)
-              // this.$router.push({ path: this.$route.path || '/' })
+
               this.loading = false
               this.getList()
             }).catch(() => {
@@ -265,7 +322,7 @@ export default {
 
             updatePermissionById(permissionData).then(res => {
             // alert(this.$route.path)
-              alert(res.message)
+              // alert(res.message)
               this.perDialogVisible = false
               // this.resetForm()
               // this.$router.go(0)
@@ -285,6 +342,7 @@ export default {
     getFatherPermissionList() {
       getFatherPermissionList().then(res => {
         if (res.total > 0) {
+          this.options = []
           this.options.push({ name: '无父权限', permissionid: null })
           this.options = this.options.concat(res.data)
         }
@@ -294,7 +352,12 @@ export default {
     getList() {
       const data = {
         pageSize: this.dataSource.pageData.pageSize,
-        pageNum: this.dataSource.pageData.pageNum
+        pageNum: this.dataSource.pageData.pageNum,
+        name: this.searchPermission.name,
+        url: this.searchPermission.url,
+        permissionCode: this.searchPermission.permissionCode,
+        type: this.searchPermission.type,
+        parentid: this.searchPermission.parentid
       }
 
       this.dataSource.loading = true
@@ -305,6 +368,7 @@ export default {
         if (res.total > 0) {
           this.dataSource.pageData.total = res.total
           this.dataSource.data = res.data
+          this.getFatherPermissionList()
           console.log(res.data)
         } else {
           this.dataSource.data = []
@@ -347,7 +411,7 @@ export default {
 
     deletePermission(index, row) {
       console.log(row.id)
-      this.$confirm('确认删除该用户?', '温馨提示', {
+      this.$confirm('确认删除该权限?', '温馨提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
@@ -372,10 +436,10 @@ export default {
       }).then(() => deletePermissionByIds(ids).then(res => {
         if (res.total > 0) {
           // console.log(res.data)
-          alert('删除成功')
+          // alert('删除成功')
           this.getList()
         } else {
-          alert('删除失败')
+          // alert('删除失败')
         }
       })
       )
@@ -385,3 +449,16 @@ export default {
 }
 </script>
 
+<style  scoped lang='scss'>
+.filter-item{
+  margin-left: 10px;
+  display: inline-block;
+}
+.filter-container .filter-item:nth-of-type(1){
+  margin-left: 0px;
+}
+.filter-btn{
+  display: inline-block;
+  margin-left: 10px;
+}
+</style>

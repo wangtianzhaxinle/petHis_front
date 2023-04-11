@@ -42,6 +42,14 @@ export function deleteRoleById(id) {
   })
 }
 
+export function deleteRoleByIds(data) {
+  return request({
+    url: '/role/deleteRoleByIds',
+    method: 'post',
+    data
+  })
+}
+
 export function getPermissionByRoleId(roleId) {
   return request({
     url: '/role/getPermissionByRoleId',

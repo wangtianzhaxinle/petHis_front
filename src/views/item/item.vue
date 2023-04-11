@@ -1,55 +1,56 @@
 <template>
 
-  <div class="app-container"> <table-pane
-                                :data-source="dataSource"
-                                @changeSize="changeSize"
-                                @changeNum="changeNum"
-                              >
-                                <template v-slot:operator="scopedata">
+  <div class="app-container">
+    <table-pane
+      :data-source="dataSource"
+      @changeSize="changeSize"
+      @changeNum="changeNum"
+    >
+      <template v-slot:operator="scopedata">
 
-                                  <div
-                                    class="btn"
-                                  >
-                                    <div key="删除">
-                                      <el-button
-                                        v-permission="['deleteItem']"
-                                        type="danger"
-                                        size="mini"
-                                        @click.native.prevent="deleteItem(scopedata.scope.$index, scopedata.scope.row)"
-                                      >
-                                        删除
-                                      </el-button>
-                                    </div>
+        <div
+          class="btn"
+        >
+          <div key="删除">
+            <el-button
+              v-permission="['deleteItem']"
+              type="danger"
+              size="mini"
+              @click.native.prevent="deleteItem(scopedata.scope.$index, scopedata.scope.row)"
+            >
+              删除
+            </el-button>
+          </div>
 
-                                    <div key="修改">
-                                      <el-button
-                                        v-permission="['editItem']"
-                                        type="warning"
-                                        size="mini"
-                                        @click.native.prevent="editItem(scopedata.scope.$index, scopedata.scope.row)"
-                                      >
-                                        修改
-                                      </el-button></div>
-                                    <div v-if="scopedata.scope.row.isSpecial===0" key="预约">
-                                      <el-button
-                                        type="info"
-                                        size="mini"
-                                        @click.native.prevent="appointItem(scopedata.scope.$index, scopedata.scope.row)"
-                                      >
-                                        预约
-                                      </el-button></div>
+          <div key="修改">
+            <el-button
+              v-permission="['editItem']"
+              type="warning"
+              size="mini"
+              @click.native.prevent="editItem(scopedata.scope.$index, scopedata.scope.row)"
+            >
+              修改
+            </el-button></div>
+          <div v-if="scopedata.scope.row.isSpecial===0" key="预约">
+            <el-button
+              type="info"
+              size="mini"
+              @click.native.prevent="appointItem(scopedata.scope.$index, scopedata.scope.row)"
+            >
+              预约
+            </el-button></div>
 
-                                  </div>
+        </div>
 
-                                </template>
-                              </table-pane>
+      </template>
+    </table-pane>
     <el-dialog
-      title="添加项目"
+      :title="title"
       :visible.sync="dialogVisible"
       width="30%"
       :before-close="handleClose"
     >
-      <el-form ref="itemForm" :model="item" :rules="rules" label-width="100px" class="demo-ruleForm">
+      <el-form ref="itemForm" :model="item" :rules="rules" label-width="120px" class="demo-ruleForm">
 
         <el-form-item label="名字" prop="name">
           <el-input v-model="item.name" />
@@ -72,9 +73,16 @@
             />
           </el-select>
         </el-form-item>
+        <el-form-item label="流程是否不同" prop="isSpecial">
+          <el-radio-group v-model="item.isSpecial">
+            <el-radio :label="1">是</el-radio>
+            <el-radio :label="0">否</el-radio>
+          </el-radio-group>
+
+        </el-form-item>
 
         <el-form-item>
-          <el-button type="primary" @click="submitForm">添加</el-button>
+          <el-button type="primary" @click="submitForm">提交</el-button>
           <el-button @click="resetForm">重置</el-button>
         </el-form-item>
 
@@ -111,7 +119,7 @@
 import tablePane from '@/components/tablePane2.vue'
 
 import permission from '@/directive/permission/index.js' // 权限判断指令
-import { getItemInfoList, addItem, deleteItembyId, updateItemById } from '@/api/item'
+import { getItemInfoList, addItem, deleteItembyId, updateItemById, deleteItemByIds } from '@/api/item'
 import { getAllRoleList } from '@/api/role'
 // import { addAppoint } from '@/api/appoint'
 // import moment from 'moment'
@@ -127,6 +135,7 @@ export default {
       userId: store.getters.userId,
       dialogVisible: false,
       apponitDialogVisible: false,
+      title: '',
       dialogtype: '',
       options: {
       },
@@ -152,17 +161,19 @@ export default {
         ],
         apponittime: [
           { type: 'datetime', required: true, message: '请选择时间', trigger: 'change' }
+        ],
+        isSpecial: [
+          { required: true, message: '请选择一项', trigger: 'change' }
         ]
 
       },
       item: {
-        /*
         itemid: '',
         name: '',
         price: '',
         chargingmethod: '',
-        roleid: ''
-*/
+        roleid: '',
+        isSpecial: ''
       },
       appoint: {
         itemid: '',
@@ -255,18 +266,18 @@ export default {
             {
               label: '删除', // 操作名称
               type: 'danger',
-              permission: 'deleteItem', // 后期这个操作的权限，用来控制权限
+              // permission: 'deleteItem', // 后期这个操作的权限，用来控制权限
               handleRow: this.deleteItem
             }, {
               label: '预约', // 操作名称
               type: 'info',
-              permission: 'apponit', // 后期这个操作的权限，用来控制权限
+              // permission: 'apponit', // 后期这个操作的权限，用来控制权限
               handleRow: this.apponit
             },
             {
               label: '修改', // 操作名称
               type: 'warning',
-              permission: 'editItem', // 后期这个操作的权限，用来控制权限
+              //  permission: 'editItem', // 后期这个操作的权限，用来控制权限
               handleRow: this.editItem
             }
           ]
@@ -294,6 +305,7 @@ export default {
     },
     resetForm() {
       if (this.dialogVisible === true) {
+        // alert('已经充值了')
         this.$refs.itemForm.resetFields()
         // this.medicine.medicineid = ''
         this.item.itemid = ''
@@ -310,13 +322,15 @@ export default {
           if (this.dialogtype === 'create') {
             addItem(item).then(res => {
             // alert(this.$route.path)
-              alert(res.message)
-              this.dialogVisible = false
-              this.resetForm()
-              // this.$router.go(0)
-              // this.$router.push({ path: this.$route.path || '/' })
-              this.loading = false
-              this.getList()
+              // alert(res.message)
+              if (res.total > 0) {
+                this.resetForm()
+                this.dialogVisible = false
+                // this.$router.go(0)
+                // this.$router.push({ path: this.$route.path || '/' })
+                this.loading = false
+                this.getList()
+              }
             }).catch(() => {
               this.loading = false
             })
@@ -326,13 +340,15 @@ export default {
             // console.log(MedicineInfo)
             updateItemById(item).then(res => {
             // alert(this.$route.path)
-              alert(res.message)
-              this.dialogVisible = false
-              this.resetForm()
-              // this.$router.go(0)
-              // this.$router.push({ path: this.$route.path || '/' })
-              this.loading = false
-              this.getList()
+              // alert(res.message)
+              if (res.total > 0) {
+                this.resetForm()
+                this.dialogVisible = false
+                // this.$router.go(0)
+                // this.$router.push({ path: this.$route.path || '/' })
+                this.loading = false
+                this.getList()
+              }
             }).catch(() => {
               this.loading = false
             })
@@ -376,15 +392,22 @@ export default {
     addItem() {
       this.dialogtype = 'create'
       this.dialogVisible = true
+      this.title = '添加项目'
     },
     deleteAllItem() {
-
+      const ids = this.selected.map((item) => item.itemid)
+      deleteItemByIds(ids).then(res => {
+        // alert(res.message)
+        if (res.total > 0) {
+          this.getList()
+        }
+      })
     },
     deleteItem(index, row) {
       console.log('deleteItem')
-      console.log(row)
+      // console.log(row)
       deleteItembyId(row.itemid).then(res => {
-        alert(res.message)
+        // alert(res.message)
         if (res.total > 0) {
           this.getList()
         }
@@ -448,6 +471,7 @@ export default {
     editItem(index, row) {
       this.dialogtype = 'edit'
       this.dialogVisible = true
+      this.title = '修改项目'
       this.$nextTick(() => {
         // 赋值
         this.item = JSON.parse(JSON.stringify(row))

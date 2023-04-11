@@ -1,9 +1,24 @@
 <template>
-  <div> <table-pane
-          :data-source="dataSource"
-          @changeSize="changeSize"
-          @changeNum="changeNum"
-        />
+  <div>
+    <div>
+      <div class="filter-container">
+        <el-input v-model="searchDuty.user.name" style="width:200px" class="filter-item" placeholder="员工名" />
+        <div class="filter-btn">
+          <el-button class="filter-item" type="primary" @click="search">
+            搜索
+          </el-button>
+          <el-button class="filter-item" type="warning" @click="resetFilter">
+            重置
+          </el-button>
+        </div>
+      </div>
+
+    </div>
+    <table-pane
+      :data-source="dataSource"
+      @changeSize="changeSize"
+      @changeNum="changeNum"
+    />
     <el-dialog
       title="修改值班"
       :visible.sync="editDutyDialogVisible"
@@ -112,6 +127,11 @@ export default {
         friday: false,
         saturday: false,
         sunday: false
+      },
+      searchDuty: {
+        user: {
+          name: null
+        }
       },
       // 表格配置
       dataSource: {
@@ -365,17 +385,33 @@ export default {
     this.getList()
   },
   methods: {
+    resetFilter() {
+      this.searchDuty.user.name = null
+    },
+    search() {
+      this.getList()
+    },
     // 获取列表数据
     getList() {
       const data = {
         pageSize: this.dataSource.pageData.pageSize,
-        pageNum: this.dataSource.pageData.pageNum
+        pageNum: this.dataSource.pageData.pageNum,
+        name: this.searchDuty.user.name
       }
       var today = moment().day()
       var tomorrow = moment().add(1, 'days').day()
-      // 设置本日和明天的值班不可更改
+      var dayAfterTomorrow = moment().add(2, 'days').day()
+      var threeDayFromNow = moment().add(3, 'days').day()
+      // console.log(today)
+      // console.log(tomorrow)
+      // console.log(dayAfterTomorrow)
+
+      // console.log(threeDayFromNow)
+      // 设置本日和明天,后天,大后天的值班不可更改
       this.setDisabled(today)
       this.setDisabled(tomorrow)
+      this.setDisabled(dayAfterTomorrow)
+      this.setDisabled(threeDayFromNow)
       this.dataSource.loading = true
       // console.log('getAllPetInfoList')
       getDutyList(data).then(res => {
@@ -417,7 +453,7 @@ export default {
         case 6:
           this.dutyDisable.saturday = true
           break
-        case 7:
+        case 0:
           this.dutyDisable.sunday = true
           break
       }
@@ -482,3 +518,16 @@ export default {
 }
 </script>
 
+<style  scoped lang='scss'>
+.filter-item{
+  margin-left: 10px;
+  display: inline-block;
+}
+.filter-container .filter-item:nth-of-type(1){
+  margin-left: 0px;
+}
+.filter-btn{
+  display: inline-block;
+  margin-left: 10px;
+}
+</style>

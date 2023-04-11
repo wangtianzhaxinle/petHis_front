@@ -40,6 +40,21 @@
           <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
         </span>
       </el-form-item>
+      <el-form-item label="">
+        <el-row :gutter="0">
+          <el-col :span="16">
+            <el-form-item>
+              <el-input v-model="loginForm.inputCode" size="large" type="text" placeholder="请输入验证码">
+                <el-icon slot="prefix" type="smile" :style="{ color: 'rgba(0,0,0,.25)' }" />
+              </el-input>
+            </el-form-item>
+          </el-col>
+          <el-col :span="8" style="text-align: right">
+            <img style="margin-top: 2px;" :src="randCodeImage" @click="handleChangeCheckCode">
+
+          </el-col>
+        </el-row>
+      </el-form-item>
 
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
       <el-row style="text-align: center;margin-top: -10px;">
@@ -59,6 +74,7 @@
 
 <script>
 import { validUsername } from '@/utils/validate'
+import { getCodeImage } from '@/api/code'
 
 export default {
   name: 'Login',
@@ -80,7 +96,8 @@ export default {
     return {
       loginForm: {
         username: 'admin',
-        password: '111111'
+        password: '111111',
+        inputCode: ''
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -88,7 +105,12 @@ export default {
       },
       loading: false,
       passwordType: 'password',
-      redirect: undefined
+      redirect: undefined,
+      currdatetime: '',
+      randCodeImage: '',
+      requestCodeSuccess: '',
+      imageCodePrefix: 'data:image/jpg;base64,'
+
     }
   },
   watch: {
@@ -99,6 +121,10 @@ export default {
       immediate: true
     }
   },
+  created() {
+    this.handleChangeCheckCode()
+  },
+
   methods: {
     showPwd() {
       if (this.passwordType === 'password') {
@@ -110,6 +136,29 @@ export default {
         this.$refs.password.focus()
       })
     },
+
+    handleChangeCheckCode() {
+      // 生成一个时间戳
+      this.currdatetime = new Date().getTime()
+      // 将数据绑定重置
+      this.loginForm.inputCode = ''
+      // 关键来了 前端发了一个请求 去服务端获取了验证码图片 看后面的代码
+      getCodeImage(this.currdatetime).then(res => {
+        // console.log(666666)
+        // console.log(res)
+        if (res.total > 0) {
+          // 将数据结果绑定到randCodeImage属性上
+          this.randCodeImage = res.data
+        //  this.requestCodeSuccess = true
+        } else {
+          this.$message.error(res.message)
+          // this.requestCodeSuccess = false
+        }
+      }).catch(() => {
+        // this.requestCodeSuccess = false
+      })
+    },
+
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {

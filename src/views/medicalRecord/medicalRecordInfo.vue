@@ -49,17 +49,53 @@
 
       </el-form>
     </el-dialog> -->
+    <el-dialog
+      :title="title"
+      :visible.sync="dignoseDialogVisible"
+      width="80%"
+      :before-close="handleClose"
+    >
+      <el-form ref="diagnoseForm" :model="diagnoseModel" :rules="rules" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="病历id">
+          <el-input v-model="diagnoseModel.medicalrecordid" />
+        </el-form-item>
+        <!-- <el-form-item label="预约id">
+          <el-input v-model="diagnoseModel.appointid" />
+        </el-form-item> -->
+
+        <el-form-item label="病史" prop="medicalHistoryme">
+          <el-input v-model="diagnoseModel.medicalhistory" type="textarea" :rows="6" />
+        </el-form-item>
+
+        <el-form-item label="诊断" prop="diagnose">
+          <el-input v-model="diagnoseModel.diagnose" type="textarea" :rows="6" />
+        </el-form-item>
+
+        <el-form-item label="就诊时间" required>
+          <el-col :span="11">
+            <el-form-item prop="visittime">
+              <el-date-picker v-model="diagnoseModel.visittime" type="datetime" placeholder="选择日期" style="width: 100%;" />
+            </el-form-item>
+          </el-col>
+        </el-form-item>
+
+        <el-form-item>
+          <el-button type="primary" @click="updateMedicalRecord">提交</el-button>
+
+        </el-form-item>
+      </el-form>
+    </el-dialog>
   </div>
 
 </template>
 <script>
 
-import tablePane from '@/components/tablePane2.vue'
+import tablePane from '@/components/tablePane.vue'
 
 // import moment from 'moment'
 import 'moment/locale/zh-cn'
 import store from '@/store'
-import { getMedicalRecordList } from '@/api/medicalRecord'
+import { getMedicalRecordList, updateMedicalRecordById } from '@/api/medicalRecord'
 export default {
   name: 'MedicalRecordinfo',
   components: { tablePane },
@@ -68,10 +104,31 @@ export default {
     return {
       userId: store.getters.userId,
       appointDialogVisible: false,
+      dignoseDialogVisible: false,
+      title: '',
+      diagnoseModel: {
 
+      },
+      rules: {
+        medicalhistory: [
+          { required: true, message: '请输入病史', trigger: 'blur' }
+        ],
+        diagnose: [
+          { required: true, message: '请输入诊断', trigger: 'blur' }
+        ],
+        visittime: [
+          { required: true, message: '请选择就诊时间', trigger: 'blur' }
+        ]
+      },
       // 表格配置
       dataSource: {
         tool: [
+          // {
+          //   name: '批量删除',
+          //   key: 'batchDelete',
+
+          //   handleClick: this.batchDelete
+          // }
 
         ],
         data: [], // 表格数据
@@ -145,10 +202,22 @@ export default {
           width: '200', // 根据实际情况给宽度
           data: [
             {
-              label: '选择', // 操作名称
-              type: 'info',
+              label: '修改', // 操作名称
+              type: 'warning',
               //  permission: '2010702', // 后期这个操作的权限，用来控制权限
-              handleRow: this.apponitDoctor
+              handleRow: this.editMedicalRecordRecord
+            },
+            // {
+            //   label: '删除', // 操作名称
+            //   type: 'danger',
+            //   //  permission: '2010702', // 后期这个操作的权限，用来控制权限
+            //   handleRow: this.deleteAppoint
+            // },
+            {
+              label: '下载病历', // 操作名称
+              type: 'danger',
+              //  permission: '2010702', // 后期这个操作的权限，用来控制权限
+              handleRow: this.downloadMedicalRecord
             }
 
           ]
@@ -169,7 +238,16 @@ export default {
     this.getList()
   },
   methods: {
+    handleClose(done) {
+      this.resetForm()
+      // 这里userid未绑定rules的prop无法用resetField重置
 
+      done()
+    },
+    resetForm() {
+      this.$refs.diagnoseForm.resetFields()
+      this.diagnoseModel = {}
+    },
     // 获取列表数据
     getList() {
       const data = {
@@ -193,7 +271,25 @@ export default {
         // }
       })
     },
+    editMedicalRecordRecord(index, row) {
+      this.title = '修改病历'
+      this.dignoseDialogVisible = true
+      this.$nextTick(() => {
+        // 赋值
+        this.diagnoseModel = JSON.parse(JSON.stringify(row))
+      })
+    },
+    updateMedicalRecord() {
+      const data = this.diagnoseModel
+      updateMedicalRecordById(data).then(res => {
+        if (res.total > 0) {
+          this.getList()
+        }
+      })
+    },
+    downloadMedicalRecord(index, row) {
 
+    },
     // 搜索层事件
 
     // 子组件通信

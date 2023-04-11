@@ -17,7 +17,31 @@
           :data-source="dataSource"
           @changeSize="changeSize"
           @changeNum="changeNum"
-        />
+        > <template v-slot:image="scopedata">
+            <el-image
+              style="width: 100px; height: 100px"
+              :src="scopedata.scope.row.image"
+            />
+          </template>
+          <template v-slot:operator="scopedata">
+
+            <div
+              class="btn"
+            >
+
+              <div v-if="scopedata.scope.row.maxAppoint>scopedata.scope.row.nowAppoint">
+                <el-button
+                  type="info"
+                  size="mini"
+                  @click.native.prevent="choose(scopedata.scope.$index, scopedata.scope.row)"
+                >
+                  预约
+                </el-button></div>
+
+            </div>
+
+          </template>
+        </table-pane>
         <el-dialog
           title="预约"
           :visible.sync="appointDialogVisible"
@@ -25,14 +49,14 @@
           append-to-body
         >
           <el-form ref="appointForm" :model="appoint" :rules="rules" label-width="100px" class="demo-ruleForm">
-            <el-form-item label="employeeid">
+            <el-form-item label="employeeid" hidden>
               <el-input v-model="appoint.employeeid" />
             </el-form-item>
-            <el-form-item label="itemid">
+            <el-form-item label="itemid" hidden>
               <el-input v-model="appoint.itemid" />
             </el-form-item>
-            <el-form-item label="appointdate">
-              <el-input v-model="appoint.appointdate" />
+            <el-form-item label="预约时间">
+              <el-input v-model="appoint.appointdate" disabled />
             </el-form-item>
             <el-form-item label="你的宠物" prop="petid">
               <el-select v-model="appoint.petid" placeholder="请选择">
@@ -46,7 +70,7 @@
             </el-form-item>
 
             <el-form-item>
-              <el-button type="primary" @click="submitForm">立即创建</el-button>
+              <el-button type="primary" @click="submitForm">提交</el-button>
               <!-- <el-button @click="resetForm('ruleForm')">重置</el-button> -->
             </el-form-item>
 
@@ -59,11 +83,11 @@
 </template>
 <script>
 
-import tablePane from '@/components/tablePane.vue'
+import tablePane from '@/components/tablePane2.vue'
 import { getEmployeeByDate } from '@/api/employee'
-
+import { getToken } from '@/utils/auth'
 import { getPetListByUserId } from '@/api/pet'
-import { addAppoint } from '@/api/appoint'
+import { addAppoint, getAppointNumber } from '@/api/appoint'
 import moment from 'moment'
 import store from '@/store'
 import 'moment/locale/zh-cn'
@@ -126,20 +150,38 @@ export default {
             prop: 'user.name',
             width: 100
           },
+          {
+            label: '照片',
+            prop: 'image',
+            isTemplate: true
 
+          },
           {
             label: '性别',
             prop: 'user.sex',
-            width: 100
+            width: 100,
+            isCodeTableFormatter: function(val) { // 过滤器
+              if (val.sex === 1) {
+                return '男'
+              } else {
+                return '女'
+              }
+            }
 
           },
-
           {
-            label: '容量',
-            prop: 'maxappoint',
-            width: 100
+            label: '最大预约人数',
+            prop: 'maxAppoint',
+            width: 200
 
           },
+          {
+            label: '当前预约人数',
+            prop: 'nowAppoint',
+            width: 200
+
+          },
+
           {
             label: '入职时间',
             prop: 'hiredate'
@@ -191,9 +233,14 @@ export default {
       moment.updateLocale()
       this.getList(this.menuTabsValue)
       this.getYourPetList()
+      this.init()
     }
     //  this.getList()
     // moment.updateLocale('zh-cn')
+  },
+  mounted() {
+    // window.mainPage = this
+    // this.init()
   },
 
   methods: {
@@ -232,13 +279,42 @@ export default {
         if (res.total > 0) {
           this.dataSource.pageData.total = res.total
           this.dataSource.data = res.data
-          console.log(res.data)
+          const ids = res.data.map((employee) => employee.employeeid)
+          // console.log(this.menuTabsValue)
+          // console.log(ids)
+          console.log('getList')
+          console.log(ids)
+          const appointNumberData = {
+            ids: ids,
+            date: this.menuTabsValue
+          }
+          console.log(appointNumberData.ids)
+          getAppointNumber(appointNumberData).then(res => {
+            if (res.total > 0) {
+              // console.log(res.data)
+              this.updateNowAppoint(res.data)
+            }
+            console.log('getAppointNumber error')
+          })
         } else {
           this.dataSource.data = []
           this.dataSource.pageData.total = 0
         }
         // }
       })
+    },
+    updateNowAppoint(newAppointNumber) {
+      const data = this.dataSource.data
+
+      for (var i = 0; i < newAppointNumber.length; i++) {
+        for (var j = 0; j < data.length; j++) {
+          if (newAppointNumber[i].employeeid === data[j].employeeid) {
+            // console.log('更新预约人数')
+            // console.log(newAppointNumber[i].employeeid)
+            this.dataSource.data[j].nowAppoint = newAppointNumber[i].nowAppoint
+          }
+        }
+      }
     },
     choose(index, row) {
       this.appointDialogVisible = true
@@ -249,7 +325,7 @@ export default {
       const data = this.appoint
       addAppoint(data).then(res => {
         if (res.total > 0) {
-          alert(res.message)
+          // alert(res.message)
           this.appointDialogVisible = false
         }
       })
@@ -279,8 +355,54 @@ export default {
       this.selected = val
       console.log('调用了父组件的select方法')
       console.log(val)
-    }
+    },
     //
+    init: function() {
+      if (typeof (WebSocket) === 'undefined') {
+        alert('您的浏览器不支持socket')
+      } else {
+        var token = getToken()
+        // 实例化socket
+        this.socket = new WebSocket('ws://localhost:8080/petHis/webSocket/' + this.userId + '?token=' + token)
+        // 监听socket连接
+        this.socket.onopen = this.open
+        // 监听socket错误信息
+        this.socket.onerror = this.error
+        // 监听socket消息
+        this.socket.onmessage = this.getMessage
+      }
+    },
+    open: function() {
+      console.log('socket连接成功')
+    },
+    error: function() {
+      console.log('连接错误')
+    },
+    // 接收服务器发来的消息
+    getMessage: function(e) {
+      const ids = this.dataSource.data.map((employee) => employee.employeeid)
+      // console.log(this.menuTabsValue)
+      console.log('onmessage')
+      const appointNumberData = {
+        ids: ids,
+        date: this.menuTabsValue
+      }
+      console.log(e)
+      // this.medicineTable = JSON.parse(e.data)
+      getAppointNumber(appointNumberData).then(res => {
+        if (res.total > 0) {
+          console.log(res.data)
+          this.updateNowAppoint(res.data)
+        }
+      })
+    },
+    // 给服务器发消息的方法
+    send: function() {
+      this.socket.send(this.parms)
+    },
+    close: function() {
+      console.log('socket已经关闭')
+    }
 
   }
 }

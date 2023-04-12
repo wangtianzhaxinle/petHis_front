@@ -43,3 +43,11 @@ export function updatePrescribeById(data) {
     data
   })
 }
+
+export function addPrescribe(data) {
+  return request({
+    url: '/prescribe/addPrescribe',
+    method: 'post',
+    data
+  })
+}

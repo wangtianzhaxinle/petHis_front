@@ -2,13 +2,20 @@
   <div>
     <div>
       <div class="filter-container">
-        <el-input v-model="searchAppoint.apponitid" style="width:200px" class="filter-item" placeholder="预约id" />
+        <el-input v-model="searchAppoint.appointid" style="width:200px" class="filter-item" placeholder="预约id" />
 
         <el-input v-model="searchAppoint.pet.name" style="width:200px" class="filter-item" placeholder="宠物名" />
-        <el-input v-model="searchAppoint.employee.name" style="width:200px" class="filter-item" placeholder="员工名" />
-        <el-date-picker v-model="searchAppoint.appointdate" style="width:200px" class="filter-item" placeholder="预约时间" />
+        <el-input v-model="searchAppoint.emp.name" style="width:200px" class="filter-item" placeholder="员工名" />
+        <el-date-picker
+          v-model="searchAppoint.appointdate"
+          type="date"
+          format="yyyy/MM/dd"
+          value-format="yyyy/MM/dd"
+          style="width:200px"
+          class="filter-item"
+          placeholder="预约时间"
+        />
         <el-select v-model="searchAppoint.status" style="width:200px" class="filter-item" placeholder="预约状态">
-
           <el-option label="未确定" value="0" />
           <el-option label="已确定" value="1" />
           <el-option label="爽约" value="2" />
@@ -55,7 +62,7 @@ export default {
         },
         appointdate: null,
         status: null,
-        employee: {
+        emp: {
           name: null
         }
 
@@ -173,7 +180,7 @@ export default {
     resetFilter() {
       this.searchAppoint.appointid = null
       this.searchAppoint.pet.name = null
-      this.searchAppoint.employee.name = null
+      this.searchAppoint.emp.name = null
       this.searchAppoint.appointdate = null
       this.searchAppoint.status = null
     },
@@ -191,8 +198,8 @@ export default {
         pet: {
           name: this.searchAppoint.pet.name
         },
-        employee: {
-          name: this.searchAppoint.employee.name
+        emp: {
+          name: this.searchAppoint.emp.name
         }
 
       }

@@ -8,6 +8,14 @@ export function getAppointList(data) {
 
   })
 }
+
+export function getAppointIdList() {
+  return request({
+    url: '/appoint/getAppointIdList',
+    method: 'get'
+
+  })
+}
 // export function getAppointPersonalInfo(data) {
 //   return request({
 //     url: '/appoint/getAppointPersonalInfo',

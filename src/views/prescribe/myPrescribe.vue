@@ -80,6 +80,11 @@ export default {
             prop: 'count',
             width: 200
           },
+          {
+            label: '单位',
+            prop: 'medicine.unit',
+            width: 200
+          },
 
           {
             label: '负责药师',

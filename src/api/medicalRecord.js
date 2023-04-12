@@ -17,3 +17,11 @@ export function updateMedicalRecordById(data) {
     data
   })
 }
+
+export function downloadMedicalRecord(appointid) {
+  return request({
+    url: '/downloading/PDF/' + appointid,
+    method: 'get'
+
+  })
+}

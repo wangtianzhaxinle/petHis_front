@@ -56,14 +56,14 @@
       :before-close="handleClose"
     >
       <el-form ref="diagnoseForm" :model="diagnoseModel" :rules="rules" label-width="100px" class="demo-ruleForm">
-        <el-form-item label="病历id">
+        <el-form-item label="病历id" hidden>
           <el-input v-model="diagnoseModel.medicalrecordid" />
         </el-form-item>
         <!-- <el-form-item label="预约id">
           <el-input v-model="diagnoseModel.appointid" />
         </el-form-item> -->
 
-        <el-form-item label="病史" prop="medicalHistoryme">
+        <el-form-item label="病史" prop="medicalhistory">
           <el-input v-model="diagnoseModel.medicalhistory" type="textarea" :rows="6" />
         </el-form-item>
 
@@ -74,7 +74,7 @@
         <el-form-item label="就诊时间" required>
           <el-col :span="11">
             <el-form-item prop="visittime">
-              <el-date-picker v-model="diagnoseModel.visittime" type="datetime" placeholder="选择日期" style="width: 100%;" />
+              <el-date-picker v-model="diagnoseModel.visittime" type="datetime" value-format="yyyy-MM-dd HH:mm:ss" placeholder="选择日期" style="width: 100%;" />
             </el-form-item>
           </el-col>
         </el-form-item>
@@ -280,10 +280,22 @@ export default {
       })
     },
     updateMedicalRecord() {
-      const data = this.diagnoseModel
-      updateMedicalRecordById(data).then(res => {
-        if (res.total > 0) {
-          this.getList()
+      this.$refs.diagnoseForm.validate(valid => {
+        if (valid) {
+          this.loading = true
+          const data = this.diagnoseModel
+          updateMedicalRecordById(data).then(res => {
+            if (res.total > 0) {
+              this.dignoseDialogVisible = false
+              this.loading = false
+              this.getList()
+            }
+          }).catch(() => {
+            this.loading = false
+          })
+        } else {
+          console.log('error submit!!')
+          return false
         }
       })
     },

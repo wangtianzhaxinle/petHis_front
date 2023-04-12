@@ -2,11 +2,19 @@
   <div>
     <div>
       <div class="filter-container">
-        <el-input v-model="searchAppoint.apponitid" style="width:200px" class="filter-item" placeholder="预约id" />
+        <el-input v-model="searchAppoint.appointid" style="width:200px" class="filter-item" placeholder="预约id" />
 
         <el-input v-model="searchAppoint.pet.name" style="width:200px" class="filter-item" placeholder="宠物名" />
         <el-input v-model="searchAppoint.employee.name" style="width:200px" class="filter-item" placeholder="员工名" />
-        <el-date-picker v-model="searchAppoint.appointdate" style="width:200px" class="filter-item" placeholder="预约时间" />
+
+        <el-select v-model="searchAppoint.itemid" style="width:200px" class="filter-item" placeholder="选择项目">
+          <el-option
+            v-for="item in itemOptions"
+            :key="item.itemid"
+            :label="item.name"
+            :value="item.itemid"
+          />
+        </el-select>
         <el-select v-model="searchAppoint.status" style="width:200px" class="filter-item" placeholder="预约状态">
 
           <el-option label="未确定" value="0" />
@@ -68,7 +76,7 @@
 import { getTodayAppointList } from '@/api/appoint'
 import tablePane from '@/components/tablePane2.vue'
 import store from '@/store'
-
+import { getItemInfoList } from '@/api/item'
 export default {
   name: 'CheckApponitList',
   components: { tablePane },
@@ -78,16 +86,18 @@ export default {
       // 搜索栏配置
       searchAppoint: {
         appointid: null,
+        itemid: null,
         pet: {
           name: null
         },
-        appointdate: null,
+
         status: null,
         employee: {
           name: null
         }
 
       },
+      itemOptions: [],
       // 表格配置
       dataSource: {
         tool: [
@@ -166,13 +176,33 @@ export default {
     this.getList()
   },
   methods: {
-
+    resetFilter() {
+      this.searchAppoint.appointid = null
+      this.searchAppoint.pet.name = null
+      this.searchAppoint.employee.name = null
+      // this.searchAppoint.appointdate = null
+      this.searchAppoint.status = null
+      this.searchAppoint.itemid = null
+    },
+    search() {
+      this.getList()
+    },
     // 获取列表数据
     getList() {
       this.dataSource.loading = true
       const data = {
         pageSize: this.dataSource.pageData.pageSize,
-        pageNum: this.dataSource.pageData.pageNum
+        pageNum: this.dataSource.pageData.pageNum,
+        appointid: this.searchAppoint.appointid,
+        status: this.searchAppoint.status,
+        itemid: this.searchAppoint.itemid,
+        // appointdate: this.searchAppoint.appointdate,
+        employee: {
+          name: this.searchAppoint.employee.name
+        },
+        pet: {
+          name: this.searchAppoint.pet.name
+        }
       }
 
       getTodayAppointList(data).then(res => {
@@ -181,6 +211,7 @@ export default {
         if (res.total > 0) {
           this.dataSource.pageData.total = res.total
           this.dataSource.data = res.data
+          this.getItemOptionsList()
           console.log(res.data)
         } else {
           this.dataSource.data = []
@@ -189,7 +220,17 @@ export default {
         // }
       })
     },
-
+    getItemOptionsList() {
+      const data = {
+        pageNum: null,
+        pageSize: null
+      }
+      getItemInfoList(data).then(res => {
+        if (res.total > 0) {
+          this.itemOptions = res.data
+        }
+      })
+    },
     // 搜索层事件
 
     // 子组件通信

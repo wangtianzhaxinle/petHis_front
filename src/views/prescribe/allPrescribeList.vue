@@ -10,7 +10,6 @@
         <el-select v-model="serchPrescribe.status" style="width:200px" class="filter-item" placeholder="状态">
           <el-option label="待配药" value="0" />
           <el-option label="已完成" value="1" />
-
         </el-select>
 
         <div class="filter-btn">
@@ -61,21 +60,49 @@
       :before-close="handleClose"
     >
       <el-form ref="prescribeForm" :model="prescribe" :rules="rules" label-width="100px" class="demo-ruleForm">
-        <el-form-item label="prescribeId">
+        <el-form-item label="prescribeId" hidden>
           <el-input v-model="prescribe.prescribeid" />
         </el-form-item>
-        <el-form-item label="appointid">
-          <el-input v-model="prescribe.appointid" />
+        <el-form-item label="appointid" prop="appointId">
+          <el-select v-model="prescribe.appointId" filterable>
+            <el-option
+              v-for="item in appointOptions"
+              :key="item.appointid"
+              :label="item.appointid"
+              :value="item.appointid"
+            />
+          </el-select>
         </el-form-item>
 
         <el-form-item label="药品" prop="medicineid">
-          <el-select />
+          <el-select
+            v-model="prescribe.medicineid"
+            filterable
+            remote
+            :loading="medicinelodading"
+            :remote-method="remoteMethod"
+          >
+            <el-option
+              v-for="item in medicineOptions"
+              :key="item.medicineid"
+              :label="item.name"
+              :value="item.medicineid"
+            />
+          </el-select>
         </el-form-item>
         <el-form-item label="药师" prop="employeeid">
-          <el-select />
+          <el-select v-model="prescribe.employeeid">
+            <el-option
+              v-for="item in medicinerOptions"
+              :key="item.employeeid"
+              :label="item.user.name"
+              :value="item.employeeid"
+            />
+          </el-select>
+
         </el-form-item>
         <el-form-item label="数量" prop="count">
-          <el-input v-model="prescribe.breed" />
+          <el-input v-model.number="prescribe.count" />
         </el-form-item>
         <el-form-item label="状态" prop="status">
           <el-radio-group v-model="prescribe.status">
@@ -101,7 +128,11 @@ import tablePane from '@/components/tablePane2.vue'
 // import moment from 'moment'
 import 'moment/locale/zh-cn'
 import store from '@/store'
-import { getPrescribeList, deletePrescribeById, deletePrescribeByIds, updatePrescribeById } from '@/api/prescribe'
+import { getPrescribeList, deletePrescribeById, deletePrescribeByIds, updatePrescribeById, addPrescribe } from '@/api/prescribe'
+import { getMedicinerList } from '@/api/employee'
+import { getMedicineList } from '@/api/medicine'
+
+import { getAppointIdList } from '@/api/appoint'
 export default {
   name: 'AllPerscribeList',
   components: { tablePane },
@@ -123,9 +154,52 @@ export default {
           name: null
         }
       },
+      prescribe: {},
+      prescribeDialogVisible: false,
+      medicinelodading: false,
+      submitType: '',
+      title: '',
+      appointOptions: [],
+      medicineOptions: [],
+      medicinerOptions: [],
+      rules: {
+        appointId: [
+          { required: true, message: '请选择预约id', trigger: 'change' }
+        ],
+        medicineid: [
+          { required: true, message: '请选择药品', trigger: 'change' }
+        ],
+        employeeid: [
+          { required: true, message: '请选择药师', trigger: 'change' }
+        ],
+        count: [
+          { required: true, message: '请输入数量', trigger: 'blur' },
+          { type: 'number', trigger: 'blur', message: '请输入数字' },
+          {
+            validator(rule, value, callback) {
+              if (value > 0) {
+                callback()
+              } else {
+                callback(new Error('请输入正整数'))
+              }
+            },
+            trigger: 'blur'
+          }
+          // 这里还需要再做一个验证,查询数据库库存数量够不够
+        ],
+        status: [
+          { required: true, message: '请选择一项', trigger: 'blur' }
+        ]
+      },
       // 表格配置
       dataSource: {
         tool: [
+          {
+            name: '添加配药',
+            key: 'addPrescribe',
+            // permission: 'AddPrescribe',
+            handleClick: this.addPrescribe
+          },
           {
             name: '批量删除',
             key: 'batchDelete',
@@ -163,6 +237,11 @@ export default {
           {
             label: '数量',
             prop: 'count',
+            width: 200
+          },
+          {
+            label: '单位',
+            prop: 'medicine.unit',
             width: 200
           },
 
@@ -234,6 +313,16 @@ export default {
     this.getList()
   },
   methods: {
+    handleClose(done) {
+      this.resetForm()
+      // 这里userid未绑定rules的prop无法用resetField重置
+
+      done()
+    },
+    resetForm() {
+      this.$refs.prescribeForm.resetFields()
+      this.prescribe = {}
+    },
     resetFilter() {
       this.serchPrescribe.appointId = null
       this.serchPrescribe.pet.name = null
@@ -270,12 +359,44 @@ export default {
         if (res.total > 0) {
           this.dataSource.pageData.total = res.total
           this.dataSource.data = res.data
+          this.getMedicinerList()
+          this.getAppointIdList()
           // console.log(res.data)
         } else {
           this.dataSource.data = []
           this.dataSource.pageData.total = 0
         }
         // }
+      })
+    },
+    remoteMethod(query) {
+      if (query !== '') {
+        this.loading = true
+        setTimeout(() => {
+          this.medicinelodading = false
+          const data = { name: query }
+          getMedicineList(data).then(res => {
+            if (res.total > 0) {
+              this.medicineOptions = res.data
+            }
+          })
+        }, 200)
+      } else {
+        this.options = []
+      }
+    },
+    getMedicinerList() {
+      getMedicinerList().then(res => {
+        if (res.total > 0) {
+          this.medicinerOptions = res.data
+        }
+      })
+    },
+    getAppointIdList() {
+      getAppointIdList().then(res => {
+        if (res.total > 0) {
+          this.appointOptions = res.data
+        }
       })
     },
     deletePrescribe(index, row) {
@@ -293,8 +414,57 @@ export default {
         }
       })
     },
+    addPrescribe() {
+      this.title = '添加配药'
+      this.prescribeDialogVisible = true
+      this.prescribe = {}
+      this.submitType = 'add'
+    },
     editPrescribe(index, row) {
-
+      this.title = '修改配药'
+      this.prescribeDialogVisible = true
+      this.submitType = 'edit'
+      this.medicineOptions = []
+      this.medicineOptions.push({ medicineid: row.medicineid, name: row.medicine.name })
+      this.$nextTick(() => {
+        // 赋值
+        this.prescribe = JSON.parse(JSON.stringify(row))
+      })
+    },
+    submitForm() {
+      this.$refs.prescribeForm.validate(valid => {
+        if (valid) {
+          this.loading = true
+          const prescribe = this.prescribe
+          if (this.submitType === 'add') {
+            addPrescribe(prescribe).then(res => {
+              if (res.total > 0) {
+                this.resetForm()
+                this.prescribeDialogVisible = false
+                this.loading = false
+                this.getList()
+              }
+            }).catch(() => {
+              this.loading = false
+            })
+          } else if (this.submitType === 'edit') {
+            this.loading = true
+            updatePrescribeById(prescribe).then(res => {
+              if (res.total > 0) {
+                this.resetForm()
+                this.prescribeDialogVisible = false
+                this.loading = false
+                this.getList()
+              }
+            }).catch(() => {
+              this.loading = false
+            })
+          }
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
     },
 
     // 搜索层事件

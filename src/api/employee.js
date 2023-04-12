@@ -81,3 +81,11 @@ export function deleteEmployeeByIds(data) {
 
   })
 }
+
+export function getMedicinerList() {
+  return request({
+    url: '/employee/getMedicinerList',
+    method: 'get'
+
+  })
+}

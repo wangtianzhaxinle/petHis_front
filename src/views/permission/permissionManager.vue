@@ -79,6 +79,7 @@
         <el-form-item>
 
           <el-button type="primary" @click="submitForm()">提交</el-button>
+          <el-button @click="resetForm">重置</el-button>
 
         </el-form-item>
 
@@ -93,7 +94,7 @@
 import { getPermissionList, deletePermissionById, deletePermissionByIds, getFatherPermissionList, updatePermissionById, addPermission } from '@/api/permission'
 
 import tablePane from '@/components/tablePane.vue'
-
+import rules from '@/utils/rules'
 export default {
   name: 'PermissionInfo',
   components: { tablePane },
@@ -147,6 +148,7 @@ export default {
         type: null,
         parentid: -1
       },
+      editPermissionCode: '',
       rules: {
         name: [
           { required: true, message: '请输入名字', trigger: 'blur' }
@@ -156,12 +158,16 @@ export default {
           { required: true, message: '请输入url', trigger: 'blur' }
 
         ],
-        parentid: [
-          { }
-          // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
-        ],
+        // parentid: [
+        //   { required: true, message: '请选择一项', trigger: 'blur' }
+
+        //   // { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+        // ],
         permissioncode: [
-          { required: true, message: '请输入权限码', trigger: 'blur' }
+          { required: true, message: '请输入权限码', trigger: 'blur' },
+          { validator: (rule, value, callback) => {
+            rules.checkPermissionCode(value, callback, this.editPermissionCode)
+          }, trigger: 'blur' }
         ],
         type: [
           { required: true, message: '请输入类型', trigger: 'blur' }
@@ -176,7 +182,7 @@ export default {
           handleClick: this.AddPermission
         },
         {
-          name: '全部删除',
+          name: '批量删除',
           key: 'AllDeletePermission',
           // permission: 'AllDeletePermission',
           handleClick: this.AllDeletePermission
@@ -224,8 +230,8 @@ export default {
           },
           {
             label: 'permissioncode',
-            prop: 'permissioncode',
-            width: 200
+            prop: 'permissioncode'
+
           },
 
           {
@@ -281,9 +287,23 @@ export default {
       this.searchPermission.permissionCode = null
       this.searchPermission.type = null
       this.searchPermission.parentid = -1
+      this.getList()
     },
     search() {
       this.getList()
+    },
+    handleClose(done) {
+      this.$confirm('确认关闭？')
+        .then(_ => {
+          this.resetForm()
+
+          done()
+        })
+        .catch(_ => {})
+    },
+    resetForm() {
+      this.$refs.PermissionForm.resetFields()
+      this.permission.parentid = this.options[0].permissionid
     },
     AddPermission() {
       this.title = '添加权限'
@@ -296,7 +316,10 @@ export default {
       this.title = '修改权限'
       this.perDialogVisible = true
       this.submitType = 'edit'
-      this.permission = JSON.parse(JSON.stringify(row))
+      this.editPermissionCode = row.permissioncode
+      this.$nextTick(() => {
+        this.permission = JSON.parse(JSON.stringify(row))
+      })
     },
     submitForm() {
       this.$refs.PermissionForm.validate(valid => {
@@ -429,7 +452,7 @@ export default {
     }, AllDeletePermission() {
       // console.log(this.selected)
       const ids = this.selected.map((permission) => permission.permissionid)
-      this.$confirm('确认删除选中的用户?', '温馨提示', {
+      this.$confirm('确认删除选中的权限?', '温馨提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'

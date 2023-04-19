@@ -1,10 +1,9 @@
 <template>
   <div>
-    <div>
+    <!-- <div>
       <div class="filter-container">
 
         <el-select v-model="searchAppoint.status" style="width:200px" class="filter-item" placeholder="预约状态">
-
           <el-option label="未确定" value="0" />
           <el-option label="已确定" value="1" />
           <el-option label="爽约" value="2" />
@@ -22,7 +21,7 @@
         </div>
       </div>
 
-    </div>
+    </div> -->
     <table-pane
       :data-source="dataSource"
       @changeSize="changeSize"
@@ -32,22 +31,31 @@
 
         <div v-if="scopedata.scope.row.itemid===2" class="btn">
           <el-button
+            v-if="scopedata.scope.row.status===1"
+            type="success"
+            size="mini"
+            @click.native.prevent=" diagnoses(scopedata.scope.$index, scopedata.scope.row)"
+          >
+            诊断
+          </el-button>
+          <el-button
+            v-if="scopedata.scope.row.status===5"
             type="success"
             size="mini"
             @click.native.prevent="addMedicalRecord(scopedata.scope.$index, scopedata.scope.row)"
           >
             写病历
           </el-button>
-          <el-button
-
+          <!-- <el-button
+            v-if="scopedata.scope.row.status===3"
             type="warning"
             size="mini"
             @click.native.prevent="editMedicalRecord(scopedata.scope.$index, scopedata.scope.row)"
           >
             修改病历
-          </el-button>
+          </el-button> -->
           <el-button
-
+            v-if="scopedata.scope.row.status===5"
             type="success
                  "
             size="mini"
@@ -56,13 +64,25 @@
             开药
           </el-button>
           <el-button
-            type="info"
+            v-if="scopedata.scope.row.status===5"
+            type="danger"
             size="mini"
+            @click.native.prevent="endDiagnoses(scopedata.scope.$index, scopedata.scope.row)"
           >
-            下载
+            结束
           </el-button>
 
           <el-button
+            v-if="scopedata.scope.row.status===3"
+            type="danger"
+            size="mini"
+            @click.native.prevent="printMedicalRecord(scopedata.scope.$index, scopedata.scope.row)"
+          >
+            打印病历
+          </el-button>
+
+          <el-button
+            v-if="scopedata.scope.row.status===1"
             type="success"
             size="mini"
             @click.native.prevent="remind(scopedata.scope.$index, scopedata.scope.row)"
@@ -79,6 +99,7 @@
             v-if="scopedata.scope.row.status===1"
             type="success"
             size="mini"
+            @click.native.prevent="finishInjection(scopedata.scope.$index, scopedata.scope.row)"
           >
             办理
           </el-button>
@@ -102,18 +123,22 @@
       width="80%"
       :before-close="handleClose"
     >
-      <el-form :inline="true" :model="prescribe" class="demo-form-inline">
-        <el-form-item label="appointid">
-          <el-input v-model="prescribe.appointid" placeholder="appointid" />
+      <el-form ref="addMedicineForm" :inline="true" :model="prescribe" :rules="addMedicineRules" class="demo-form-inline">
+        <el-form-item v-show="false" label="appointid">
+          <el-input v-model="prescribe.appointId" placeholder="appointid" />
         </el-form-item>
-        <el-form-item label="药品id">
+        <el-form-item v-show="false" label="员工id" :hidden="true">
+          <el-input v-model="prescribe.employeeid" placeholder="药品id" />
+        </el-form-item>
+        <el-form-item v-show="false" label="药品id" hidden>
           <el-input v-model="prescribe.medicineid" placeholder="药品id" />
         </el-form-item>
-        <el-form-item label="药名">
+
+        <el-form-item label="药名" prop="medicineName" hidden>
           <el-input v-model="prescribe.medicineName" placeholder="药名" />
         </el-form-item>
-        <el-form-item label="数量">
-          <el-input v-model="prescribe.count" placeholder="请输入数量" />
+        <el-form-item label="数量" prop="count">
+          <el-input v-model.number="prescribe.count" placeholder="请输入数量" />
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="selectmedicinme">查询</el-button>
@@ -125,7 +150,7 @@
 
       <!--form表单设置 label-width="100px"会导致表单项输入框前面留出100px的位置,导致输入框右移,会在el-form-item__content 位置添加style="margin-left: 100px;" -->
       <el-form ref="presecibeForm" :model="presecibeList">
-        <el-table v-if="presecibeList.presecibeTable.length>0" :data="presecibeList.presecibeTable" border style="width: 100%" :highlight-current-row="true">
+        <el-table v-if="presecibeList.presecibeTable.length>0" :data="presecibeList.presecibeTable" border :highlight-current-row="true">
           <el-table-column label="id" width="70" prop="medicineid" align="left">
             <!-- <template slot-scope="scope">
                 <el-form-item :prop="medicineid" labe="id">
@@ -193,7 +218,6 @@
         width="70%"
         title="药品列表"
         :visible.sync="medicineListVisible"
-
         append-to-body
       >
         <el-table
@@ -213,6 +237,16 @@
           <el-table-column
             prop="description"
             label="描述"
+          />
+          <el-table-column
+            prop="amount"
+            label="实际库存"
+            align="center"
+          />
+          <el-table-column
+            prop="nowAmount"
+            label="当前库存"
+            align="center"
           />
           <el-table-column
             prop="isprescription"
@@ -238,7 +272,7 @@
         </el-table>
       </el-dialog>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitRecord">提交</el-button>
+        <el-button type="primary" @click="submitPrescribeList">提交</el-button>
 
       </div>
     </el-dialog>
@@ -249,15 +283,18 @@
       width="80%"
       :before-close="handleClose"
     >
-      <el-form ref="diagnoseForm" :model="diagnoseModel" label-width="100px" class="demo-ruleForm">
-        <el-form-item label="petid" prop="namedicalHistoryme">
-          <el-input v-model="diagnoseModel.petid" />
+      <el-form ref="diagnoseForm" :model="diagnoseModel" :rules="rules" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="预约id" hidden>
+          <el-input v-model="diagnoseModel.appointid" />
         </el-form-item>
-        <el-form-item label="employeeid" prop="namedicalHistoryme">
+        <el-form-item label="病历id" hidden>
+          <el-input v-model="diagnoseModel.medicalrecordid" />
+        </el-form-item>
+        <!-- <el-form-item label="employeeid">
           <el-input v-model="diagnoseModel.employeeid" />
-        </el-form-item>
-        <el-form-item label="病史" prop="medicalHistoryme">
-          <el-input v-model="diagnoseModel.medicalHistory" type="textarea" :rows="6" />
+        </el-form-item>  -->
+        <el-form-item label="病史" prop="medicalhistory">
+          <el-input v-model="diagnoseModel.medicalhistory" type="textarea" :rows="6" />
         </el-form-item>
 
         <el-form-item label="诊断" prop="diagnose">
@@ -275,12 +312,15 @@
 </template>
 
 <script>
-
-import { getAppointListByEmp, getAppointPersonalInfo, addCheck } from '@/api/appoint'
+import axios from 'axios'
+import { getAppointListByEmp, diagnoses, endDiagnoses, finishInjection, remind } from '@/api/appoint'
+import { getMedicineRecordById, addMedicalRecord } from '@/api/medicalRecord'
+import { addPrescribeList } from '@/api/prescribe'
+import rules from '@/utils/rules'
 import tablePane from '@/components/tablePane2.vue'
 import store from '@/store'
 import { getMedicineListByName } from '@/api/medicine'
-import { getToken } from '@/utils/auth'
+// import { getToken } from '@/utils/auth'
 
 export default {
   name: 'CheckApponitList',
@@ -299,8 +339,9 @@ export default {
       diagnoseModel: {
       },
       prescribe: {
-        appointid: '',
+        appointId: '',
         medicineid: '',
+        // employeeid: '',
         count: '',
         medicineName: ''
       },
@@ -309,6 +350,26 @@ export default {
       presecibeList: {
 
         presecibeTable: []
+      },
+      rules: {
+        medicalhistory: [
+          { required: true, message: '请输入病史', trigger: 'blur' }
+        ],
+        diagnose: [
+          { required: true, message: '请输入诊断', trigger: 'blur' }
+        ]
+      },
+      addMedicineRules: {
+        medicineName: [
+          { required: true, message: '请选择药品', trigger: ['blur', 'change'] }
+        ],
+        count: [
+          { required: true, message: '请输入数量', trigger: 'blur' },
+          { type: 'number', message: '请输入数字', trigger: ['blur', 'change'] },
+          { validator: (rule, value, callback) => {
+            rules.checkMedicineAmount(value, callback, this.prescribe.medicineid, this.prescribe.count)
+          }, trigger: 'blur' }
+        ]
       },
       // 搜索栏配置
 
@@ -345,6 +406,12 @@ export default {
             width: 100
 
           },
+          // {
+          //   label: '主人电话',
+          //   prop: 'user.phonenumber',
+          //   width: 150
+
+          // },
 
           //   {
           //     label: 'employeeId',
@@ -357,13 +424,13 @@ export default {
             width: 100
           },
           {
-            label: 'status',
+            label: '状态',
             prop: 'status',
             isCodeTableFormatter: function(val) { // 过滤器
               if (val.status === 0) {
-                return '未确定'
+                return '待确认'
               } else if (val.status === 1) {
-                return '已确定'
+                return '已确认'
               } else if (val.status === 2) {
                 return '爽约'
               } else if (val.status === 3) {
@@ -400,24 +467,24 @@ export default {
         operation: {
           // 表格有操作列时设置
           label: '操作', // 列名
-          width: '400', // 根据实际情况给宽度
+          width: '600', // 根据实际情况给宽度
           data: [
             {
               label: '挂起', // 操作名称
               type: 'info',
-              permission: 'deleteRow', // 后期这个操作的权限，用来控制权限
+
               handleRow: this.deleteRow
             },
             {
               label: '诊断', // 操作名称
               type: 'info',
-              permission: 'diagnose', // 后期这个操作的权限，用来控制权限
+
               handleRow: this.diagnose
             },
             {
               label: '提醒', // 操作名称
               type: 'info',
-              permission: 'deleteRow', // 后期这个操作的权限，用来控制权限
+
               handleRow: this.deleteRow
             }
           ]
@@ -433,25 +500,35 @@ export default {
     // this.init()
   },
   methods: {
-    diagnose(index, row) {
-      this.DialogVisible = true
-      this.diagnoseModel.petid = row.petid
-      this.diagnoseModel.employeeid = row.employeeid
-    },
+    // diagnose(index, row) {
+    //   this.DialogVisible = true
+    //   this.diagnoseModel.petid = row.petid
+    //   this.diagnoseModel.employeeid = row.employeeid
+    // },
     submitForm() {
       const data = {
-
-        petid: this.diagnoseModel.petid,
-        employeeid: this.diagnoseModel.employeeid,
-        medicalHistoryme: this.diagnoseModel.medicalHistoryme,
+        appointid: this.diagnoseModel.appointid,
+        // petid: this.diagnoseModel.petid,
+        // employeeid: this.diagnoseModel.employeeid,
+        medicalrecordid: this.diagnoseModel.medicalrecordid,
+        medicalhistory: this.diagnoseModel.medicalhistory,
         diagnose: this.diagnoseModel.diagnose,
-        medicineList: this.presecibe.presecibeTable
+        visittime: this.diagnoseModel.visittime
+        // medicineList: this.presecibe.presecibeTable
 
       }
-      console.log(data)
+      addMedicalRecord(data).then(res => {
+        if (res.total > 0) {
+          this.dignoseDialogVisible = false
+          this.getList()
+        }
+      })
     },
 
     handleClose(done) {
+      if (this.prescribeDialogVisible) {
+        this.prescribe = {}
+      }
       this.presecibeList.presecibeTable = []
       done()
     },
@@ -479,27 +556,177 @@ export default {
         // }
       })
     },
-    getAppointPersonalInfo() {
-      getAppointPersonalInfo(this.userId).then(res => {
+    // getAppointPersonalInfo() {
+    //   getAppointPersonalInfo(this.userId).then(res => {
+
+    //   })
+    // },
+    addMedicalRecord(index, row) {
+      const data = {
+        id: row.appointid
+      }
+
+      // this.diagnoseModel.petid = row.petid
+      // this.diagnoseModel.employeeid = row.employeeid
+      getMedicineRecordById(data).then(res => {
+        if (res.total > 0) {
+          this.diagnoseModel = res.data
+          this.diagnoseModel.appointid = row.appointid
+        } else {
+          this.diagnoseModel = {}
+          this.diagnoseModel.appointid = row.appointid
+        }
+      })
+
+      // this.diagnoseModel.appointid = row.appointid
+      this.dignoseDialogVisible = true
+      this.title = '添加病历'
+    },
+    editMedicalRecord(index, row) {
+      this.dignoseDialogVisible = true
+      this.title = '修改病历'
+    },
+    diagnoses(index, row) {
+      const data = {
+        appointid: row.appointid
+      }
+      diagnoses(data).then(res => {
+        if (res.total > 0) {
+          this.getList()
+        }
+      })
+    },
+    addPrescribeList(index, row) {
+      this.prescribeDialogVisible = true
+      this.prescribe.appointId = row.appointid
+      // this.prescribe.employeeid = row.employeeid
+    },
+    endDiagnoses(index, row) {
+      const data = {
+        appointid: row.appointid
+      }
+      endDiagnoses(data).then(res => {
+        if (res.total > 0) {
+          this.getList()
+        }
+      })
+    },
+    printMedicalRecord(index, row) {
+      axios({
+        methods: 'get',
+        url: 'http://localhost:8080/petHis/downloading/PDF/' + row.appointid,
+
+        responseType: 'blob'
+      }).then((res) => {
+        const content = res.data
+        this.pdfUrl = window.URL.createObjectURL(
+          new Blob([content], { type: 'application/pdf' })
+        )
+        // window.open(this.pdfUrl);
+        var date = new Date().getTime()
+        var ifr = document.createElement('iframe')
+        ifr.style.frameborder = 'no'
+        ifr.style.display = 'none'
+        ifr.style.pageBreakBefore = 'always'
+        ifr.setAttribute('id', 'printPdf' + date)
+        ifr.setAttribute('name', 'printPdf' + date)
+        ifr.src = this.pdfUrl
+        document.body.appendChild(ifr)
+        this.doPrint('printPdf' + date)
+        window.URL.revokeObjectURL(ifr.src) // 释放URL 对象
+      })
+    },
+    // 打印
+    doPrint(val) {
+      var ordonnance = document.getElementById(val).contentWindow
+      setTimeout(() => {
+        ordonnance.print()
+        this.pdfLoading = false
+      }, 10)
+    },
+
+    remind(index, row) {
+      const data = {
+        phonenumber: row.user.phonenumber
+      }
+      remind(data).then(res => {
 
       })
     },
-    submitRecord() {
+    finishInjection(index, row) {
       const data = {
-
-        petid: this.diagnoseModel.petid,
-        employeeid: this.diagnoseModel.employeeid,
-        medicalHistoryme: this.diagnoseModel.medicalHistoryme,
-        diagnose: this.diagnoseModel.diagnose,
-        medicineList: this.presecibe.presecibeTable
-
+        appointid: row.appointid
       }
-      console.log(data)
+      finishInjection(data).then(res => {
+        if (res.total > 0) {
+          this.getList()
+        }
+      })
+    },
+    selectmedicinme() {
+      this.medicineListVisible = true
+      getMedicineListByName(this.prescribe.medicineName).then(res => {
+        this.medicineTable = res.data
+      })
+    },
+    chooseMedicine(index, row) {
+      // const presecibeMedicne = JSON.parse(JSON.stringify(row))
+      // presecibeMedicne['count'] = ''
+      // console.log(presecibeMedicne)
+      // const map = new Map()
+      // this.presecibe.presecibeTable.push(presecibeMedicne)
+      // const qc = this.presecibe.presecibeTable.filter(key => !map.has(key.medicineid) && map.set(key.medicineid, key.medicineid)) // 这里对name属性进行去重
+      // this.presecibe.presecibeTable = qc
+
+      this.prescribe.medicineid = row.medicineid
+      this.prescribe.medicineName = row.name
+      this.medicineListVisible = false
+    },
+    addMedicine() {
+      this.$refs.addMedicineForm.validate(valid => {
+        if (valid) {
+          this.presecibeList.presecibeTable.push(JSON.parse(JSON.stringify(this.prescribe)))
+          this.prescribe.medicineid = null
+          this.prescribe.medicineName = null
+          this.prescribe.count = null
+        } else {
+          this.$message({
+            message: '请填写好内容',
+            type: 'warning'
+          })
+        }
+      })
+    },
+    deletePrescribe(index, row) {
+      this.presecibeList.presecibeTable.splice(index, 1)
+    },
+    submitPrescribeList() {
+      const data =
+
+      // petid: this.diagnoseModel.petid,
+      // employeeid: this.diagnoseModel.employeeid,
+      // medicalHistoryme: this.diagnoseModel.medicalHistoryme,
+      // diagnose: this.diagnoseModel.diagnose,
+       this.presecibeList.presecibeTable
+
+      // console.log(data)
       // addCheck().then(res => {
       //   if (res.total > 0) {
       //     alert(res.message)
       //   }
       // })
+      this.$confirm('确定要提交处方?提交后无法修改', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        addPrescribeList(data).then(res => {
+          if (res.total > 0) {
+            this.prescribeDialogVisible = false
+            this.presecibeList.presecibeTable = []
+          }
+        })
+      })
     },
     // 搜索层事件
 
@@ -531,56 +758,6 @@ export default {
     // 表格上方工具栏回调
     handleAdd(index, row) {
       this.dialogAdd = true
-    },
-    remind(index, row) {
-
-    },
-    finishInjection(index, row) {
-
-    },
-    addMedicalRecord(index, row) {
-      this.dignoseDialogVisible = true
-      this.title = '添加病历'
-    },
-    editMedicalRecord(index, row) {
-      this.dignoseDialogVisible = true
-      this.title = '修改病历'
-    },
-    addPrescribeList(index, row) {
-      this.prescribeDialogVisible = true
-      this.prescribe.appointid = row.appointid
-    },
-    selectmedicinme() {
-      this.medicineListVisible = true
-      getMedicineListByName(this.prescribe.medicineName).then(res => {
-        this.medicineTable = res.data
-      })
-    },
-    chooseMedicine(index, row) {
-      // const presecibeMedicne = JSON.parse(JSON.stringify(row))
-      // presecibeMedicne['count'] = ''
-      // console.log(presecibeMedicne)
-      // const map = new Map()
-      // this.presecibe.presecibeTable.push(presecibeMedicne)
-      // const qc = this.presecibe.presecibeTable.filter(key => !map.has(key.medicineid) && map.set(key.medicineid, key.medicineid)) // 这里对name属性进行去重
-      // this.presecibe.presecibeTable = qc
-
-      this.prescribe.medicineid = row.medicineid
-      this.prescribe.medicineName = row.name
-      this.medicineListVisible = false
-    },
-    addMedicine() {
-      this.presecibeList.presecibeTable.push(JSON.parse(JSON.stringify(this.prescribe)))
-      this.prescribe.medicineid = null
-      this.prescribe.medicineName = null
-      this.prescribe.count = null
-    },
-    deletePrescribe(index, row) {
-      this.presecibeList.presecibeTable.splice(index, 1)
-    },
-
-    downloadMedicalRecord(index, row) {
-
     }
 
     // init: function() {

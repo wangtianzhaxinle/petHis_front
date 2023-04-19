@@ -30,7 +30,7 @@
     >
       <template v-slot:operator="scopedata">
         <div class="btn">
-          <el-button
+          <!-- <el-button
 
             type="warning"
             size="mini"
@@ -38,7 +38,7 @@
           >
 
             修改
-          </el-button>
+          </el-button> -->
           <el-button
 
             type="danger"
@@ -63,7 +63,7 @@
         <el-form-item label="prescribeId" hidden>
           <el-input v-model="prescribe.prescribeid" />
         </el-form-item>
-        <el-form-item label="appointid" prop="appointId">
+        <el-form-item label="预约id" prop="appointId">
           <el-select v-model="prescribe.appointId" filterable>
             <el-option
               v-for="item in appointOptions"
@@ -104,16 +104,16 @@
         <el-form-item label="数量" prop="count">
           <el-input v-model.number="prescribe.count" />
         </el-form-item>
-        <el-form-item label="状态" prop="status">
+        <!-- <el-form-item label="状态" prop="status">
           <el-radio-group v-model="prescribe.status">
             <el-radio :label="1">已完成</el-radio>
             <el-radio :label="0">待配药</el-radio>
           </el-radio-group>
-        </el-form-item>
+        </el-form-item> -->
 
         <el-form-item>
           <el-button type="primary" @click="submitForm">提交</el-button>
-          <!-- <el-button @click="resetForm('ruleForm')">重置</el-button> -->
+          <el-button @click="resetForm">重置</el-button>
         </el-form-item>
 
       </el-form>
@@ -124,7 +124,7 @@
 <script>
 
 import tablePane from '@/components/tablePane2.vue'
-
+import rules from '@/utils/rules'
 // import moment from 'moment'
 import 'moment/locale/zh-cn'
 import store from '@/store'
@@ -177,19 +177,27 @@ export default {
           { type: 'number', trigger: 'blur', message: '请输入数字' },
           {
             validator(rule, value, callback) {
-              if (value > 0) {
-                callback()
-              } else {
+              if (value < 0) {
                 callback(new Error('请输入正整数'))
+              } else {
+                callback()
               }
+              // else if (!/^(0|[1-9][0-9]*)$/.test(value)) {
+              //   callback(new Error('请输入整数'))
+              // }
             },
             trigger: 'blur'
-          }
+          },
+          { validator: (rule, value, callback) => {
+            rules.checkMedicineAmount(value, callback, this.prescribe.medicineid, this.prescribe.count)
+          }, trigger: 'blur' }
+
           // 这里还需要再做一个验证,查询数据库库存数量够不够
-        ],
-        status: [
-          { required: true, message: '请选择一项', trigger: 'blur' }
         ]
+        //,
+        // status: [
+        //   { required: true, message: '请选择一项', trigger: 'blur' }
+        // ]
       },
       // 表格配置
       dataSource: {
@@ -314,10 +322,14 @@ export default {
   },
   methods: {
     handleClose(done) {
-      this.resetForm()
-      // 这里userid未绑定rules的prop无法用resetField重置
+      this.$confirm('确认关闭？')
+        .then(_ => {
+          this.resetForm()
+          // 这里userid未绑定rules的prop无法用resetField重置
 
-      done()
+          done()
+        })
+        .catch(_ => {})
     },
     resetForm() {
       this.$refs.prescribeForm.resetFields()
@@ -329,6 +341,7 @@ export default {
       this.serchPrescribe.medicine.name = null
       this.serchPrescribe.employee.name = null
       this.serchPrescribe.status = null
+      this.getList()
     },
     search() {
       this.getList()
@@ -378,6 +391,8 @@ export default {
           getMedicineList(data).then(res => {
             if (res.total > 0) {
               this.medicineOptions = res.data
+            } else {
+              this.medicineOptions = []
             }
           })
         }, 200)
@@ -400,18 +415,30 @@ export default {
       })
     },
     deletePrescribe(index, row) {
-      deletePrescribeById(row.prescribeid).then(res => {
-        if (res.total > 0) {
-          this.getList()
-        }
+      this.$confirm('确定要删除该配药记录?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deletePrescribeById(row.prescribeid).then(res => {
+          if (res.total > 0) {
+            this.getList()
+          }
+        })
       })
     },
     batchDelete() {
       const ids = this.selected.map((prescribe) => prescribe.prescribeid)
-      deletePrescribeByIds(ids).then(res => {
-        if (res.total > 0) {
-          this.getList()
-        }
+      this.$confirm('确定要删除选中的配药记录?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deletePrescribeByIds(ids).then(res => {
+          if (res.total > 0) {
+            this.getList()
+          }
+        })
       })
     },
     addPrescribe() {
@@ -435,7 +462,7 @@ export default {
       this.$refs.prescribeForm.validate(valid => {
         if (valid) {
           this.loading = true
-          const prescribe = this.prescribe
+          const prescribe = [this.prescribe]
           if (this.submitType === 'add') {
             addPrescribe(prescribe).then(res => {
               if (res.total > 0) {

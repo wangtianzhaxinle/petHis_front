@@ -24,7 +24,7 @@
       />
       <div slot="footer" class="dialog-footer">
         <el-button type="primary" @click="submit">提交</el-button>
-      <!-- <el-button @click="resetForm('addMedicineForm')">重置</el-button> -->
+
       </div>
 
     </el-dialog>
@@ -33,6 +33,8 @@
       :title="title"
       :visible.sync="roleDialogVisible"
       width="30%"
+
+      :before-close="handleClose"
     >
       <!-- :rules少了一个s写成了:rule所以验证一直不生效...... -->
       <el-form ref="RoleForm" :model="role" :rules="rules" label-width="100px" class="demo-ruleForm">
@@ -50,6 +52,7 @@
 
         <el-form-item>
           <el-button type="primary" @click="submitForm()">提交</el-button>
+          <el-button @click="resetForm">重置</el-button>
         </el-form-item>
 
       </el-form>
@@ -105,13 +108,13 @@ export default {
         tool: [{
           name: '新增角色',
           key: 'AddRole',
-          // permission: 'AddRole',
+
           handleClick: this.AddRole
         },
         {
-          name: '全部删除',
+          name: '批量删除',
           key: 'bitchDelete',
-          // permission: 'AllDeleteRole',
+
           handleClick: this.deleteRoleByIds
         }
         ],
@@ -185,10 +188,13 @@ export default {
     handleClose(done) {
       this.$confirm('确认关闭？')
         .then(_ => {
-          // this.resetForm()
+          this.resetForm()
           done()
         })
         .catch(_ => {})
+    },
+    resetForm() {
+      this.$refs.RoleForm.resetFields()
     },
     submit() {
       // alert('提交')
@@ -197,7 +203,7 @@ export default {
         roleId: this.roleId
       }
       updatePermissionByRoleId(data).then(res => {
-        alert(res.message)
+        // alert(res.message)
         if (res.total > 0) {
           this.perDialogVisible = false
         }
@@ -325,10 +331,16 @@ export default {
     },
     deleteRoleByIds() {
       const ids = this.selected.map((role) => role.roleid)
-      deleteRoleByIds(ids).then(res => {
-        if (res.total > 0) {
-          this.getList()
-        }
+      this.$confirm('确认删除选中角色?', '温馨提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteRoleByIds(ids).then(res => {
+          if (res.total > 0) {
+            this.getList()
+          }
+        })
       })
     },
     viewPermission(index, row) {

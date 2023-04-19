@@ -208,7 +208,6 @@
         </el-form-item>
 
         <el-form-item label="头像" prop="avatar">
-
           <el-upload
             ref="pictureUpload"
             class="avatar-uploader"
@@ -219,7 +218,6 @@
             :file-list="filelist"
             :before-upload="beforeUpload"
           >
-
             <i slot="default" class="el-icon-plus" />
             <div slot="file" slot-scope="{file}">
               <img
@@ -266,7 +264,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="手机号" prop="phonenumber">
-          <el-input v-model.number="userInfo.phonenumber" />
+          <el-input v-model="userInfo.phonenumber" />
         </el-form-item>
         <el-form-item label="地址" prop="address">
           <el-input v-model="userInfo.address" />
@@ -394,6 +392,9 @@
 
       </el-form>
     </el-dialog>
+    <el-dialog :visible.sync="dialogVisible">
+      <img width="100%" :src="dialogImageUrl" alt="">
+    </el-dialog>
 
   </div>
 
@@ -403,9 +404,11 @@
 import { getUserInfoList, deleteUserById, deleteUserByIds, addUser, updateUserById } from '@/api/user'
 import { getAllRoleList, getRoleByUserId, updateRoleByUserId } from '@/api/role'
 import { upload } from '@/api/upload'
-import { checkUsername } from '@/utils/validate'
+// import { checkUsername } from '@/utils/validate'
 import { addEmployee } from '@/api/employee'
 import tablePane from '@/components/tablePane2.vue'
+import rules from '@/utils/rules'
+// var _this = {}
 // import FakeProgress from 'fake-progress'
 
 export default {
@@ -413,31 +416,33 @@ export default {
   components: { tablePane },
 
   data() {
-    const telCheck = (rule, value, callback) => {
-      var reg = /^1[3-9]\d{9}$/
-      // console.log(value)
-      // console.log(Number.isInteger(value))
-      if (!Number.isInteger(value)) {
-        // 这里输入框必须是v-model.number不然Number.isInteger(value)结果始终为false
-        return callback(new Error('手机号码必须是数字'))
-      } else if (value.toString().length !== 11) {
-        return callback(new Error('手机号码必须是11位数字'))
-      } else if (!reg.test(value)) {
-        return callback(new Error('请输入有效的手机号码'))
-      } else {
-        callback()
-      }
-    }
+    // const telCheck = (rule, value, callback) => {
+    //   var reg = /^1[3-9]\d{9}$/
+    //   // console.log(value)
+    //   // console.log(Number.isInteger(value))
+    //   if (!Number.isInteger(value)) {
+    //     // 这里输入框必须是v-model.number不然Number.isInteger(value)结果始终为false
+    //     return callback(new Error('手机号码必须是数字'))
+    //   } else if (value.toString().length !== 11) {
+    //     return callback(new Error('手机号码必须是11位数字'))
+    //   } else if (!reg.test(value)) {
+    //     return callback(new Error('请输入有效的手机号码'))
+    //   } else {
+    //     callback()
+    //   }
+    // }
+    // var user = '777'
     return {
       title: '',
       empDialogVisible: false,
       userDialogVisible: false,
-
+      dialogVisible: false,
       roleDialogVisible: false,
       submitType: '',
       baseurl: 'http://localhost:8080/petHis',
       filelist: [],
       progressShow: false,
+      test: '123456',
       // fake: '',
       userInfo: {
         userid: '',
@@ -453,6 +458,7 @@ export default {
         avatar: ''
 
       },
+      editUsername: null,
       employee: {
         hiredate: '',
         salary: '',
@@ -471,7 +477,7 @@ export default {
         sex: null,
         address: null,
         isEmployee: null,
-        isDelete: null
+        isDelete: '0'
       },
 
       defaultProps: {
@@ -506,7 +512,7 @@ export default {
         phonenumber: [
           { required: true, trigger: 'blur', message: '请输入手机号码' },
 
-          { validator: telCheck, trigger: 'blur' }
+          { validator: rules.checkPhone, trigger: 'blur' }
         ],
         address: [
           { required: true, message: '请输入地址', trigger: 'blur' }
@@ -516,22 +522,25 @@ export default {
           { type: 'email', message: '请输入正确的邮箱地址', trigger: ['blur', 'change'] }
         ], username: [
           { required: true, message: '请输入用户名', trigger: 'blur' },
-          {
-            async validator(rule, value, callback) {
-              // console.log(value)
-              var flag = await checkUsername(value)
-              // console.log('flag' + flag)
-              if (!flag) {
-                // console.log(11)
-                console.log('用户名可用')
-                callback()
-              } else {
-                // console.log(22)
-                callback(new Error('用户名已经存在'))
-              }
-            },
-            trigger: 'blur'
-          }
+          // {
+          //   async validator(rule, value, callback) {
+          //     // console.log(value)
+          //     var flag = await checkUsername(value)
+          //     // console.log('flag' + flag)
+          //     if (!flag) {
+          //       // console.log(11)
+          //       console.log('用户名可用')
+          //       callback()
+          //     } else {
+          //       console.log('用户名不可用')
+          //       callback(new Error('用户名已经存在'))
+          //     }
+          //   },
+          //   trigger: 'blur'
+          // }
+          { validator: (rule, value, callback) => {
+            rules.checkRepeatUserName(value, callback, this.editUsername)
+          }, trigger: 'blur' }
 
         ], createtime: [
           { required: true, message: '请选择日期', trigger: 'blur' }
@@ -566,7 +575,10 @@ export default {
         ],
         card: [
 
-          { required: true, message: '请输入身份证', trigger: 'blur' }
+          { required: true, message: '请输入身份证', trigger: 'blur' },
+          {
+            validator: rules.checkIdCard, trigger: 'blur'
+          }
         ],
         nativePlace: [
           { required: true, message: '请输入籍贯', trigger: 'blur' }
@@ -580,14 +592,14 @@ export default {
       dataSource: {
         tool: [{
           name: '新增用户',
-          //  key: 'Adduser',
-          permission: 'AddUser',
+          key: 'Adduser',
+
           handleClick: this.AddUser
         },
         {
           name: '批量删除',
-          //   key: 'AllDelete',
-          permission: 'batchDelete',
+          key: 'AllDelete',
+
           handleClick: this.batchDelete
         }
         ],
@@ -735,6 +747,7 @@ export default {
   },
   created() {
     this.getList()
+  //  _this = this
   },
   methods: {
     resetFilter() {
@@ -743,7 +756,7 @@ export default {
       this.searchUser.address = null
       this.searchUser.sex = null
       this.searchUser.isEmployee = null
-      this.searchUser.isDelete = null
+      this.searchUser.isDelete = '0'
     },
     search() {
       this.getList()
@@ -871,6 +884,7 @@ export default {
       this.userDialogVisible = true
       this.title = '修改用户信息'
       this.submitType = 'edit'
+      this.editUsername = row.username
       this.$nextTick(() => {
         // 赋值
         this.userInfo = JSON.parse(JSON.stringify(row))
@@ -939,6 +953,7 @@ export default {
       if (this.userDialogVisible === true) {
         this.$refs.userForm.resetFields()
         this.userInfo = {}
+        this.editUsername = null
       }
       if (this.empDialogVisible === true) {
         // alert(666)

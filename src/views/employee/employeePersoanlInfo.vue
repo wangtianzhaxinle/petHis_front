@@ -1,6 +1,6 @@
 
 <template>
-  <el-form ref="ruleForm" :model="employeePerosanlInfo" :rules="rules" label-width="100px" class="demo-ruleForm">
+  <el-form ref="ruleForm" :model="employeePerosanlInfo" label-width="100px" class="demo-ruleForm">
     <el-form-item label="姓名">
       <el-input v-model="employeePerosanlInfo.user.name" :disabled="true" />
     </el-form-item>
@@ -90,7 +90,7 @@ export default {
       // 原来data中可以直接获取到vuex的数据
       userId: store.getters.userId,
       employeePerosanlInfo: {
-
+        user: {}
       }
     }
   },

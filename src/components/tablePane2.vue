@@ -6,7 +6,7 @@
         <el-button
           v-for="(item) in dataSource.tool"
           :key="item.key"
-
+          v-permission="item.permission!==undefined?[item.permission]:[]"
           class="filter-item"
           :style="{'background':item.bgColor,borderColor:item.bgColor}"
           :type="item.type || 'primary'"
@@ -145,7 +145,9 @@
 </template>
 
 <script>
+import permission from '@/directive/permission/index.js' // 权限判断指令
 export default {
+  directives: { permission },
   // 接收父组件传递过来的值
   props: {
     //  表格数据和表格部分属性的对象

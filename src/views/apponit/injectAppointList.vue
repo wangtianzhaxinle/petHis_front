@@ -96,19 +96,19 @@ export default {
             {
               label: '挂起', // 操作名称
               type: 'info',
-              permission: 'deleteRow', // 后期这个操作的权限，用来控制权限
+
               handleRow: this.deleteRow
             },
             {
               label: '诊断', // 操作名称
               type: 'info',
-              permission: 'diagnose', // 后期这个操作的权限，用来控制权限
+
               handleRow: this.diagnose
             },
             {
               label: '提醒', // 操作名称
               type: 'info',
-              permission: 'deleteRow', // 后期这个操作的权限，用来控制权限
+
               handleRow: this.deleteRow
             }
           ]

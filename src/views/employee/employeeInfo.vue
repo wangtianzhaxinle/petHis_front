@@ -62,18 +62,16 @@
       :before-close="handleClose"
     >
       <el-form ref="empForm" :model="employee" :rules="empRules" label-width="100px" class="demo-ruleForm">
-        <el-form-item v-if="submitType==='edit'" label="用户id" prop="userid">
+
+        <el-form-item v-if="submitType==='edit'" label="用户" prop="userid">
           <el-input v-model="employee.userid" />
         </el-form-item>
         <el-form-item v-if="submitType==='add'" label="用户id" prop="userid">
           <el-select
             v-model="employee.userid"
             filterable
-            remote
-            reserve-keyword
+
             placeholder="请输入用户名"
-            :remote-method="remoteMethod"
-            :loading="userlodading"
           >
             <el-option
               v-for="item in options"
@@ -153,10 +151,184 @@
 
         <el-form-item>
           <el-button type="primary" @click="submitEmpForm">提交</el-button>
-          <!-- <el-button @click="resetForm('ruleForm')">重置</el-button> -->
+          <el-button @click="resetForm('ruleForm')">重置</el-button>
         </el-form-item>
 
       </el-form>
+    </el-dialog>
+
+    <!-- <el-dialog
+      :title="title"
+      :visible.sync="empDialogVisible"
+      width="50%"
+      :before-close="handleClose"
+    >
+      <el-form ref="userEmpForm" :inline="true" :model="useremployee" :rules="empRules" label-width="100px" class="demo-ruleForm">
+        <er-row>
+        <el-form-item label="头像" prop="user.avatar">
+          <el-upload
+            ref="pictureUpload"
+            class="avatar-uploader"
+            action="#"
+            list-type="picture-card"
+            :limit="1"
+            :http-request="uploadImg"
+            :file-list="filelist"
+            :before-upload="beforeUpload"
+          >
+            <i slot="default" class="el-icon-plus" />
+            <div slot="file" slot-scope="{file}">
+              <img
+                class="el-upload-list__item-thumbnail"
+                :src="file.url"
+                alt=""
+              >
+              <span class="el-upload-list__item-actions">
+                <span
+                  class="el-upload-list__item-preview"
+                  @click="handlePictureCardPreview(file)"
+                >
+                  <i class="el-icon-zoom-in" />
+                </span>
+                <span
+                  class="el-upload-list__item-delete"
+                  @click="handleRemove(file)"
+                >
+                  <i class="el-icon-delete" />
+                </span>
+
+              </span>
+            </div>
+          </el-upload>
+        </el-form-item>
+        <el-form-item label="照片" prop="employee.image">
+          <el-upload
+            ref="pictureUpload"
+            class="avatar-uploader"
+            action="#"
+            list-type="picture-card"
+            :limit="1"
+            :http-request="uploadImg"
+            :file-list="filelist"
+          >
+
+            <i slot="default" class="el-icon-plus" />
+            <div slot="file" slot-scope="{file}">
+              <img
+                class="el-upload-list__item-thumbnail"
+                :src="file.url"
+                alt=""
+              >
+              <span class="el-upload-list__item-actions">
+                <span
+                  class="el-upload-list__item-preview"
+                  @click="handlePictureCardPreview(file)"
+                >
+                  <i class="el-icon-zoom-in" />
+                </span>
+                <span
+                  class="el-upload-list__item-delete"
+                  @click="handleRemove(file)"
+                >
+                  <i class="el-icon-delete" />
+                </span>
+
+              </span>
+            </div>
+          </el-upload>
+        </el-form-item>
+        </er-row>
+        <er-row>
+
+          <el-col :span="12">
+
+            <el-form-item label="用户id">
+              <el-input v-model="useremployee.user.userid" />
+            </el-form-item>
+            <el-form-item label="姓名" prop="user.name">
+              <el-input v-model="useremployee.user.name" />
+            </el-form-item>
+
+            <el-form-item label="年龄" prop="user.age">
+              <el-input v-model.number="useremployee.user.age" />
+            </el-form-item>
+            <el-form-item label="用户名" prop="user.username">
+              <el-input v-model="useremployee.user.username" />
+            </el-form-item>
+
+            <el-form-item label="密码" prop="user.password">
+              <el-input v-model="useremployee.user.password" />
+            </el-form-item>
+            <el-form-item label="性别" prop="user.sex">
+              <el-radio-group v-model="useremployee.user.sex">
+                <el-radio :label="1">男</el-radio>
+                <el-radio :label="0">女</el-radio>
+              </el-radio-group>
+            </el-form-item>
+            <el-form-item label="手机号" prop="user.phonenumber">
+              <el-input v-model.number="useremployee.user.phonenumber" />
+            </el-form-item>
+            <el-form-item label="地址" prop="user.address">
+              <el-input v-model="useremployee.user.address" />
+            </el-form-item>
+            <el-form-item v-if="submitType==='edit'" label="注册时间" required>
+
+              <el-col :span="11">
+                <el-form-item prop="user.createtime">
+                  <el-date-picker v-model="useremployee.user.createtime" placeholder="选择日期" style="width: 100%;" />
+                </el-form-item>
+              </el-col>
+            </el-form-item>
+            <el-form-item label="电子邮件" prop="user.email">
+              <el-input v-model="useremployee.user.email" />
+            </el-form-item>
+          </el-col>
+
+          <el-col :span="12">
+            <el-form-item label="用户id" prop="employee.userid">
+              <el-input v-model="useremployee.employee.userid" />
+            </el-form-item>
+            <el-form-item label="入职日期" required>
+              <el-col :span="11">
+                <el-form-item prop="employee.hiredate">
+                  <el-date-picker v-model="useremployee.employee.hiredate" placeholder="选择日期" style="width: 100%;" />
+                </el-form-item>
+              </el-col>
+            </el-form-item>
+
+            <el-form-item label="薪水" prop="employee.salary">
+              <el-input v-model.number="useremployee.employee.salary" />
+            </el-form-item>
+            <el-form-item label="银行卡" prop="employee.bankcard">
+              <el-input v-model="useremployee.employee.bankcard" />
+            </el-form-item>
+
+            <el-form-item label="最大容量" prop="employee.maxAppoint">
+              <el-input v-model.number="useremployee.employee.maxAppoint" />
+            </el-form-item>
+            <el-form-item label="身份证" prop="employee.card">
+              <el-input v-model="useremployee.employee.card" />
+            </el-form-item>
+            <el-form-item label="籍贯" prop="employee.nativePlace">
+              <el-input v-model="useremployee.employee.nativePlace" />
+            </el-form-item>
+            <el-form-item label="学历" prop="employee.educationBackground">
+              <el-input v-model="useremployee.employee.educationBackground" />
+            </el-form-item>
+
+          </el-col>
+
+        </er-row>
+
+        <el-form-item>
+          <el-button type="primary" @click="submitEmpForm">提交</el-button>
+          <el-button @click="resetForm('ruleForm')">重置</el-button>
+        </el-form-item>
+
+      </el-form>
+    </el-dialog> -->
+    <el-dialog :visible.sync="dialogVisible">
+      <img width="100%" :src="dialogImageUrl" alt="">
     </el-dialog>
   </div>
 </template>
@@ -169,6 +341,7 @@ import { getUserInfoList } from '@/api/user'
 import tablePane from '@/components/tablePane.vue'
 import { getAllRoleList, getRoleByUserId, updateRoleByUserId } from '@/api/role'
 import { upload } from '@/api/upload'
+// import { checkUsername } from '@/utils/validate'
 
 export default {
   name: 'EmployeeInfo',
@@ -183,9 +356,17 @@ export default {
       roleDialogVisible: false,
       title: '',
       empDialogVisible: false,
+      userEmpDialogVisible: false,
       submitType: '',
       userlodading: '',
       employee: {},
+      dialogImageUrl: '',
+      dialogVisible: false,
+      baseurl: 'http://localhost:8080/petHis',
+      useremployee: {
+        user: {},
+        employee: {}
+      },
       defaultProps: {
         label: 'description'
       },
@@ -199,6 +380,7 @@ export default {
 
       },
       empRules: {
+
         image: [
           { required: true, message: '请选择图片', trigger: 'blur' }
         ],
@@ -232,23 +414,31 @@ export default {
         educationBackground: [
           { required: true, message: '请输入学历', trigger: 'blur' }
         ]
+
       },
       // 搜索栏配置
 
       // 表格配置
       dataSource: {
-        tool: [{
-          name: '新增员工',
-          key: 'addEmployee',
-          // permission: 'addEmployee',
-          handleClick: this.addEmployee
-        },
-        {
-          name: '批量删除',
-          key: 'batchDelete',
-          // permission: 'batchDeleteEmployee',
-          handleClick: this.batchDelete
-        }
+        tool: [
+          // {
+          //   name: '将用户添加为员工',
+          //   key: 'addEmployee',
+          //   // permission: 'addEmployee',
+          //   handleClick: this.addEmployee
+          // },
+          {
+            name: '添加员工',
+            key: 'addEmployee',
+            // permission: 'addEmployee',
+            handleClick: this.addEmployee
+          },
+          {
+            name: '批量删除',
+            key: 'batchDelete',
+            // permission: 'batchDeleteEmployee',
+            handleClick: this.batchDelete
+          }
         ],
         data: [], // 表格数据
         cols: [
@@ -378,6 +568,7 @@ export default {
       this.searchEmployee.user.address = null
       this.searchEmployee.user.sex = null
       this.searchEmployee.nativeplace = null
+      this.getList()
     },
     search() {
       this.getList()
@@ -388,9 +579,10 @@ export default {
       done()
     },
     resetForm() {
-      if (this.roleDialogVisible) {
+      // if (this.roleDialogVisible) {
 
-      } if (this.empDialogVisible) {
+      // }
+      if (this.empDialogVisible) {
         this.$refs.empForm.resetFields()
         // 这里userid未绑定rules的prop无法用resetField重置
         this.employee = {}
@@ -421,6 +613,7 @@ export default {
           this.dataSource.pageData.total = res.total
           this.dataSource.data = res.data
           this.getRoleList()
+          this.getUserByNoEmployee()
           // console.log(res.data)
         } else {
           this.dataSource.data = []
@@ -434,21 +627,40 @@ export default {
         this.roleData = res.data
       })
     },
-    remoteMethod(query) {
-      if (query !== '') {
-        this.loading = true
-        setTimeout(() => {
-          this.userlodading = false
-          const data = { name: query }
-          getUserInfoList(data).then(res => {
-            if (res.total > 0) {
-              this.options = res.data.records
-            }
-          })
-        }, 200)
-      } else {
-        this.options = []
-      }
+    // remoteMethod(query) {
+    //   if (query !== '') {
+    //     this.loading = true
+    //     setTimeout(() => {
+    //       this.userlodading = false
+    //       const data = { name: query, isEmployee: 0 }
+    //       getUserInfoList(data).then(res => {
+    //         if (res.total > 0) {
+    //           this.options = res.data.records
+    //         } else {
+    //           this.options = []
+    //         }
+    //       })
+    //     }, 200)
+    //   } else {
+    //     const data = { name: null, isEmployee: 0 }
+    //     getUserInfoList(data).then(res => {
+    //       if (res.total > 0) {
+    //         this.options = res.data.records
+    //       } else {
+    //         this.options = []
+    //       }
+    //     })
+    //   }
+    // },
+    getUserByNoEmployee() {
+      const data = { name: null, isEmployee: 0 }
+      getUserInfoList(data).then(res => {
+        if (res.total > 0) {
+          this.options = res.data.records
+        } else {
+          this.options = []
+        }
+      })
     },
     submitEmpForm() {
       this.$refs.empForm.validate(valid => {
@@ -492,6 +704,11 @@ export default {
       this.filelist = []
       this.employee = {}
     },
+    // addUserEmployee() {
+    //   this.title = '添加员工'
+    //   this.userEmpDialogVisible = true
+    //   this.submitType = 'add'
+    // },
     editEmployee(index, row) {
       this.title = '修改员工'
       this.empDialogVisible = true
@@ -504,7 +721,7 @@ export default {
       })
     },
     batchDelete() {
-      const ids = this.selected.map((employee) => employee.employeeid)
+      const ids = this.selected.map((employee) => employee.userid)
       deleteEmployeeByIds(ids).then(res => {
         if (res.total > 0) {
           this.getList()
@@ -512,7 +729,10 @@ export default {
       })
     },
     deleteEmployee(index, row) {
-      deleteEmployeeById(row.employeeid).then(res => {
+      const data = {
+        userid: row.userid
+      }
+      deleteEmployeeById(data).then(res => {
         if (res.total > 0) {
           this.getList()
         }
@@ -599,13 +819,13 @@ export default {
           // alert(res.message)
           if (this.userDialogVisible) { this.userInfo.avatar = this.baseurl + res.data }
           if (this.empDialogVisible) { this.employee.image = this.baseurl + res.data }
-          this.fake.end()
+          // this.fake.end()
           // console.log(this.medicine)
         }
       })
     },
     handlePictureCardPreview(file) {
-      this.dialogImageUrl = this.userInfo.avatar
+      this.dialogImageUrl = this.employee.image
       this.dialogVisible = true
     },
     handleRemove(file) {

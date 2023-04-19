@@ -127,3 +127,61 @@ export function cancelAppoint(id) {
 
   })
 }
+
+export function diagnoses(params) {
+  return request({
+    url: '/appoint/diagnoses',
+    method: 'get',
+    params
+
+  })
+}
+export function finishInjection(params) {
+  return request({
+    url: '/appoint/finishInjection',
+    method: 'get',
+    params
+
+  })
+}
+export function endDiagnoses(params) {
+  return request({
+    url: '/appoint/endDiagnoses',
+    method: 'get',
+    params
+
+  })
+}
+
+export function remind(params) {
+  return request({
+    url: '/appoint/remind',
+    method: 'get',
+    params
+
+  })
+}
+export function deleteAppointById(params) {
+  return request({
+    url: '/appoint/deleteAppointById',
+    method: 'get',
+    params
+
+  })
+}
+export function deleteAppointByIds(data) {
+  return request({
+    url: '/appoint/deleteAppointByIds',
+    method: 'post',
+    data
+
+  })
+}
+export function finishDeposit(params) {
+  return request({
+    url: '/appoint/finishDeposit',
+    method: 'get',
+    params
+
+  })
+}

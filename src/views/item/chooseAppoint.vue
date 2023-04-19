@@ -228,7 +228,7 @@ export default {
     this.itemid = this.$route.query.itemid
     this.roleid = this.$route.query.roleid
     if (typeof (this.itemid) === 'undefined' || typeof (this.roleid) === 'undefined') {
-      this.$router.go(-1)
+      this.$router.push({ path: '/itemManager/itemInfo' })
     } else {
       moment.updateLocale()
       this.getList(this.menuTabsValue)

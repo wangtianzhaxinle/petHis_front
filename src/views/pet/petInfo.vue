@@ -42,7 +42,7 @@
       :before-close="handleClose"
     >
       <el-form ref="petForm" :model="petInfo" :rules="rules" label-width="100px" class="demo-ruleForm">
-        <el-form-item label="宠物id">
+        <el-form-item label="宠物id" hidden>
           <el-input v-model="petInfo.petid" />
         </el-form-item>
 
@@ -90,7 +90,7 @@
 
         <el-form-item>
           <el-button type="primary" @click="submitForm">提交</el-button>
-          <!-- <el-button @click="resetForm('ruleForm')">重置</el-button> -->
+          <el-button @click="resetForm()">重置</el-button>
         </el-form-item>
 
       </el-form>
@@ -269,6 +269,7 @@ export default {
       this.searchPet.user.name = null
       this.searchPet.sex = null
       this.searchPet.isHealth = null
+      this.getList()
     },
     search() {
       this.getList()

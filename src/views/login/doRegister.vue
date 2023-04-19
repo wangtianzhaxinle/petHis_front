@@ -147,14 +147,14 @@
         />
       </el-form-item>
       <el-form-item
-        prop="VerificationCode"
+        prop="code"
       >
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
         <el-input
-          ref="VerificationCode"
-          v-model="registerForm.VerificationCode"
+          ref="code"
+          v-model="registerForm.code"
           placeholder="验证码"
           name="VerificationCode"
           type="text"
@@ -176,7 +176,7 @@
 </template>
 
 <script>
-// import { registerUser } from '@/api/user'
+import { registerUser } from '@/api/user'
 import { checkUsername } from '@/utils/validate'
 export default {
 
@@ -284,7 +284,7 @@ export default {
         password: '',
         confirmPassword: '',
         phonenumber: '',
-        VerificationCode: ''
+        code: ''
 
       },
       /*
@@ -374,7 +374,7 @@ export default {
           // { min: 1, max: 11, message: '手机号码应为11位数字' },
           { validator: telCheck, trigger: 'blur' }
         ],
-        VerificationCode: [
+        code: [
           { required: true, trigger: 'blur', message: '请输入验证码' }
         ]
       }
@@ -394,7 +394,11 @@ export default {
     handleRegister() {
       this.$refs.registerForm.validate(valid => {
         if (valid) {
-          console.log('success')
+          // console.log('success')
+          const data = this.registerForm
+          registerUser(data).then(res => {
+
+          })
         } else {
           console.log('error submit!!')
           return false

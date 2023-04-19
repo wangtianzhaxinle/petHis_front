@@ -66,6 +66,7 @@ https://blog.csdn.net/weixin_44345975/article/details/123697991
             :limit="1"
             :http-request="uploadImg"
             :file-list="filelist"
+            :before-upload="beforeUpload"
           >
 
             <!-- <div slot="file" slot-scope="{file}">
@@ -118,8 +119,12 @@ https://blog.csdn.net/weixin_44345975/article/details/123697991
           <el-input v-model.number="medicine.price" />
         </el-form-item>
 
-        <el-form-item label="数量" prop="amount">
+        <el-form-item label="实际库存" prop="amount">
           <el-input v-model.number="medicine.amount" />
+        </el-form-item>
+
+        <el-form-item v-if="dialogtype==='edit'" label="当前库存" prop="nowAmount">
+          <el-input v-model.number="medicine.nowAmount" />
         </el-form-item>
         <el-form-item label="单位" prop="unit">
           <el-input v-model="medicine.unit" />
@@ -143,7 +148,7 @@ https://blog.csdn.net/weixin_44345975/article/details/123697991
         </el-form-item>
 
         <el-form-item>
-          <el-button type="primary" @click="submitForm">添加</el-button>
+          <el-button type="primary" @click="submitForm">提交</el-button>
           <el-button @click="resetForm('MedicineForm')">重置</el-button>
         </el-form-item>
 
@@ -157,9 +162,9 @@ https://blog.csdn.net/weixin_44345975/article/details/123697991
 </template>
 
 <script>
-import { getMedicineList, addMedicineInfo, deleteMedicineById, updateMedicineInfo } from '@/api/medicine'
+import { getMedicineList, addMedicineInfo, deleteMedicineById, updateMedicineInfo, deleteMedicineByIds } from '@/api/medicine'
 import { upload } from '@/api/upload'
-
+import rules from '@/utils/rules'
 import tablePane from '@/components/tablePane.vue'
 import store from '@/store'
 export default {
@@ -186,6 +191,7 @@ export default {
         authenticationcode: null,
         isprescription: null
       },
+      editAuthenticationcode: '',
       rules: {
 
         name: [
@@ -229,6 +235,26 @@ export default {
             trigger: ['blur', 'change']
           }
         ],
+        nowAmount: [
+          { required: true, message: '请输入数量', trigger: 'blur' },
+          { type: 'number', message: '请输入数字', trigger: 'blur' },
+          {
+            validator(rule, value, callback) {
+              if (value > 0) {
+                callback()
+              } else {
+                callback(new Error('请输入正确的数量'))
+              }
+            },
+            trigger: ['blur', 'change']
+          },
+          { validator: (rule, value, callback) => {
+            rules.checkMedicineNowAmount(value, callback, this.medicine.amount, this.medicine.nowAmount)
+          },
+          trigger: 'blur' }
+
+        ],
+
         description: [
           { message: '请输入描述', trigger: 'blur' }
         ],
@@ -237,7 +263,13 @@ export default {
 
         ],
         authenticationcode: [
-          { required: true, message: '请输入批准文号', trigger: 'blur' }
+          { required: true, message: '请输入批准文号', trigger: 'blur' },
+          {
+            validator: (rule, value, callback) => {
+              rules.checkAuthenticationcode(value, callback, this.editAuthenticationcode)
+            },
+            trigger: 'blur'
+          }
 
         ],
         isprescription: [
@@ -257,6 +289,7 @@ export default {
         price: '',
         amount: '',
         description: '',
+        nowAmount: '',
         exp: '',
         authenticationcode: '',
         image: '',
@@ -412,6 +445,7 @@ export default {
       this.searchMedicine.company = null
       this.searchMedicine.authenticationcode = null
       this.searchMedicine.isprescription = null
+      this.getList()
     },
     search() {
       this.getList()
@@ -429,6 +463,28 @@ export default {
         })
         .catch(_ => {})
     },
+    beforeUpload(file) {
+      // this.progressShow = true
+      // this.fake = new FakeProgress({
+      //   timeConstant: 10000,
+      //   autoStart: true
+      // })
+      const isJPG = file.type === 'image/jpeg'
+      const isLt2M = file.size / 1024 < 200
+      console.log(file.type)
+      console.log(file.size)
+      if (!isJPG) {
+        this.$message.error('上传头像图片只能是 JPG 格式!')
+        return false
+      }
+      if (!isLt2M) {
+        this.$message.error('上传头像图片大小不能超过 200k!')
+        return false
+      }
+
+      // console.log(isJPG && isLt2M)
+      return isJPG && isLt2M
+    },
 
     uploadImg(file) {
       /* const instance1 = axios.create({
@@ -445,7 +501,7 @@ export default {
       })*/
       upload(form).then(res => {
         if (res.total > 0) {
-          alert(res.message)
+          // alert(res.message)
           this.medicine.image = this.baseurl + res.data
           console.log(this.medicine)
         }
@@ -477,7 +533,7 @@ export default {
           if (this.dialogtype === 'create') {
             addMedicineInfo(MedicineInfo).then(res => {
             // alert(this.$route.path)
-              alert(res.message)
+              // alert(res.message)
               this.addDialogVisible = false
               this.resetForm()
               // this.$router.go(0)
@@ -493,8 +549,6 @@ export default {
 
             console.log(MedicineInfo)
             updateMedicineInfo(MedicineInfo).then(res => {
-            // alert(this.$route.path)
-              alert(res.message)
               this.addDialogVisible = false
               this.resetForm()
               // this.$router.go(0)
@@ -550,6 +604,7 @@ export default {
       // this.filelist.push({ 'url': this.medicine.image })
       this.dialogtype = 'edit'
       console.log('editMedicine')
+      this.editAuthenticationcode = row.authenticationcode
       this.addDialogVisible = true
       // console.log('row')
       // console.log(row)
@@ -589,12 +644,41 @@ export default {
       // this.filelist.push({ 'url': this.medicine.image })
     },
     deleteMedicine(index, row) {
-      deleteMedicineById(row.medicineid
-      ).then(res => {
-        alert(res.message)
-        if (res.total > 0) {
-          this.getList()
-        }
+      this.$confirm('确定要删除该药品信息?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteMedicineById(row.medicineid
+        ).then(res => {
+          if (res.total > 0) {
+            this.getList()
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
+    },
+    batchDelete() {
+      this.$confirm('确定要删除选中的药品信息?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        const ids = this.selected.map((medicine) => medicine.medicineid)
+        deleteMedicineByIds(ids).then(res => {
+          if (res.total > 0) {
+            this.getList()
+          }
+        })
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
       })
     },
     // 获取列表数据

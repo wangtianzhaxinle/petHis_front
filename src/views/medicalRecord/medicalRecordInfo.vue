@@ -1,6 +1,23 @@
 <template>
 
   <div class="app-container">
+    <div>
+      <div class="filter-container">
+        <el-input v-model="searchMedicalRecord.appointid" style="width:200px" class="filter-item" placeholder="请输入预约id" />
+        <el-input v-model="searchMedicalRecord.pet.name" style="width:200px" class="filter-item" placeholder="请输入宠物名" />
+        <el-input v-model="searchMedicalRecord.emp.name" style="width:200px" class="filter-item" placeholder="请输入员工名" />
+
+        <div class="filter-btn">
+          <el-button class="filter-item" type="primary" @click="search">
+            搜索
+          </el-button>
+          <el-button class="filter-item" type="warning" @click="resetFilter">
+            重置
+          </el-button>
+        </div>
+      </div>
+
+    </div>
     <table-pane
       :data-source="dataSource"
       @changeSize="changeSize"
@@ -81,7 +98,7 @@
 
         <el-form-item>
           <el-button type="primary" @click="updateMedicalRecord">提交</el-button>
-
+          <el-button type="primary" @click="resetForm">重置</el-button>
         </el-form-item>
       </el-form>
     </el-dialog>
@@ -95,6 +112,7 @@ import tablePane from '@/components/tablePane.vue'
 // import moment from 'moment'
 import 'moment/locale/zh-cn'
 import store from '@/store'
+// import axios from 'axios'
 import { getMedicalRecordList, updateMedicalRecordById } from '@/api/medicalRecord'
 export default {
   name: 'MedicalRecordinfo',
@@ -108,6 +126,15 @@ export default {
       title: '',
       diagnoseModel: {
 
+      },
+      searchMedicalRecord: {
+        appointid: null,
+        pet: {
+          name: null
+        },
+        emp: {
+          name: null
+        }
       },
       rules: {
         medicalhistory: [
@@ -138,11 +165,11 @@ export default {
             prop: 'medicalrecordid',
             width: 100
           },
-          {
-            label: '宠物id',
-            prop: 'pet.petid',
-            width: 100
-          },
+          // {
+          //   label: '宠物id',
+          //   prop: 'pet.petid',
+          //   width: 100
+          // },
           {
             label: '预约id',
             prop: 'appointid',
@@ -156,12 +183,12 @@ export default {
             width: 100
 
           },
-          {
-            label: '医生id',
-            prop: 'appoint.employeeid',
-            width: 100
+          // {
+          //   label: '医生id',
+          //   prop: 'appoint.employeeid',
+          //   width: 100
 
-          },
+          // },
           {
             label: '医生名',
             prop: 'emp.name',
@@ -169,14 +196,14 @@ export default {
           },
           {
             label: '病史',
-            prop: 'medicalhistory',
-            width: 200
+            prop: 'medicalhistory'
+
           },
 
           {
             label: '诊断',
-            prop: 'diagnose',
-            width: 200
+            prop: 'diagnose'
+
           },
           {
             label: '就诊时间',
@@ -239,20 +266,40 @@ export default {
   },
   methods: {
     handleClose(done) {
-      this.resetForm()
-      // 这里userid未绑定rules的prop无法用resetField重置
+      this.$confirm('确认关闭？')
+        .then(_ => {
+          this.resetForm()
+          // 这里userid未绑定rules的prop无法用resetField重置
 
-      done()
+          done()
+        })
+        .catch(_ => {})
     },
     resetForm() {
       this.$refs.diagnoseForm.resetFields()
       this.diagnoseModel = {}
     },
+    resetFilter() {
+      this.searchMedicalRecord.appointid = null
+      this.searchMedicalRecord.pet.name = null
+      this.searchMedicalRecord.emp.name = null
+      this.getList()
+    },
+    search() {
+      this.getList()
+    },
     // 获取列表数据
     getList() {
       const data = {
         pageSize: this.dataSource.pageData.pageSize,
-        pageNum: this.dataSource.pageData.pageNum
+        pageNum: this.dataSource.pageData.pageNum,
+        appointid: this.searchMedicalRecord.appointid,
+        pet: {
+          name: this.searchMedicalRecord.pet.name
+        },
+        emp: {
+          name: this.searchMedicalRecord.emp.name
+        }
 
       }
       this.dataSource.loading = true
@@ -300,8 +347,46 @@ export default {
       })
     },
     downloadMedicalRecord(index, row) {
-
+      const link = document.createElement('a')
+      link.style.display = 'none'
+      link.href = 'http://localhost:8080/petHis/' + 'downloading/PDF/' + row.appointid
+      document.body.appendChild(link)
+      link.click()
     },
+    // downloadMedicalRecord(index, row) {
+    //   // 请求类型 responseType: "blob",
+    //   axios({
+    //     methods: 'get',
+    //     url: 'http://localhost:8080/petHis/downloading/PDF/' + row.appointid,
+
+    //     responseType: 'blob'
+    //   }).then((res) => {
+    //     const content = res.data
+    //     this.pdfUrl = window.URL.createObjectURL(
+    //       new Blob([content], { type: 'application/pdf' })
+    //     )
+    //     // window.open(this.pdfUrl);
+    //     var date = new Date().getTime()
+    //     var ifr = document.createElement('iframe')
+    //     ifr.style.frameborder = 'no'
+    //     ifr.style.display = 'none'
+    //     ifr.style.pageBreakBefore = 'always'
+    //     ifr.setAttribute('id', 'printPdf' + date)
+    //     ifr.setAttribute('name', 'printPdf' + date)
+    //     ifr.src = this.pdfUrl
+    //     document.body.appendChild(ifr)
+    //     this.doPrint('printPdf' + date)
+    //     window.URL.revokeObjectURL(ifr.src) // 释放URL 对象
+    //   })
+    // },
+    // // 打印
+    // doPrint(val) {
+    //   var ordonnance = document.getElementById(val).contentWindow
+    //   setTimeout(() => {
+    //     ordonnance.print()
+    //     this.pdfLoading = false
+    //   }, 100)
+    // },
     // 搜索层事件
 
     // 子组件通信
@@ -335,3 +420,16 @@ export default {
 
 </script>
 
+<style  scoped lang='scss'>
+.filter-item{
+  margin-left: 10px;
+  display: inline-block;
+}
+.filter-container .filter-item:nth-of-type(1){
+  margin-left: 0px;
+}
+.filter-btn{
+  display: inline-block;
+  margin-left: 10px;
+}
+</style>

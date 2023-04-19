@@ -51,3 +51,18 @@ export function addPrescribe(data) {
     data
   })
 }
+
+export function finishPrescribe(params) {
+  return request({
+    url: '/prescribe/finishPrescribe',
+    method: 'get',
+    params
+  })
+}
+export function addPrescribeList(data) {
+  return request({
+    url: '/prescribe/addPrescribeList',
+    method: 'post',
+    data
+  })
+}

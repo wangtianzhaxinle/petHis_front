@@ -22,3 +22,11 @@ export function submitCode(data) {
     data
   })
 }
+
+export function getPhoneCode(params) {
+  return request({
+    url: '/code/getPhoneCode',
+    method: 'get',
+    params
+  })
+}

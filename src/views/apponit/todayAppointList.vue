@@ -17,8 +17,8 @@
         </el-select>
         <el-select v-model="searchAppoint.status" style="width:200px" class="filter-item" placeholder="预约状态">
 
-          <el-option label="未确定" value="0" />
-          <el-option label="已确定" value="1" />
+          <el-option label="待确认" value="0" />
+          <el-option label="已确认" value="1" />
           <el-option label="爽约" value="2" />
           <el-option label="已完成" value="3" />
           <el-option label="已取消" value="4" />
@@ -44,20 +44,20 @@
       <template v-slot:operator="scopedata">
         <div class="btn">
           <el-button
-            v-if="scopedata.scope.row.itemid===1"
+            v-if="scopedata.scope.row.itemid===1 && scopedata.scope.row.status===1"
             type="info"
             size="mini"
-            @click.native.prevent="editRoom(scopedata.scope.$index, scopedata.scope.row)"
+            @click.native.prevent="finishDeposit(scopedata.scope.$index, scopedata.scope.row)"
           >
 
             办理托管
           </el-button>
 
           <el-button
-            v-if="scopedata.scope.row.itemid===1"
+            v-if="scopedata.scope.row.itemid===1 && scopedata.scope.row.status===1"
             type="success"
             size="mini"
-            @click.native.prevent="editRoom(scopedata.scope.$index, scopedata.scope.row)"
+            @click.native.prevent="remind(scopedata.scope.$index, scopedata.scope.row)"
           >
 
             提醒
@@ -73,7 +73,7 @@
 
 <script>
 
-import { getTodayAppointList } from '@/api/appoint'
+import { getTodayAppointList, remind, finishDeposit } from '@/api/appoint'
 import tablePane from '@/components/tablePane2.vue'
 import store from '@/store'
 import { getItemInfoList } from '@/api/item'
@@ -126,15 +126,36 @@ export default {
             width: 100
 
           },
+          // {
+          //   label: '主人电话',
+          //   prop: 'user.phonenumber',
+          //   width: 150
+
+          // },
 
           {
-            label: '员工名',
+            label: '负责员工',
             prop: 'emp.name',
             width: 100
           },
           {
-            label: 'status',
-            prop: 'status'
+            label: '状态',
+            prop: 'status',
+            isCodeTableFormatter: function(val) { // 过滤器
+              if (val.status === 0) {
+                return '待确认'
+              } else if (val.status === 1) {
+                return '已确认'
+              } else if (val.status === 2) {
+                return '爽约'
+              } else if (val.status === 3) {
+                return '已完成'
+              } else if (val.status === 4) {
+                return '已取消'
+              } else if (val.status === 5) {
+                return '进行中'
+              }
+            }
           },
 
           {
@@ -183,6 +204,7 @@ export default {
       // this.searchAppoint.appointdate = null
       this.searchAppoint.status = null
       this.searchAppoint.itemid = null
+      this.getList()
     },
     search() {
       this.getList()
@@ -228,6 +250,25 @@ export default {
       getItemInfoList(data).then(res => {
         if (res.total > 0) {
           this.itemOptions = res.data
+        }
+      })
+    },
+    remind(index, row) {
+      const data = {
+        phonenumber: row.user.phonenumber
+      }
+      remind(data).then(res => {
+
+      })
+    },
+    finishDeposit(index, row) {
+      const data = {
+        appointid: row.appointid,
+        userid: this.userId
+      }
+      finishDeposit(data).then(res => {
+        if (res.total > 0) {
+          this.getList()
         }
       })
     },

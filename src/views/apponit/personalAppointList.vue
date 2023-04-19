@@ -15,8 +15,8 @@
           />
         </el-select>
         <el-select v-model="searchAppoint.status" style="width:200px" class="filter-item" placeholder="预约状态">
-          <el-option label="未确定" value="0" />
-          <el-option label="已确定" value="1" />
+          <el-option label="待确认" value="0" />
+          <el-option label="已确认" value="1" />
           <el-option label="爽约" value="2" />
           <el-option label="已完成" value="3" />
           <el-option label="已取消" value="4" />
@@ -50,7 +50,7 @@
             @click.native.prevent="confirm(scopedata.scope.$index, scopedata.scope.row)"
           >
 
-            确认预约
+            确认
           </el-button>
           <el-button
             v-if="scopedata.scope.row.status===0"
@@ -62,7 +62,7 @@
             取消预约
           </el-button>
           <el-button
-            v-if="scopedata.scope.row.status===3"
+            v-if="scopedata.scope.row.status===3&&scopedata.scope.row.itemid===2"
             type="warning"
             size="mini"
             @click.native.prevent="downloadMedicalRecord(scopedata.scope.$index, scopedata.scope.row)"
@@ -138,18 +138,25 @@ export default {
           //   width: 100
           // },
           {
-            label: '员工名',
+            label: '负责员工',
             prop: 'emp.name',
-            width: 100
+            width: 100,
+            isCodeTableFormatter: function(val) {
+              if (val.emp === null) {
+                return '无'
+              } else {
+                return val.emp.name
+              }
+            }
           },
           {
-            label: 'status',
+            label: '状态',
             prop: 'status',
             isCodeTableFormatter: function(val) { // 过滤器
               if (val.status === 0) {
-                return '未确定'
+                return '待确认'
               } else if (val.status === 1) {
-                return '已确定'
+                return '已确认'
               } else if (val.status === 2) {
                 return '爽约'
               } else if (val.status === 3) {
@@ -207,6 +214,7 @@ export default {
       this.searchAppoint.appointdate = null
       this.searchAppoint.status = null
       this.searchAppoint.itemid = null
+      this.getList()
     },
     search() {
       this.getList()
@@ -260,7 +268,7 @@ export default {
 
       confirmAppoint(appointid).then(res => {
         if (res.total > 0) {
-          alert(res.message)
+          // alert(res.message)
           this.getList()
         }
       })
@@ -273,8 +281,12 @@ export default {
         }
       })
     },
-    downloadMedicalRecord() {
-
+    downloadMedicalRecord(index, row) {
+      const link = document.createElement('a')
+      link.style.display = 'none'
+      link.href = 'http://localhost:8080/petHis/' + 'downloading/PDF/' + row.appointid
+      document.body.appendChild(link)
+      link.click()
     },
 
     // 搜索层事件

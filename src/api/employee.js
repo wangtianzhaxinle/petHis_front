@@ -63,13 +63,11 @@ export function updateEmployeeById(data) {
   })
 }
 
-export function deleteEmployeeById(id) {
+export function deleteEmployeeById(params) {
   return request({
     url: '/employee/deleteEmployeeById',
     method: 'delete',
-    params: {
-      id: id
-    }
+    params
 
   })
 }

@@ -6,7 +6,7 @@
         <el-button
           v-for="(item) in dataSource.tool"
           :key="item.key"
-
+          v-permission="item.permission!==undefined?[item.permission]:[]"
           class="filter-item"
           :style="{'background':item.bgColor,borderColor:item.bgColor}"
           :type="item.type || 'primary'"

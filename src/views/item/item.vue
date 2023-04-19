@@ -196,7 +196,7 @@ export default {
         {
           name: '全部删除',
           key: 'deleteAllItem',
-          permission: 'deleteAllItem',
+          permission: 'batchDeleteItem',
           handleClick: this.deleteAllItem
         }
         ],
@@ -396,21 +396,33 @@ export default {
     },
     deleteAllItem() {
       const ids = this.selected.map((item) => item.itemid)
-      deleteItemByIds(ids).then(res => {
+      this.$confirm('确认删除选中的项目?', '温馨提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteItemByIds(ids).then(res => {
         // alert(res.message)
-        if (res.total > 0) {
-          this.getList()
-        }
+          if (res.total > 0) {
+            this.getList()
+          }
+        })
       })
     },
     deleteItem(index, row) {
       console.log('deleteItem')
       // console.log(row)
-      deleteItembyId(row.itemid).then(res => {
+      this.$confirm('确认删除该项目?', '温馨提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteItembyId(row.itemid).then(res => {
         // alert(res.message)
-        if (res.total > 0) {
-          this.getList()
-        }
+          if (res.total > 0) {
+            this.getList()
+          }
+        })
       })
     },
 

@@ -3,11 +3,8 @@ import request from '@/utils/request'
 export function getMedicalRecordList(data) {
   return request({
     url: '/MedicalRecord/getMedicalRecordList',
-    method: 'get',
-    params: {
-      pageSize: data.pageSize,
-      pageNum: data.pageNum
-    }
+    method: 'post',
+    data
   })
 }
 export function updateMedicalRecordById(data) {
@@ -22,6 +19,23 @@ export function downloadMedicalRecord(appointid) {
   return request({
     url: '/downloading/PDF/' + appointid,
     method: 'get'
+
+  })
+}
+
+export function getMedicineRecordById(params) {
+  return request({
+    url: '/MedicalRecord/getMedicineRecordById',
+    method: 'get',
+    params
+
+  })
+}
+export function addMedicalRecord(data) {
+  return request({
+    url: '/MedicalRecord/addMedicalRecord',
+    method: 'post',
+    data
 
   })
 }

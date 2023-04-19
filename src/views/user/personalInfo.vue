@@ -29,7 +29,6 @@
           :file-list="filelist"
           :before-upload="beforeUpload"
         >
-
           <i slot="default" class="el-icon-plus" />
           <div slot="file" slot-scope="{file}">
             <img
@@ -50,7 +49,6 @@
               >
                 <i class="el-icon-delete" />
               </span>
-
             </span>
           </div>
         </el-upload>
@@ -66,7 +64,7 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item label="手机号" prop="phonenumber">
-        <el-input v-model.number="perosanlInfo.phonenumber" :disabled="disable" />
+        <el-input v-model="perosanlInfo.phonenumber" :disabled="disable" />
       </el-form-item>
       <el-form-item label="地址" prop="address">
         <el-input v-model="perosanlInfo.address" :disabled="disable" />

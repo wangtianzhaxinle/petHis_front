@@ -14,7 +14,9 @@
         <el-form-item label="宠物id" hidden>
           <el-input v-model="petInfo.petid" />
         </el-form-item>
-
+        <el-form-item label="用户id">
+          <el-input v-model="petInfo.userid" />
+        </el-form-item>
         <el-form-item label="宠物名" prop="name">
           <el-input v-model="petInfo.name" />
         </el-form-item>
@@ -28,7 +30,7 @@
           </el-radio-group>
         </el-form-item>
         <el-form-item label="年龄" prop="age">
-          <el-input v-model="petInfo.age" />
+          <el-input v-model.number="petInfo.age" />
         </el-form-item>
         <el-form-item label="性别" prop="sex">
           <el-radio-group v-model="petInfo.sex">
@@ -39,7 +41,7 @@
 
         <el-form-item>
           <el-button type="primary" @click="submitForm">提交</el-button>
-          <!-- <el-button @click="resetForm('ruleForm')">重置</el-button> -->
+          <el-button @click="resetForm()">重置</el-button>
         </el-form-item>
 
       </el-form>
@@ -59,7 +61,9 @@ export default {
     return {
       // 搜索栏配置
       userId: store.getters.userId,
-      petInfo: {},
+      petInfo: {
+
+      },
       title: '',
       petDialogVisible: false,
       submitType: '',
@@ -237,6 +241,7 @@ export default {
       this.petDialogVisible = true
       this.submitType = 'add'
       this.petInfo = {}
+      this.petInfo.userid = this.userId
     },
     editPet(index, row) {
       this.title = '修改宠物'

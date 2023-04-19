@@ -3,7 +3,7 @@
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form" auto-complete="on" label-position="left">
 
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">登录界面</h3>
       </div>
 
       <el-form-item prop="username">
@@ -56,7 +56,7 @@
         </el-row>
       </el-form-item>
 
-      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">Login</el-button>
+      <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleLogin">登录</el-button>
       <el-row style="text-align: center;margin-top: -10px;">
         <el-link type="primary" @click="doRegister">注册账号</el-link>
         <el-divider direction="vertical" />
@@ -75,6 +75,7 @@
 <script>
 import { validUsername } from '@/utils/validate'
 import { getCodeImage } from '@/api/code'
+import { v4 as uuidv4 } from 'uuid'
 
 export default {
   name: 'Login',
@@ -97,7 +98,8 @@ export default {
       loginForm: {
         username: 'admin',
         password: '111111',
-        inputCode: ''
+        inputCode: '',
+        key: ''
       },
       loginRules: {
         username: [{ required: true, trigger: 'blur', validator: validateUsername }],
@@ -106,7 +108,7 @@ export default {
       loading: false,
       passwordType: 'password',
       redirect: undefined,
-      currdatetime: '',
+      key: '',
       randCodeImage: '',
       requestCodeSuccess: '',
       imageCodePrefix: 'data:image/jpg;base64,'
@@ -139,11 +141,13 @@ export default {
 
     handleChangeCheckCode() {
       // 生成一个时间戳
-      this.currdatetime = new Date().getTime()
+      // this.key = new Date().getTime()
+      this.loginForm.key = uuidv4().replace(/-/g, '')
+      console.log(this.key)
       // 将数据绑定重置
       this.loginForm.inputCode = ''
       // 关键来了 前端发了一个请求 去服务端获取了验证码图片 看后面的代码
-      getCodeImage(this.currdatetime).then(res => {
+      getCodeImage(this.loginForm.key).then(res => {
         // console.log(666666)
         // console.log(res)
         if (res.total > 0) {

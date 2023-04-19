@@ -51,7 +51,7 @@ service.interceptors.response.use(
     // console.log(response.data)
     // if the custom code is not 20000, it is judged as an error.
     // 505是ajax请求，不希望弹出提示框
-    if (res.code !== 20000 && res.code !== 505) {
+    if (res.code !== 20000 && res.code !== 505 && res.code !== 20001) {
       Message({
         message: res.message || 'Error',
         type: 'error',
@@ -71,19 +71,23 @@ service.interceptors.response.use(
           })
         })
       }
+      console.log("  return Promise.reject(new Error(res.message || 'Error'))")
       return Promise.reject(new Error(res.message || 'Error'))
     } else {
     //  console.log(res)
-      Message({
-        message: res.message,
-        type: 'success',
-        duration: 1 * 1000
-      })
+      if (res.code !== 505 && res.code !== 20001) {
+        Message({
+          message: res.message,
+          type: 'success',
+          duration: 1 * 1000
+        })
+      }
+
       return res
     }
   },
   error => {
-    console.log(222)
+    // console.log(222)
     console.log('err' + error) // for debug
     Message({
       message: error.message,

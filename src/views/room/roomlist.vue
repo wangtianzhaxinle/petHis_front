@@ -32,6 +32,7 @@
 
         <div class="btn">
           <el-button
+            v-permission="['editRoom']"
             type="warning"
             size="mini"
             @click.native.prevent="editRoom(scopedata.scope.$index, scopedata.scope.row)"
@@ -40,6 +41,7 @@
           </el-button>
           <el-button
 
+            v-permission="['deleteRoom']"
             type="danger"
             size="mini"
             @click.native.prevent="deleteRoom(scopedata.scope.$index, scopedata.scope.row)"
@@ -47,7 +49,7 @@
             删除
           </el-button>
           <el-button
-            v-if="scopedata.scope.row.status!==0"
+            v-if="scopedata.scope.row.status!==0&&scopedata.scope.row.status!==1"
             type="success"
             size="mini"
             @click.native.prevent="takeBackPet(scopedata.scope.$index, scopedata.scope.row)"
@@ -75,7 +77,7 @@
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="submitForm">提交</el-button>
-          <!-- <el-button @click="resetForm('ruleForm')">重置</el-button> -->
+          <el-button @click="resetForm">重置</el-button>
         </el-form-item>
 
       </el-form>
@@ -86,7 +88,7 @@
 <script>
 
 import tablePane from '@/components/tablePane2.vue'
-
+import permission from '@/directive/permission/index.js' // 权限判断指令
 import { getRoomList, addRoom, updateRoomById, deleteRoomById, deleteRoomByIds, takeBackPetById } from '@/api/room'
 import moment from 'moment'
 import 'moment/locale/zh-cn'
@@ -95,7 +97,7 @@ import store from '@/store'
 export default {
   name: 'RoomList',
   components: { tablePane },
-
+  directives: { permission },
   data() {
     return {
       userId: store.getters.userId,
@@ -123,13 +125,13 @@ export default {
           {
             name: '新增房间',
             key: 'addRoom',
-            //  permission: 'addRoom',
+            permission: 'addRoom',
             handleClick: this.addRoom
           },
           {
             name: '批量删除',
             key: 'batchDelete',
-            //  permission: 'addRoom',
+            permission: 'batchDeleteRoom',
             handleClick: this.batchDelete
           }
         ],
@@ -223,13 +225,18 @@ export default {
   },
   methods: {
     handleClose(done) {
-      this.resetForm()
-      done()
+      this.$confirm('确认关闭？')
+        .then(_ => {
+          this.resetForm()
+          done()
+        })
+        .catch(_ => {})
     },
     resetFilter() {
       this.searchRoom.name = null
       this.searchRoom.status = null
       this.searchRoom.appointid = null
+      this.getList()
     },
     search() {
       this.getList()
@@ -284,16 +291,22 @@ export default {
       this.title = '添加房间'
     },
     deleteRoom(index, row) {
-      deleteRoomById(row.roomid).then(res => {
-        if (res.total > 0) {
-          this.getList()
-        }
-      })
+      this.$confirm('确认删除该房间?', '温馨提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() =>
+        deleteRoomById(row.roomid).then(res => {
+          if (res.total > 0) {
+            this.getList()
+          }
+        })
+      )
     },
     batchDelete() {
       const ids = this.selected.map((room) => room.roomid)
       console.log(ids)
-      this.$confirm('确认删除选中的用户?', '温馨提示', {
+      this.$confirm('确认删除选中房间?', '温馨提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'

@@ -387,6 +387,7 @@ export default {
   methods: {
     resetFilter() {
       this.searchDuty.user.name = null
+      this.getList()
     },
     search() {
       this.getList()
@@ -475,7 +476,7 @@ export default {
       */
       const data = this.duty
       updateDutyByDutyId(data).then(res => {
-        alert(res.message)
+        // alert(res.message)
         if (res.total > 0) {
           this.getList()
           this.editDutyDialogVisible = false

@@ -9,9 +9,9 @@
       <template v-slot:operator="scopedata">
         <div class="btn">
           <el-button
-            type="info"
+            type="success"
             size="mini"
-            @click.native.prevent="editRoom(scopedata.scope.$index, scopedata.scope.row)"
+            @click.native.prevent="finishPrescribe(scopedata.scope.$index, scopedata.scope.row)"
           >
 
             完成配药
@@ -33,7 +33,7 @@ import tablePane from '@/components/tablePane2.vue'
 // import moment from 'moment'
 import 'moment/locale/zh-cn'
 import store from '@/store'
-import { getPrescribeListByUserId } from '@/api/prescribe'
+import { getPrescribeListByUserId, finishPrescribe } from '@/api/prescribe'
 export default {
   name: 'AllPerscribeList',
   components: { tablePane },
@@ -179,7 +179,14 @@ export default {
         // }
       })
     },
-
+    finishPrescribe(index, row) {
+      const data = { prescribeid: row.prescribeid }
+      finishPrescribe(data).then(res => {
+        if (res.total > 0) {
+          this.getList()
+        }
+      })
+    },
     // 搜索层事件
 
     // 子组件通信

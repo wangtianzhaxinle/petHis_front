@@ -33,6 +33,14 @@ export function deleteMedicineById(id) {
 
   })
 }
+
+export function deleteMedicineByIds(data) {
+  return request({
+    url: '/medicine/deleteMedicineByIds',
+    method: 'post',
+    data
+  })
+}
 export function updateMedicineInfo(data) {
   return request({
     url: '/medicine/updateMedicineInfo',
@@ -48,6 +56,26 @@ export function getMedicineListByName(name) {
     method: 'get',
     params: {
       name: name
+    }
+
+  })
+}
+
+export function checkAmountByMedicineId(data) {
+  return request({
+    url: '/medicine/checkAmountByMedicineId',
+    method: 'post',
+    data
+
+  })
+}
+
+export function isRepeatAuthenticationCode(AuthenticationCode) {
+  return request({
+    url: '/medicine/isRepeatAuthenticationCode',
+    method: 'get',
+    params: {
+      authenticationCode: AuthenticationCode
     }
 
   })

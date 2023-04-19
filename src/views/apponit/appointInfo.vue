@@ -16,8 +16,8 @@
           placeholder="预约时间"
         />
         <el-select v-model="searchAppoint.status" style="width:200px" class="filter-item" placeholder="预约状态">
-          <el-option label="未确定" value="0" />
-          <el-option label="已确定" value="1" />
+          <el-option label="待确认" value="0" />
+          <el-option label="已认" value="1" />
           <el-option label="爽约" value="2" />
           <el-option label="已完成" value="3" />
           <el-option label="已取消" value="4" />
@@ -39,12 +39,73 @@
       @changeSize="changeSize"
       @changeNum="changeNum"
     />
+    <!-- <el-dialog
+      :title="title"
+      :visible.sync="appointDialogVisible"
+      width="30%"
+      :before-close="handleClose"
+    >
+      <el-form ref="appointForm" :model="appoint" :rules="rules" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="prescribeId" hidden>
+          <el-input v-model="prescribe.prescribeid" />
+        </el-form-item>
+        <el-form-item label="项目" prop="itemid">
+          <el-select v-model="appoint.itemid">
+            <el-option
+              v-for="item in itemOptions"
+              :key="item.itemid"
+              :label="item.name"
+              :value="item.itemid"
+            />
+          </el-select>
+        </el-form-item>
+
+        <el-form-item label="宠物" prop="petid">
+          <el-select
+            v-model="appoint.petid"
+            filterable
+          >
+            <el-option
+              v-for="item in petOptions"
+              :key="item.petid"
+              :label="item.name"
+              :value="item.petid"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="医生" prop="employeeid">
+          <el-select v-model="appoint.employeeid">
+            <el-option
+              v-for="item in employeeOptions"
+              :key="item.employeeid"
+              :label="item.user.name"
+              :value="item.employeeid"
+            />
+          </el-select>
+
+        </el-form-item>
+        <el-form-item label="预约时间" prop="appointdate">
+          <el-input v-model="appoint.appointdate" />
+          <el-date-picker
+            v-model="appoint.appointdate"
+            align="right"
+            type="date"
+          />
+        </el-form-item>
+
+        <el-form-item>
+          <el-button type="primary" @click="submitForm">提交</el-button>
+          <el-button @click="resetForm('ruleForm')">重置</el-button>
+        </el-form-item>
+
+      </el-form>
+    </el-dialog> -->
   </div>
 </template>
 
 <script>
 
-import { getAppointList } from '@/api/appoint'
+import { getAppointList, deleteAppointById, deleteAppointByIds } from '@/api/appoint'
 import tablePane from '@/components/tablePane.vue'
 import store from '@/store'
 
@@ -67,15 +128,20 @@ export default {
         }
 
       },
+      title: '',
+      appointDialogVisible: false,
+      appoint: {},
+
       // 表格配置
       dataSource: {
         tool: [
-          // {
-          //   name: '批量删除',
-          //   key: 'batchDeleteApponit',
-          //   permission: 'batchDeleteApponit',
-          //   handleClick: this.batchDeleteApponit
-          // }
+
+          {
+            name: '批量删除',
+            key: 'batchDelete',
+            // permission: 'batchDeleteApponit',
+            handleClick: this.batchDelete
+          }
         ],
         data: [], // 表格数据
         cols: [
@@ -103,18 +169,26 @@ export default {
           },
 
           {
-            label: '员工名',
+            label: '负责员工',
             prop: 'emp.name',
-            width: 100
+            width: 100,
+            isCodeTableFormatter: function(val) {
+              // console.log(val)
+              if (val.emp == null) {
+                return '无'
+              } else {
+                return val.emp.name
+              }
+            }
           },
           {
-            label: 'status',
+            label: '状态',
             prop: 'status',
             isCodeTableFormatter: function(val) { // 过滤器
               if (val.status === 0) {
-                return '未确定'
+                return '待确认'
               } else if (val.status === 1) {
-                return '已确定'
+                return '已确认'
               } else if (val.status === 2) {
                 return '爽约'
               } else if (val.status === 3) {
@@ -131,6 +205,21 @@ export default {
             label: '预约看病时间',
             prop: 'appointdate'
           },
+          // {
+          //   label: '是否删除',
+          //   prop: 'isDelete',
+          //   filter: function(val) {
+
+          //   },
+          //   isIcon: true,
+          //   icon: function(val) {
+          //     if (val === 1) {
+          //       return 'el-icon-check'
+          //     } else {
+          //       return 'el-icon-close'
+          //     }
+          //   }
+          // },
           {
             label: '下单时间',
             prop: 'createtime'
@@ -153,12 +242,12 @@ export default {
           label: '操作', // 列名
           width: '100', // 根据实际情况给宽度
           data: [
-            // {
-            //   label: '删除', // 操作名称
-            //   type: 'danger',
-            //   permission: 'deleteRow', // 后期这个操作的权限，用来控制权限
-            //   handleRow: this.deleteRow
-            // },
+            {
+              label: '删除', // 操作名称
+              type: 'danger',
+              // permission: 'deleteAppoint', // 后期这个操作的权限，用来控制权限
+              handleRow: this.deleteAppoint
+            }
             // {
             //   label: '修改', // 操作名称
             //   type: 'warming',
@@ -183,6 +272,7 @@ export default {
       this.searchAppoint.emp.name = null
       this.searchAppoint.appointdate = null
       this.searchAppoint.status = null
+      this.getList()
     },
     search() {
       this.getList()
@@ -218,6 +308,40 @@ export default {
           this.dataSource.pageData.total = 0
         }
         // }
+      })
+    },
+    addAppoint() {
+      this.title = '添加预约'
+      this.appointDialogVisible = true
+    },
+    deleteAppoint(index, row) {
+      const data = {
+        appointid: row.appointid
+      }
+      this.$confirm('确定要删除该预约信息?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteAppointById(data).then(res => {
+          if (res.total > 0) {
+            this.getList()
+          }
+        })
+      })
+    },
+    batchDelete() {
+      const ids = this.selected.map((appoint) => appoint.appointid)
+      this.$confirm('确定要删除选中的预约信息?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        deleteAppointByIds(ids).then(res => {
+          if (res.total > 0) {
+            this.getList()
+          }
+        })
       })
     },
 

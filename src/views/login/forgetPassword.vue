@@ -127,6 +127,8 @@
 <script>
 // import { registerUser } from '@/api/user'
 import { checkUsername } from '@/utils/validate'
+
+import { getPhoneCode } from '@/api/code'
 export default {
 
   name: 'Register',
@@ -161,12 +163,12 @@ export default {
       timer: null,
       registerForm: {
 
-        name: '',
+        // name: '',
         username: '',
-        sex: '',
-        age: '',
-        address: '',
-        email: '',
+        // sex: '',
+        // age: '',
+        // address: '',
+        // email: '',
 
         password: '',
         confirmPassword: '',
@@ -278,7 +280,7 @@ export default {
         this.$refs.password.focus()
       })
     },
-    handleRegister() {
+    resetPasword() {
       this.$refs.registerForm.validate(valid => {
         if (valid) {
           console.log('success')
@@ -290,18 +292,30 @@ export default {
     },
     getPhoneCode() {
       const TIME_COUNT = 60
-      if (!this.timer) {
-        this.count = TIME_COUNT
-        this.show = false
-        this.timer = setInterval(() => {
-          if (this.count > 0 && this.count <= TIME_COUNT) {
-            this.count--
-          } else {
-            this.show = true
-            clearInterval(this.timer)
-            this.timer = null
-          }
-        }, 1000)
+
+      if (this.$refs.phonenumber.value !== '' && this.$refs.phonenumber.value !== null && this.$refs.phonenumber.value !== undefined) {
+        if (!this.timer) {
+          this.count = TIME_COUNT
+          this.show = false
+          const data = { userPhone: this.registerForm.phonenumber }
+          getPhoneCode(data).then(res => {
+
+          })
+          this.timer = setInterval(() => {
+            if (this.count > 0 && this.count <= TIME_COUNT) {
+              this.count--
+            } else {
+              this.show = true
+              clearInterval(this.timer)
+              this.timer = null
+            }
+          }, 1000)
+        }
+      } else {
+        this.$alert('请输入手机号码', '提示', {
+          confirmButtonText: '确定'
+
+        })
       }
     },
     submit() {

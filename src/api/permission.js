@@ -63,3 +63,13 @@ export function addPermission(data) {
     data
   })
 }
+
+export function isRepeatPermissionCode(permissionCode) {
+  return request({
+    url: '/permission/isRepeatPermissionCode',
+    method: 'get',
+    params: {
+      permissionCode: permissionCode
+    }
+  })
+}

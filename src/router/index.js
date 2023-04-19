@@ -250,14 +250,14 @@ export const asyncRoutes = [
 
       {
 
-        path: '/itemInfo',
+        path: 'itemInfo',
         name: 'itemInfo',
         component: () => import('@/views/item/item'),
         meta: { title: '项目信息管理', icon: 'form', permission: ['itemInfo'] }
 
       },
       {
-        path: '/chooseAppoint',
+        path: 'chooseAppoint',
         name: 'chooseAppoint',
         component: () => import('@/views/item/chooseAppoint'),
         meta: { title: '选择预约人员', icon: 'form', permission: ['chooseEmployee'] },
@@ -279,7 +279,7 @@ export const asyncRoutes = [
       // },
       // #endregion
       {
-        path: '/appointDeposit',
+        path: 'appointDeposit',
         name: 'appointDeposit',
         component: () => import('@/views/item/appointDeposit'),
         meta: { title: '预约托管', icon: 'form', permission: ['appointDeposit'] }
@@ -294,7 +294,7 @@ export const asyncRoutes = [
     children: [
       {
 
-        path: '/personalAppointList',
+        path: 'personalAppointList',
         name: 'personalAppointList',
         component: () => import('@/views/apponit/personalAppointList'),
         meta: { title: '历史预约', icon: 'form', permission: ['historyAppoint'] }
@@ -302,7 +302,7 @@ export const asyncRoutes = [
       },
       {
 
-        path: '/myAppointCustomer',
+        path: 'myAppointCustomer',
         name: 'myAppointCustomer',
         component: () => import('@/views/apponit/myAppointCustomer'),
         meta: { title: '我的预约用户', icon: 'form', permission: ['myAppointCustomer'] }
@@ -338,7 +338,7 @@ export const asyncRoutes = [
       // #endregion
       {
 
-        path: '/todayAppointList',
+        path: 'todayAppointList',
         name: 'todayAppointList',
         component: () => import('@/views/apponit/todayAppointList'),
         meta: { title: '本日预约列表', icon: 'form', permission: ['todayAppointList'] }
@@ -358,7 +358,7 @@ export const asyncRoutes = [
       // #endregion
       {
 
-        path: '/appointInfo',
+        path: 'appointInfo',
         name: 'appointInfo',
         component: () => import('@/views/apponit/appointInfo'),
         meta: { title: '预约信息管理', icon: 'form', permission: ['allAppointList'] }
@@ -392,7 +392,7 @@ export const asyncRoutes = [
     children: [
       {
 
-        path: '/medicalRecordInfo',
+        path: 'medicalRecordInfo',
         name: 'medicalRecordInfo',
         component: () => import('@/views/medicalRecord/medicalRecordInfo'),
         meta: { title: '宠物病历信息管理', icon: 'form', permission: ['medicalRecordList'] }
@@ -408,7 +408,7 @@ export const asyncRoutes = [
     children: [
       {
 
-        path: '/roomlist',
+        path: 'roomlist',
         name: 'roomlist',
         component: () => import('@/views/room/roomlist'),
         meta: { title: '宠物房间信息管理', icon: 'form', permission: ['roomList'] }
@@ -424,7 +424,7 @@ export const asyncRoutes = [
     children: [
       {
 
-        path: '/allPrescribeList',
+        path: 'allPrescribeList',
         name: 'allPrescribeList',
         component: () => import('@/views/prescribe/allPrescribeList'),
         meta: { title: '配药信息管理', icon: 'form', permission: ['prescribeList'] }
@@ -432,7 +432,7 @@ export const asyncRoutes = [
       },
       {
 
-        path: '/myPrescribe',
+        path: 'myPrescribe',
         name: 'myPrescribe',
         component: () => import('@/views/prescribe/myPrescribe'),
         meta: { title: '我的配药', icon: 'form', permission: ['myPrescribe'] }
@@ -448,7 +448,7 @@ export const asyncRoutes = [
     children: [
       {
 
-        path: '/roleManager',
+        path: 'roleManager',
         name: 'roleManager',
         component: () => import('@/views/role/roleManager'),
         meta: { title: '角色管理', icon: 'form', permission: ['roleManager'] }
@@ -456,7 +456,7 @@ export const asyncRoutes = [
       },
       {
 
-        path: '/permissionManager',
+        path: 'permissionManager',
         name: 'permissionManager',
         component: () => import('@/views/permission/permissionManager'),
         meta: { title: '权限管理', icon: 'form', permission: ['permissionManager'] }
@@ -472,7 +472,7 @@ export const asyncRoutes = [
     children: [
       {
 
-        path: '/medicineInfo',
+        path: 'medicineInfo',
         name: 'medicineInfo',
         component: () => import('@/views/medicine/medicineInfo'),
         meta: { title: '药品信息管理', icon: 'form', permission: ['medicineInfo'] }
@@ -488,7 +488,7 @@ export const asyncRoutes = [
     children: [
       {
 
-        path: '/dutyInfo',
+        path: 'dutyInfo',
         name: 'dutyInfo',
         component: () => import('@/views/duty/dutyInfo'),
         meta: { title: '值班信息管理', icon: 'form', permission: ['dutyInfo'] }

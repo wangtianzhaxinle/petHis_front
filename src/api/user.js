@@ -70,10 +70,41 @@ export async function isRepeatUsername(username) {
     data: { username }
   })
 }
-export async function updatePassword(data) {
+// export async function updateUserById(data) {
+//   return request({
+//     url: '/user/updateUserById',
+//     method: 'post',
+//     data
+//   })
+// }
+
+export function checkUser(data) {
   return request({
-    url: '/user/updatePassword',
+    url: '/user/checkUser',
     method: 'post',
     data
   })
 }
+export function resetPassword(data) {
+  return request({
+    url: '/user/resetPassword',
+    method: 'post',
+    data
+  })
+}
+
+export function getUserInfoById(params) {
+  return request({
+    url: '/user/getUserInfoById',
+    method: 'get',
+    params
+  })
+}
+export function checkCodeByPhone(data) {
+  return request({
+    url: '/user/checkCodeByPhone',
+    method: 'post',
+    data
+  })
+}
+

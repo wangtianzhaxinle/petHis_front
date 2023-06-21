@@ -63,7 +63,7 @@
     >
       <el-form ref="empForm" :model="employee" :rules="empRules" label-width="100px" class="demo-ruleForm">
 
-        <el-form-item v-if="submitType==='edit'" label="用户" prop="userid">
+        <el-form-item v-if="submitType==='edit'" label="用户" prop="userid" hidden>
           <el-input v-model="employee.userid" />
         </el-form-item>
         <el-form-item v-if="submitType==='add'" label="用户id" prop="userid">
@@ -142,11 +142,11 @@
         <el-form-item label="身份证" prop="card">
           <el-input v-model="employee.card" />
         </el-form-item>
-        <el-form-item label="籍贯" prop="nativePlace">
-          <el-input v-model="employee.nativePlace" />
+        <el-form-item label="籍贯" prop="nativeplace">
+          <el-input v-model="employee.nativeplace" />
         </el-form-item>
-        <el-form-item label="学历" prop="educationBackground">
-          <el-input v-model="employee.educationBackground" />
+        <el-form-item label="学历" prop="educationbackground">
+          <el-input v-model="employee.educationbackground" />
         </el-form-item>
 
         <el-form-item>
@@ -408,10 +408,10 @@ export default {
 
           { required: true, message: '请输入身份证', trigger: 'blur' }
         ],
-        nativePlace: [
+        nativeplace: [
           { required: true, message: '请输入籍贯', trigger: 'blur' }
         ],
-        educationBackground: [
+        educationbackground: [
           { required: true, message: '请输入学历', trigger: 'blur' }
         ]
 
@@ -671,7 +671,7 @@ export default {
             addEmployee(employee).then(res => {
               if (res.total > 0) {
                 this.resetForm()
-                this.petDialogVisible = false
+                this.empDialogVisible = false
                 this.loading = false
                 this.getList()
               }
@@ -680,10 +680,11 @@ export default {
             })
           } else if (this.submitType === 'edit') {
             this.loading = true
+            const employee = this.employee
             updateEmployeeById(employee).then(res => {
               if (res.total > 0) {
                 this.resetForm()
-                this.petDialogVisible = false
+                this.empDialogVisible = false
                 this.loading = false
                 this.getList()
               }

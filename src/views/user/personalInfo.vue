@@ -64,7 +64,7 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item label="手机号" prop="phonenumber">
-        <el-input v-model="perosanlInfo.phonenumber" :disabled="disable" />
+        <el-input v-model.number="perosanlInfo.phonenumber" :disabled="disable" />
       </el-form-item>
       <el-form-item label="地址" prop="address">
         <el-input v-model="perosanlInfo.address" :disabled="disable" />
@@ -140,7 +140,8 @@
 import { mapGetters } from 'vuex'
 import store from '@/store'
 import { upload } from '@/api/upload'
-import { updateUserById, updatePassword } from '@/api/user'
+import { getPhoneCode } from '@/api/code'
+import { updateUserById, getUserInfoById, checkCodeByPhone } from '@/api/user'
 export default {
   name: 'PersoanlInfo',
   data() {
@@ -148,10 +149,7 @@ export default {
       var reg = /^1[3-9]\d{9}$/
 
       // console.log(Number.isInteger(value))
-      if (!Number.isInteger(value)) {
-        // 这里输入框必须是v-model.number不然Number.isInteger(value)结果始终为false
-        return callback(new Error('手机号码必须是数字'))
-      } else if (value.toString().length !== 11) {
+      if (value.toString().length !== 11) {
         return callback(new Error('手机号码必须是11位数字'))
       } else if (!reg.test(value)) {
         return callback(new Error('请输入有效的手机号码'))
@@ -186,6 +184,7 @@ export default {
       count: '',
       timer: null,
       valid: {
+        phonenumber: '',
         code: ''
       },
       resetPasswordModel: {
@@ -250,19 +249,20 @@ export default {
           { required: true, message: '请选择头像', trigger: 'blur' }
         ]
       },
+      userid: store.getters.userId,
       // 原来data中可以直接获取到vuex的数据
       perosanlInfo: {
-        userid: store.getters.userId,
-        name: store.getters.name,
-        avatar: store.getters.avatar,
-        sex: store.getters.sex,
-        age: store.getters.age,
-        phonenumber: store.getters.phoneNumber,
-        address: store.getters.address,
-        createtime: store.getters.createtime,
-        email: store.getters.email,
-        username: store.getters.username,
-        isEmployee: store.getters.isEmployee
+        // userid: store.getters.userId,
+        // name: store.getters.name,
+        // avatar: store.getters.avatar,
+        // sex: store.getters.sex,
+        // age: store.getters.age,
+        // phonenumber: store.getters.phoneNumber,
+        // address: store.getters.address,
+        // createtime: store.getters.createtime,
+        // email: store.getters.email,
+        // username: store.getters.username,
+        // isEmployee: store.getters.isEmployee
       }
     }
   },
@@ -292,6 +292,7 @@ export default {
   },
   created() {
     // this.getLoginInfo()
+    this.getList()
   },
 
   methods: {
@@ -303,6 +304,14 @@ export default {
       }
 
       done()
+    },
+    getList() {
+      const data = { userid: this.userid }
+      getUserInfoById(data).then(res => {
+        if (res.total > 0) {
+          this.perosanlInfo = res.data
+        }
+      })
     },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
@@ -320,7 +329,7 @@ export default {
         password: this.resetPasswordModel.password
 
       }
-      updatePassword(data).then(async res => {
+      updateUserById(data).then(async res => {
         if (res.total > 0) {
           this.isCodeRight = false
           await this.$store.dispatch('user/logout')
@@ -344,6 +353,7 @@ export default {
             if (res.total > 0) {
               // this.userDialogVisible = false
               // this.resetForm()
+              this.getList()
               this.loading = false
               this.cancel()
             }
@@ -361,6 +371,10 @@ export default {
       if (!this.timer) {
         this.count = TIME_COUNT
         this.show = false
+        const data = { userPhone: this.perosanlInfo.phonenumber }
+        getPhoneCode(data).then(res => {
+
+        })
         this.timer = setInterval(() => {
           if (this.count > 0 && this.count <= TIME_COUNT) {
             this.count--
@@ -373,7 +387,16 @@ export default {
       }
     },
     submitCode() {
-      this.isCodeRight = true
+      const data = {
+        phonenumber: this.perosanlInfo.phonenumber,
+        code: this.valid.code
+
+      }
+      checkCodeByPhone(data).then(res => {
+        if (res.total > 0) {
+          this.isCodeRight = true
+        }
+      })
     },
     resetPassword() {
       this.resetPassDialogVisible = true
@@ -382,16 +405,8 @@ export default {
       this.disable = true
     },
     beforeUpload(file) {
-      // this.progressShow = true
-      // this.fake = new FakeProgress({
-      //   timeConstant: 10000,
-      //   autoStart: true
-      // })
       const isJPG = file.type === 'image/jpeg'
       const isLt2M = file.size / 1024 < 200
-      // console.log(file.type)
-      // console.log(file.size)
-
       if (!isLt2M) {
         this.$message.error('上传头像图片大小不能超过 200k!')
         return false
@@ -400,7 +415,6 @@ export default {
         this.$message.error('上传头像图片只能是 JPG 格式!')
         return false
       }
-      // console.log(isJPG && isLt2M)
       return isJPG && isLt2M
     },
     uploadImg(file) {
@@ -409,11 +423,8 @@ export default {
 
       upload(form).then(res => {
         if (res.total > 0) {
-          // alert(res.message)
           if (!this.disable) { this.perosanlInfo.avatar = this.baseurl + res.data }
           if (this.empDialogVisible) { this.employee.image = this.baseurl + res.data }
-          // this.fake.end()
-          // console.log(this.medicine)
         }
       })
     },

@@ -290,7 +290,6 @@ export default {
     }
   },
   created() {
-    this.getRoleList()
     this.getList()
   },
   methods: {
@@ -381,6 +380,7 @@ export default {
         if (res.total > 0) {
           this.dataSource.pageData.total = res.total
           this.dataSource.data = res.data
+          this.getRoleList()
           console.log(res.data)
         } else {
           this.dataSource.data = []

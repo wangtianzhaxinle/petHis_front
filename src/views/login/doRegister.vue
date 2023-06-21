@@ -8,13 +8,13 @@
       </div>
 
       <el-form-item prop="name">
-        <span class="svg-container">
-          <svg-icon icon-class="user" />
+        <span style="color: white;">
+          名字
         </span>
         <el-input
           ref="name"
           v-model="registerForm.name"
-          placeholder="名字"
+
           name="name"
           type="text"
           tabindex="1"
@@ -23,13 +23,13 @@
       </el-form-item>
 
       <el-form-item prop="username">
-        <span class="svg-container">
-          <svg-icon icon-class="user" />
+        <span style="color: white;">
+          用户名
         </span>
         <el-input
           ref="username"
           v-model="registerForm.username"
-          placeholder="用户名"
+
           name="username"
           type="text"
           tabindex="1"
@@ -38,8 +38,11 @@
       </el-form-item>
 
       <el-form-item prop="sex">
-        <span class="svg-container">
+        <!-- <span class="svg-container">
           <svg-icon icon-class="user" />
+        </span> -->
+        <span style="color: white;">
+          性别
         </span>
         <el-radio-group v-model="registerForm.sex">
           <el-radio :label="1">男</el-radio>
@@ -49,13 +52,16 @@
       </el-form-item>
 
       <el-form-item prop="address">
-        <span class="svg-container">
+        <!-- <span class="svg-container">
           <svg-icon icon-class="user" />
+        </span> -->
+        <span style="color: white;">
+          地址
         </span>
         <el-input
           ref="address"
           v-model="registerForm.address"
-          placeholder="地址"
+
           name="address"
           type="text"
           tabindex="1"
@@ -64,13 +70,13 @@
       </el-form-item>
 
       <el-form-item prop="age">
-        <span class="svg-container">
-          <svg-icon icon-class="user" />
+        <span style="color: white;">
+          年龄
         </span>
         <el-input
           ref="age"
           v-model.number="registerForm.age"
-          placeholder="年龄"
+
           name="age"
           type="text"
           tabindex="1"
@@ -79,13 +85,16 @@
       </el-form-item>
 
       <el-form-item prop="email">
-        <span class="svg-container">
+        <!-- <span class="svg-container">
           <svg-icon icon-class="user" />
+        </span> -->
+        <span style="color: white;">
+          邮箱
         </span>
         <el-input
           ref="email"
           v-model="registerForm.email"
-          placeholder="邮箱"
+
           name="email"
           type="text"
           tabindex="1"
@@ -94,15 +103,18 @@
       </el-form-item>
 
       <el-form-item prop="password">
-        <span class="svg-container">
+        <!-- <span class="svg-container">
           <svg-icon icon-class="password" />
+        </span> -->
+        <span style="color: white;">
+          密码
         </span>
         <el-input
           :key="passwordType"
           ref="password"
           v-model="registerForm.password"
           :type="passwordType"
-          placeholder="密码"
+
           name="password"
           tabindex="2"
           auto-complete="on"
@@ -114,15 +126,18 @@
       </el-form-item>
 
       <el-form-item prop="confirmPassword">
-        <span class="svg-container">
+        <!-- <span class="svg-container">
           <svg-icon icon-class="password" />
+        </span> -->
+        <span style="color: white;">
+          确认密码
         </span>
         <el-input
           :key="passwordType"
           ref="confirmPassword"
           v-model="registerForm.confirmPassword"
           :type="passwordType"
-          placeholder="确认密码"
+
           name="confirmPassword"
           tabindex="2"
           auto-complete="on"
@@ -133,13 +148,16 @@
         </span>
       </el-form-item>
       <el-form-item prop="phonenumber">
-        <span class="svg-container">
+        <!-- <span class="svg-container">
           <svg-icon icon-class="user" />
+        </span> -->
+        <span style="color: white;">
+          手机号
         </span>
         <el-input
           ref="phonenumber"
           v-model.number="registerForm.phonenumber"
-          placeholder="手机"
+
           name="phonenumber"
           type="text"
           tabindex="1"
@@ -149,13 +167,16 @@
       <el-form-item
         prop="code"
       >
-        <span class="svg-container">
+        <!-- <span class="svg-container">
           <svg-icon icon-class="user" />
+        </span> -->
+        <span style="color: white;">
+          验证码
         </span>
         <el-input
           ref="code"
           v-model="registerForm.code"
-          placeholder="验证码"
+
           name="VerificationCode"
           type="text"
           tabindex="1"
@@ -166,7 +187,7 @@
 
       <el-button v-if="show" type="primary" style="width:100%;margin-bottom:30px;" @click="getPhoneCode">获取验证码</el-button>
 
-      <el-button v-if="!show" type="primary" style="width:100%;margin-bottom:30px;" disabled="true"><span v-if="!show" style="color: #707070;">{{ count }}s后重新获取</span></el-button>
+      <el-button v-if="!show" type="primary" style="width:100%;margin-bottom:30px;" :disabled="true"><span v-if="!show" style="color: #707070;">{{ count }}s后重新获取</span></el-button>
       <el-row />
       <!-- 这里一直提示handleRegister不是一个方法,原来我把handleRegister写在methods括号外面了,获取不到 -->
       <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="handleRegister">注册</el-button>
@@ -178,6 +199,7 @@
 <script>
 import { registerUser } from '@/api/user'
 import { checkUsername } from '@/utils/validate'
+import { getPhoneCode } from '@/api/code'
 export default {
 
   name: 'Register',
@@ -397,7 +419,9 @@ export default {
           // console.log('success')
           const data = this.registerForm
           registerUser(data).then(res => {
-
+            if (res.total > 0) {
+              this.$router.push(`/login`)
+            }
           })
         } else {
           console.log('error submit!!')
@@ -407,18 +431,30 @@ export default {
     },
     getPhoneCode() {
       const TIME_COUNT = 60
-      if (!this.timer) {
-        this.count = TIME_COUNT
-        this.show = false
-        this.timer = setInterval(() => {
-          if (this.count > 0 && this.count <= TIME_COUNT) {
-            this.count--
-          } else {
-            this.show = true
-            clearInterval(this.timer)
-            this.timer = null
-          }
-        }, 1000)
+      if (this.$refs.phonenumber.value !== '' && this.$refs.phonenumber.value !== null &&
+      this.$refs.phonenumber.value !== undefined) {
+        if (!this.timer) {
+          this.count = TIME_COUNT
+          this.show = false
+          const data = { userPhone: this.registerForm.phonenumber }
+          getPhoneCode(data).then(res => {
+
+          })
+          this.timer = setInterval(() => {
+            if (this.count > 0 && this.count <= TIME_COUNT) {
+              this.count--
+            } else {
+              this.show = true
+              clearInterval(this.timer)
+              this.timer = null
+            }
+          }, 1000)
+        }
+      } else {
+        this.$alert('请输入手机号码', '提示', {
+          confirmButtonText: '确定'
+
+        })
       }
     }
 

@@ -423,7 +423,7 @@ export default {
     //   if (!Number.isInteger(value)) {
     //     // 这里输入框必须是v-model.number不然Number.isInteger(value)结果始终为false
     //     return callback(new Error('手机号码必须是数字'))
-    //   } else if (value.toString().length !== 11) {
+    //   } else if (value.toString().length !== 11) {dialogVisible
     //     return callback(new Error('手机号码必须是11位数字'))
     //   } else if (!reg.test(value)) {
     //     return callback(new Error('请输入有效的手机号码'))
@@ -442,6 +442,7 @@ export default {
       baseurl: 'http://localhost:8080/petHis',
       filelist: [],
       progressShow: false,
+      dialogImageUrl: '',
       test: '123456',
       // fake: '',
       userInfo: {
@@ -888,6 +889,7 @@ export default {
       this.$nextTick(() => {
         // 赋值
         this.userInfo = JSON.parse(JSON.stringify(row))
+        this.userInfo.password = null
         // console.log(this.medicine)
         this.filelist.push({ 'url': this.userInfo.avatar })
       })

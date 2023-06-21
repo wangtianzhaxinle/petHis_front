@@ -203,7 +203,7 @@ export default {
     //  this.getList()
     // moment.updateLocale('zh-cn')
     moment.updateLocale()
-    this.getYourPetList()
+
     this.getList()
   },
   methods: {
@@ -240,6 +240,7 @@ export default {
         if (res.total > 0) {
           this.dataSource.pageData.total = res.total
           this.dataSource.data = res.data
+          this.getYourPetList()
           console.log(res.data)
         } else {
           this.dataSource.data = []

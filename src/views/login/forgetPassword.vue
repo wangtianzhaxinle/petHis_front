@@ -37,16 +37,16 @@
           />
         </el-form-item>
         <el-form-item
-          prop="VerificationCode"
+          prop="code"
         >
           <span class="svg-container">
             <svg-icon icon-class="user" />
           </span>
           <el-input
-            ref="VerificationCode"
-            v-model="registerForm.VerificationCode"
+            ref="code"
+            v-model="registerForm.code"
             placeholder="验证码"
-            name="VerificationCode"
+            name="code"
             type="text"
             tabindex="1"
             auto-complete="on"
@@ -61,7 +61,7 @@
           </span></el-button>
         <el-row />
         <!-- 这里一直提示handleRegister不是一个方法,原来我把handleRegister写在methods括号外面了,获取不到 -->
-        <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="submit">提交</el-button>
+        <el-button :loading="loading" type="primary" style="width:100%;margin-bottom:30px;" @click.native.prevent="checkUser">提交</el-button>
 
       </template>
 
@@ -126,9 +126,10 @@
 
 <script>
 // import { registerUser } from '@/api/user'
-import { checkUsername } from '@/utils/validate'
+// import { checkUsername } from '@/utils/validate'
 
 import { getPhoneCode } from '@/api/code'
+import { checkUser, resetPassword } from '@/api/user'
 export default {
 
   name: 'Register',
@@ -161,6 +162,11 @@ export default {
       show: true,
       count: '',
       timer: null,
+      // checkUser: {
+      //   username: '',
+      //   phonenumber: '',
+      //   code: ''
+      // },
       registerForm: {
 
         // name: '',
@@ -173,7 +179,7 @@ export default {
         password: '',
         confirmPassword: '',
         phonenumber: '',
-        VerificationCode: ''
+        code: ''
 
       },
       /*
@@ -192,69 +198,16 @@ export default {
           { max: 10, message: '最大长度为10', trigger: 'blur' }
         ],
         username: [
-          { required: true, trigger: 'blur', message: '请输入用户名' },
-          {
-            async validator(rule, value, callback) {
-              // console.log(value)
-              var flag = await checkUsername(value)
-              // console.log('flag' + flag)
-              if (!flag) {
-                // console.log(11)
-                console.log('用户名可用')
-                callback()
-              } else {
-                // console.log(22)
-                callback(new Error('用户名已经存在'))
-              }
-            },
-            trigger: 'blur'
-          }
-        ],
-        sex: [
-          { required: true, message: '请选择性别', trigger: 'change' }
-        ],
-        address: [
-          { required: true, trigger: 'blur', message: '请输入地址' }
-        ],
-        // 年龄
-        age: [
-          { required: true, trigger: 'blur', message: '请输入年龄' },
-          { type: 'number', required: true, trigger: 'blur', message: '请输入数字' },
-          {
-            validator(rule, value, callback) {
-              if (value > 0 && value < 150) {
-                callback()
-              } else {
-                callback(new Error('年龄范围不正确'))
-              }
-            },
-            trigger: 'blur'
-          }
-        ],
-        // 校验电子邮箱
-        email: [
-          { required: true, trigger: 'blur', message: '请输入电子邮箱' },
-          { type: 'email', message: '正确的请输入电子邮箱', trigger: 'blur' }
+          { required: true, trigger: 'blur', message: '请输入用户名' }
 
         ],
+
         password: [
           { required: true, trigger: 'blur', message: '请输入密码' }
         ],
         confirmPassword: [
           { required: true, trigger: 'blur', message: '请确认密码' },
 
-          /* 这里触发验证后this指向会发生改变,指向该输入框无法通过this.registerForm.password获取密码的值,此时this.registerForm是未定义
-            { validator(rule, value, callback) {
-              console.log(this)
-              if (value !== this.registerForm.password) {
-                callback(new Error('两次输入的密码不一致'))
-              } else {
-                callback()
-              }
-            },
-            trigger: 'blur'
-            }
-  */
           { validator: confirmPassword, trigger: 'blur' }
         ],
         phonenumber: [
@@ -263,7 +216,7 @@ export default {
           // { min: 1, max: 11, message: '手机号码应为11位数字' },
           { validator: telCheck, trigger: 'blur' }
         ],
-        VerificationCode: [
+        code: [
           { required: true, trigger: 'blur', message: '请输入验证码' }
         ]
       }
@@ -283,10 +236,15 @@ export default {
     resetPasword() {
       this.$refs.registerForm.validate(valid => {
         if (valid) {
-          console.log('success')
+          const data = this.registerForm
+          resetPassword(data).then(res => {
+            if (res.total > 0) {
+              this.$router.push(`/login`)
+            }
+          })
         } else {
           console.log('error submit!!')
-          return false
+          // return false
         }
       })
     },
@@ -318,8 +276,17 @@ export default {
         })
       }
     },
-    submit() {
-      this.checkcode = true
+    checkUser() {
+      const data = this.registerForm
+      this.$refs.registerForm.validate(valid => {
+        if (valid) {
+          checkUser(data).then(res => {
+            if (res.total > 0) {
+              this.checkcode = true
+            }
+          })
+        }
+      })
     }
 
   }

@@ -363,7 +363,8 @@ export default {
       } else {
         var token = getToken()
         // 实例化socket
-        this.socket = new WebSocket('ws://localhost:8080/petHis/webSocket/' + this.userId + '?token=' + token)
+        this.socket = new WebSocket('ws://localhost:8080/petHis/webSocket/' +
+         this.userId + '?token=' + token)
         // 监听socket连接
         this.socket.onopen = this.open
         // 监听socket错误信息
@@ -388,7 +389,7 @@ export default {
         date: this.menuTabsValue
       }
       console.log(e)
-      // this.medicineTable = JSON.parse(e.data)
+      // 服务器发送信息说明有人预约了或者取消预约，需要刷新预约人数
       getAppointNumber(appointNumberData).then(res => {
         if (res.total > 0) {
           console.log(res.data)
